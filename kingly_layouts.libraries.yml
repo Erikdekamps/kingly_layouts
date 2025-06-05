@@ -1,0 +1,19 @@
+kingly_onecol:
+  css:
+    theme:
+      css/kingly-onecol.css: {}
+
+kingly_twocol:
+  css:
+    theme:
+      css/kingly-twocol.css: {}
+
+kingly_threecol:
+  css:
+    theme:
+      css/kingly-threecol.css: {}
+
+kingly_fourcol:
+  css:
+    theme:
+      css/kingly-fourcol.css: {}

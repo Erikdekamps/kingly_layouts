@@ -1,0 +1,38 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display a two-column layout.
+ *
+ * Available variables:
+ * - in_preview: Whether the plugin is being rendered in preview mode.
+ * - content: An array containing the content for the regions:
+ *   - first: The content for the first region.
+ *   - second: The content for the second region.
+ * - attributes: HTML attributes for the layout <div>.
+ * - region_attributes: HTML attributes for the regions.
+ * - configuration: The layout configuration, including 'sizing_option'.
+ *
+ * @ingroup themeable
+ */
+#}
+{%
+  set classes = [
+  'layout',
+  'layout--kingly-twocol',
+  configuration.sizing_option ? 'layout--kingly-twocol--' ~ configuration.sizing_option|clean_class,
+]
+%}
+{% if content %}
+  <div{{ attributes.addClass(classes) }}>
+    {% if content.first %}
+      <div {{ region_attributes.first.addClass('layout__region', 'layout__region--first') }}>
+        {{ content.first }}
+      </div>
+    {% endif %}
+    {% if content.second %}
+      <div {{ region_attributes.second.addClass('layout__region', 'layout__region--second') }}>
+        {{ content.second }}
+      </div>
+    {% endif %}
+  </div>
+{% endif %}

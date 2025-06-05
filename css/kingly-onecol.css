@@ -1,0 +1,11 @@
+/*
+ * @file
+ * Provides the layout styles for kingly_onecol.
+ */
+.layout--kingly-onecol {
+  /* Add basic styling for the one column layout if needed */
+}
+
+.layout--kingly-onecol > .layout__region {
+  /* Add styling for the content region if needed */
+}
