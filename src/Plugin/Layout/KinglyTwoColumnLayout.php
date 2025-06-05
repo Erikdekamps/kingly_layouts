@@ -14,7 +14,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   category: new TranslatableMarkup("Kingly"),
   template: "layout--kingly-twocol",
   library: "kingly_layouts/kingly_twocol",
-// Moved before default_region.
   regions: [
     "first" => [
       "label" => new TranslatableMarkup("First"),
@@ -23,7 +22,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
       "label" => new TranslatableMarkup("Second"),
     ],
   ],
-  // Moved after regions.
   default_region: "first"
 )]
 class KinglyTwoColumnLayout extends KinglyLayoutBase {
