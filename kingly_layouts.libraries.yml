@@ -1,19 +1,40 @@
+# A general library for styles that apply across all Kingly layouts.
+kingly_layouts_background_color:
+  css:
+    theme:
+      css/background-color.css: {}
+
+# Library for the one-column layout.
 kingly_onecol:
   css:
     theme:
       css/kingly-onecol.css: {}
+  dependencies:
+    - kingly_layouts/kingly_layouts_background_color
 
+# Library for the two-column layout.
 kingly_twocol:
   css:
     theme:
+      # You would create this CSS file for your two-column layout styles.
       css/kingly-twocol.css: {}
+  dependencies:
+    - kingly_layouts/kingly_layouts_background_color
 
+# Library for the three-column layout.
 kingly_threecol:
   css:
     theme:
+      # You would create this CSS file for your three-column layout styles.
       css/kingly-threecol.css: {}
+  dependencies:
+    - kingly_layouts/kingly_layouts_background_color
 
+# Library for the four-column layout.
 kingly_fourcol:
   css:
     theme:
+      # You would create this CSS file for your four-column layout styles.
       css/kingly-fourcol.css: {}
+  dependencies:
+    - kingly_layouts/kingly_layouts_background_color

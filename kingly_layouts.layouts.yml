@@ -4,9 +4,10 @@ kingly_onecol:
   path: templates
   template: layout--kingly-onecol
   library: kingly_layouts/kingly_onecol
+  class: '\Drupal\kingly_layouts\Plugin\Layout\KinglyOneColumnLayout'
   default_region: content
   icon_map:
-    - [ content]
+    - [ content ]
   regions:
     content:
       label: Content
