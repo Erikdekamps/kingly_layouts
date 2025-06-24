@@ -2,46 +2,46 @@
  * @file
  * Provides the layout styles for kingly_threecol.
  */
-.layout--kingly-threecol {
+.layout--kingly_threecol {
   display: flex;
   flex-wrap: wrap;
 }
 
-.layout--kingly-threecol > .layout__region {
+.layout--kingly_threecol > .layout__region {
   flex: 1 1 100%; /* Default to full width on small screens */
 }
 
 /* Sizing variations for larger screens */
 @media screen and (min-width: 40em) { /* Example breakpoint */
-  .layout--kingly-threecol--33-34-33 > .layout__region--first,
-  .layout--kingly-threecol--33-34-33 > .layout__region--third {
+  .layout--kingly_threecol--33-34-33 > .layout__region--first,
+  .layout--kingly_threecol--33-34-33 > .layout__region--third {
     flex: 0 0 33.333%;
   }
-  .layout--kingly-threecol--33-34-33 > .layout__region--second {
+  .layout--kingly_threecol--33-34-33 > .layout__region--second {
     flex: 0 0 33.334%; /* To make it add up to 100% */
   }
 
-  .layout--kingly-threecol--25-50-25 > .layout__region--first,
-  .layout--kingly-threecol--25-50-25 > .layout__region--third {
+  .layout--kingly_threecol--25-50-25 > .layout__region--first,
+  .layout--kingly_threecol--25-50-25 > .layout__region--third {
     flex: 0 0 25%;
   }
-  .layout--kingly-threecol--25-50-25 > .layout__region--second {
+  .layout--kingly_threecol--25-50-25 > .layout__region--second {
     flex: 0 0 50%;
   }
 
-  .layout--kingly-threecol--25-25-50 > .layout__region--first,
-  .layout--kingly-threecol--25-25-50 > .layout__region--second {
+  .layout--kingly_threecol--25-25-50 > .layout__region--first,
+  .layout--kingly_threecol--25-25-50 > .layout__region--second {
     flex: 0 0 25%;
   }
-  .layout--kingly-threecol--25-25-50 > .layout__region--third {
+  .layout--kingly_threecol--25-25-50 > .layout__region--third {
     flex: 0 0 50%;
   }
 
-  .layout--kingly-threecol--50-25-25 > .layout__region--first {
+  .layout--kingly_threecol--50-25-25 > .layout__region--first {
     flex: 0 0 50%;
   }
-  .layout--kingly-threecol--50-25-25 > .layout__region--second,
-  .layout--kingly-threecol--50-25-25 > .layout__region--third {
+  .layout--kingly_threecol--50-25-25 > .layout__region--second,
+  .layout--kingly_threecol--50-25-25 > .layout__region--third {
     flex: 0 0 25%;
   }
 }
