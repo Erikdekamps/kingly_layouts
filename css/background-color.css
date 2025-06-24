@@ -25,18 +25,3 @@
   background-color: #dc3545; /* A standard red */
   color: #ffffff;
 }
-
-.layout--background-color-*::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: -1;
-  /* This combination stretches the element to the full viewport width. */
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  /* The pseudo-element gets the background color from the variable set on its parent. */
-  background-color: var(--layout-background-color);
-}
