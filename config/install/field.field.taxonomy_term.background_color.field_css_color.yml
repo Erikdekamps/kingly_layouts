@@ -1,0 +1,19 @@
+uuid: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_css_color
+    - taxonomy.vocabulary.background_color
+id: taxonomy_term.background_color.field_css_color
+field_name: field_css_color
+entity_type: taxonomy_term
+bundle: background_color
+label: 'CSS Color'
+description: 'Enter the hex value for the color (e.g., #ffffff).'
+required: true
+translatable: false
+default_value: { }
+default_value_callback: ''
+settings: { }
+field_type: string
