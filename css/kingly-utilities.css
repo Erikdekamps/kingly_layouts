@@ -3,6 +3,37 @@
  * Provides utility styles for Kingly Layouts.
  */
 
+/* --- CSS Variables --- */
+:root {
+  /* Spacing Scale */
+  --kingly-spacing-xs: 0.25rem;
+  --kingly-spacing-sm: 0.5rem;
+  --kingly-spacing-md: 1rem;
+  --kingly-spacing-lg: 2rem;
+  --kingly-spacing-xl: 4rem;
+  /* Border Radius Scale */
+  --kingly-border-radius-xs: 0.25rem;
+  --kingly-border-radius-sm: 0.5rem;
+  --kingly-border-radius-md: 1rem;
+  --kingly-border-radius-lg: 2rem;
+  --kingly-border-radius-xl: 4rem;
+  --kingly-border-radius-full: 9999px; /* Large value for pill/circle effect */
+  /* Border Width Scale */
+  --kingly-border-width-sm: 1px;
+  --kingly-border-width-md: 2px;
+  --kingly-border-width-lg: 4px;
+  /* Breakpoints (adjust to match your theme's actual breakpoints) */
+  --kingly-breakpoint-mobile-max: 767px;
+  --kingly-breakpoint-tablet-min: 768px;
+  --kingly-breakpoint-tablet-max: 1023px;
+  --kingly-breakpoint-desktop-min: 1024px;
+  /* Shadow Colors (example, could be more granular if needed) */
+  --kingly-shadow-color-light: rgba(0, 0, 0, 0.05);
+  --kingly-shadow-color-medium: rgba(0, 0, 0, 0.1);
+  --kingly-shadow-color-dark: rgba(0, 0, 0, 0.06);
+  --kingly-shadow-color-xl-dark: rgba(0, 0, 0, 0.04);
+}
+
 /* --- Container Types --- */
 
 /* Common full-bleed styles for both container types */
@@ -28,140 +59,140 @@
 
 /* Padding X */
 .kingly-layout-padding-x-xs {
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
+  padding-left: var(--kingly-spacing-xs);
+  padding-right: var(--kingly-spacing-xs);
 }
 .kingly-layout-padding-x-sm {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  padding-left: var(--kingly-spacing-sm);
+  padding-right: var(--kingly-spacing-sm);
 }
 .kingly-layout-padding-x-md {
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: var(--kingly-spacing-md);
+  padding-right: var(--kingly-spacing-md);
 }
 .kingly-layout-padding-x-lg {
-  padding-left: 2rem;
-  padding-right: 2rem;
+  padding-left: var(--kingly-spacing-lg);
+  padding-right: var(--kingly-spacing-lg);
 }
 .kingly-layout-padding-x-xl {
-  padding-left: 4rem;
-  padding-right: 4rem;
+  padding-left: var(--kingly-spacing-xl);
+  padding-right: var(--kingly-spacing-xl);
 }
 
 /* Padding Y */
 .kingly-layout-padding-y-xs {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
+  padding-top: var(--kingly-spacing-xs);
+  padding-bottom: var(--kingly-spacing-xs);
 }
 .kingly-layout-padding-y-sm {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding-top: var(--kingly-spacing-sm);
+  padding-bottom: var(--kingly-spacing-sm);
 }
 .kingly-layout-padding-y-md {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: var(--kingly-spacing-md);
+  padding-bottom: var(--kingly-spacing-md);
 }
 .kingly-layout-padding-y-lg {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+  padding-top: var(--kingly-spacing-lg);
+  padding-bottom: var(--kingly-spacing-lg);
 }
 .kingly-layout-padding-y-xl {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding-top: var(--kingly-spacing-xl);
+  padding-bottom: var(--kingly-spacing-xl);
 }
 
 /* Gap (for flex/grid containers) */
 .kingly-layout-gap-xs {
-  gap: 0.25rem;
+  gap: var(--kingly-spacing-xs);
 }
 .kingly-layout-gap-sm {
-  gap: 0.5rem;
+  gap: var(--kingly-spacing-sm);
 }
 .kingly-layout-gap-md {
-  gap: 1rem;
+  gap: var(--kingly-spacing-md);
 }
 .kingly-layout-gap-lg {
-  gap: 2rem;
+  gap: var(--kingly-spacing-lg);
 }
 .kingly-layout-gap-xl {
-  gap: 4rem;
+  gap: var(--kingly-spacing-xl);
 }
 
 /* Margin X */
 .kingly-layout-margin-x-xs {
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
+  margin-left: var(--kingly-spacing-xs);
+  margin-right: var(--kingly-spacing-xs);
 }
 .kingly-layout-margin-x-sm {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  margin-left: var(--kingly-spacing-sm);
+  margin-right: var(--kingly-spacing-sm);
 }
 .kingly-layout-margin-x-md {
-  margin-left: 1rem;
-  margin-right: 1rem;
+  margin-left: var(--kingly-spacing-md);
+  margin-right: var(--kingly-spacing-md);
 }
 .kingly-layout-margin-x-lg {
-  margin-left: 2rem;
-  margin-right: 2rem;
+  margin-left: var(--kingly-spacing-lg);
+  margin-right: var(--kingly-spacing-lg);
 }
 .kingly-layout-margin-x-xl {
-  margin-left: 4rem;
-  margin-right: 4rem;
+  margin-left: var(--kingly-spacing-xl);
+  margin-right: var(--kingly-spacing-xl);
 }
 
 /* Margin Y */
 .kingly-layout-margin-y-xs {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+  margin-top: var(--kingly-spacing-xs);
+  margin-bottom: var(--kingly-spacing-xs);
 }
 .kingly-layout-margin-y-sm {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: var(--kingly-spacing-sm);
+  margin-bottom: var(--kingly-spacing-sm);
 }
 .kingly-layout-margin-y-md {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin-top: var(--kingly-spacing-md);
+  margin-bottom: var(--kingly-spacing-md);
 }
 .kingly-layout-margin-y-lg {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: var(--kingly-spacing-lg);
+  margin-bottom: var(--kingly-spacing-lg);
 }
 .kingly-layout-margin-y-xl {
-  margin-top: 4rem;
-  margin-bottom: 4rem;
+  margin-top: var(--kingly-spacing-xl);
+  margin-bottom: var(--kingly-spacing-xl);
 }
 
 /* --- Border Utilities --- */
 
 /* Border Radius */
 .kingly-layout-border-radius-xs {
-  border-radius: 0.25rem;
+  border-radius: var(--kingly-border-radius-xs);
 }
 .kingly-layout-border-radius-sm {
-  border-radius: 0.5rem;
+  border-radius: var(--kingly-border-radius-sm);
 }
 .kingly-layout-border-radius-md {
-  border-radius: 1rem;
+  border-radius: var(--kingly-border-radius-md);
 }
 .kingly-layout-border-radius-lg {
-  border-radius: 2rem;
+  border-radius: var(--kingly-border-radius-lg);
 }
 .kingly-layout-border-radius-xl {
-  border-radius: 4rem;
+  border-radius: var(--kingly-border-radius-xl);
 }
 .kingly-layout-border-radius-full {
-  border-radius: 9999px;
-} /* Large value for pill/circle effect */
+  border-radius: var(--kingly-border-radius-full);
+}
 
 /* Border Width */
 .kingly-layout-border-width-sm {
-  border-width: 1px;
+  border-width: var(--kingly-border-width-sm);
 }
 .kingly-layout-border-width-md {
-  border-width: 2px;
+  border-width: var(--kingly-border-width-md);
 }
 .kingly-layout-border-width-lg {
-  border-width: 4px;
+  border-width: var(--kingly-border-width-lg);
 }
 
 /* Border Style */
@@ -247,19 +278,19 @@
 
 /* Box Shadow */
 .kingly-layout-shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 var(--kingly-shadow-color-light);
 }
 .kingly-layout-shadow-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--kingly-shadow-color-medium), 0 2px 4px -1px var(--kingly-shadow-color-dark);
 }
 .kingly-layout-shadow-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px -3px var(--kingly-shadow-color-medium), 0 4px 6px -2px var(--kingly-shadow-color-light);
 }
 .kingly-layout-shadow-xl {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px var(--kingly-shadow-color-medium), 0 10px 10px -5px var(--kingly-shadow-color-xl-dark);
 }
 .kingly-layout-shadow-inner {
-  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 2px 4px 0 var(--kingly-shadow-color-dark);
 }
 
 /* Filter */
@@ -267,32 +298,35 @@
   filter: grayscale(100%);
 }
 .kingly-layout-filter-blur {
-  filter: blur(5px);
+  filter: blur(5px); /* This value could also be a variable if you have a blur scale */
 }
 .kingly-layout-filter-sepia {
   filter: sepia(100%);
 }
 .kingly-layout-filter-brightness {
-  filter: brightness(1.5);
+  filter: brightness(1.5); /* This value could also be a variable if you have a brightness scale */
 }
 
 /* --- Responsiveness Utilities --- */
 
 /* Hide on Breakpoint */
 /* Using common breakpoints, adjust as per theme's actual breakpoints */
-@media (max-width: 767px) { /* Mobile */
+@media (max-width: var(--kingly-breakpoint-mobile-max)) {
+  /* Mobile */
   .kingly-layout-hide-on-mobile {
     display: none !important;
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) { /* Tablet */
+@media (min-width: var(--kingly-breakpoint-tablet-min)) and (max-width: var(--kingly-breakpoint-tablet-max)) {
+  /* Tablet */
   .kingly-layout-hide-on-tablet {
     display: none !important;
   }
 }
 
-@media (min-width: 1024px) { /* Desktop */
+@media (min-width: var(--kingly-breakpoint-desktop-min)) {
+  /* Desktop */
   .kingly-layout-hide-on-desktop {
     display: none !important;
   }
