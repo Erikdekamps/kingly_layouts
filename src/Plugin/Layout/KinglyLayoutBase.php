@@ -543,10 +543,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   protected function getSlideDirectionOptions(): array {
     return [
       self::NONE_OPTION_KEY => $this->t('None'),
-      'up' => $this->t('From Bottom'),
-      'down' => $this->t('From Top'),
-      'left' => $this->t('From Right'),
-      'right' => $this->t('From Left'),
+      'up' => $this->t('Bottom up'),
+      'down' => $this->t('Top down'),
+      'left' => $this->t('Right to Left'),
+      'right' => $this->t('Left to Right'),
     ];
   }
 
