@@ -429,7 +429,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#type' => 'url',
       '#title' => $this->t('Background Media URL'),
       '#default_value' => $this->configuration['background_media_url'],
-      '#description' => $this->t('Enter the full, absolute URL for the background image or video (e.g., https://example.com/image.jpg).'),
+      '#description' => $this->t('Enter the full, absolute URL for the background image or video (e.g., https://example.com/image.jpg or https://example.com/video.mp4). YouTube or Vimeo URLs are not supported; please use direct links to video files.'),
       '#states' => [
         'visible' => [
           [':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'image']],
