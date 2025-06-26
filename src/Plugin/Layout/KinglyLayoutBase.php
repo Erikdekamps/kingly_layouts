@@ -122,8 +122,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['border_width_option'] = self::NONE_OPTION_KEY;
     $configuration['border_style_option'] = self::NONE_OPTION_KEY;
 
-    // Add default for animation option.
-    $configuration['animation_option'] = self::NONE_OPTION_KEY;
+    // Add defaults for animation options.
+    $configuration['animation_type'] = self::NONE_OPTION_KEY;
+    // New default.
+    $configuration['slide_direction'] = self::NONE_OPTION_KEY;
+    $configuration['transition_property'] = self::NONE_OPTION_KEY;
+    $configuration['transition_duration'] = self::NONE_OPTION_KEY;
+    $configuration['transition_timing_function'] = self::NONE_OPTION_KEY;
+    $configuration['transition_delay'] = self::NONE_OPTION_KEY;
 
     return $configuration;
   }
@@ -161,99 +167,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    */
   protected function getGapOptions(): array {
     return $this->getScaleOptions();
-  }
-
-  /**
-   * Returns the available horizontal margin options for this layout.
-   *
-   * @return array
-   *   An associative array of margin options.
-   */
-  protected function getHorizontalMarginOptions(): array {
-    return $this->getScaleOptions();
-  }
-
-  /**
-   * Returns the available vertical margin options for this layout.
-   *
-   * @return array
-   *   An associative array of margin options.
-   */
-  protected function getVerticalMarginOptions(): array {
-    return $this->getScaleOptions();
-  }
-
-  /**
-   * Returns the available border radius options.
-   *
-   * @return array
-   *   An associative array of border radius options.
-   */
-  protected function getBorderRadiusOptions(): array {
-    $options = $this->getScaleOptions();
-    $options['full'] = $this->t('Full (Pill/Circle)');
-    return $options;
-  }
-
-  /**
-   * Returns the available border width options.
-   *
-   * @return array
-   *   An associative array of border width options.
-   */
-  protected function getBorderWidthOptions(): array {
-    return [
-      self::NONE_OPTION_KEY => $this->t('None'),
-      'sm' => $this->t('Small (1px)'),
-      'md' => $this->t('Medium (2px)'),
-      'lg' => $this->t('Large (4px)'),
-    ];
-  }
-
-  /**
-   * Returns the available border style options.
-   *
-   * @return array
-   *   An associative array of border style options.
-   */
-  protected function getBorderStyleOptions(): array {
-    return [
-      self::NONE_OPTION_KEY => $this->t('None'),
-      'solid' => $this->t('Solid'),
-      'dashed' => $this->t('Dashed'),
-      'dotted' => $this->t('Dotted'),
-    ];
-  }
-
-  /**
-   * Returns the available animation options.
-   *
-   * @return array
-   *   An associative array of animation options.
-   */
-  protected function getAnimationOptions(): array {
-    return [
-      self::NONE_OPTION_KEY => $this->t('None'),
-      'fade-in' => $this->t('Fade In'),
-      'slide-in-up' => $this->t('Slide In From Bottom'),
-      'slide-in-down' => $this->t('Slide In From Top'),
-      'slide-in-left' => $this->t('Slide In From Left'),
-      'slide-in-right' => $this->t('Slide In From Right'),
-    ];
-  }
-
-  /**
-   * Returns the available container type options.
-   *
-   * @return array
-   *   An associative array of container type options.
-   */
-  protected function getContainerTypeOptions(): array {
-    return [
-      'boxed' => $this->t('Boxed'),
-      'full' => $this->t('Full Width (Background Only)'),
-      'edge-to-edge' => $this->t('Edge to Edge (Full Bleed)'),
-    ];
   }
 
   /**
@@ -392,21 +305,96 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#default_value' => $this->configuration['border_radius_option'],
     ];
 
-    // Display Options.
-    $form['display_options'] = [
+    // Animation Options.
+    $form['animation'] = [
       '#type' => 'details',
-      '#title' => $this->t('Display Options'),
+      '#title' => $this->t('Animation'),
       '#open' => FALSE,
     ];
-    $form['display_options']['animation_option'] = [
+    $form['animation']['animation_type'] = [
       '#type' => 'select',
-      '#title' => $this->t('Animation'),
-      '#options' => $this->getAnimationOptions(),
-      '#default_value' => $this->configuration['animation_option'],
-      '#description' => $this->t('Select an animation to apply when the layout scrolls into view.'),
+      '#title' => $this->t('Animation Type'),
+      '#options' => $this->getAnimationTypeOptions(),
+      '#default_value' => $this->configuration['animation_type'],
+      '#description' => $this->t('Select an animation to apply when the layout scrolls into view. This defines the start and end states.'),
+    ];
+    // New field for slide direction.
+    $form['animation']['slide_direction'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Slide Direction'),
+      '#options' => $this->getSlideDirectionOptions(),
+      '#default_value' => $this->configuration['slide_direction'],
+      '#description' => $this->t('Select the direction for slide-in animations.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="layout_settings[animation][animation_type]"]' => ['value' => 'slide-in'],
+        ],
+      ],
+    ];
+    $form['animation']['transition_property'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Transition Property'),
+      '#options' => $this->getTransitionPropertyOptions(),
+      '#default_value' => $this->configuration['transition_property'],
+      '#description' => $this->t('The CSS property that the transition will animate.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="layout_settings[animation][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
+        ],
+      ],
+    ];
+    $form['animation']['transition_duration'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Transition Duration'),
+      '#options' => $this->getTransitionDurationOptions(),
+      '#default_value' => $this->configuration['transition_duration'],
+      '#description' => $this->t('How long the animation takes to complete.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="layout_settings[animation][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
+        ],
+      ],
+    ];
+    $form['animation']['transition_timing_function'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Transition Speed Curve'),
+      '#options' => $this->getTransitionTimingFunctionOptions(),
+      '#default_value' => $this->configuration['transition_timing_function'],
+      '#description' => $this->t('The speed curve of the animation.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="layout_settings[animation][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
+        ],
+      ],
+    ];
+    $form['animation']['transition_delay'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Transition Delay'),
+      '#options' => $this->getTransitionDelayOptions(),
+      '#default_value' => $this->configuration['transition_delay'],
+      '#description' => $this->t('The delay before the animation starts.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="layout_settings[animation][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
+        ],
+      ],
     ];
 
     return $form;
+  }
+
+  /**
+   * Returns the available container type options.
+   *
+   * @return array
+   *   An associative array of container type options.
+   */
+  protected function getContainerTypeOptions(): array {
+    return [
+      'boxed' => $this->t('Boxed'),
+      'full' => $this->t('Full Width (Background Only)'),
+      'edge-to-edge' => $this->t('Edge to Edge (Full Bleed)'),
+    ];
   }
 
   /**
@@ -426,6 +414,26 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   An associative array of padding options.
    */
   protected function getVerticalPaddingOptions(): array {
+    return $this->getScaleOptions();
+  }
+
+  /**
+   * Returns the available horizontal margin options for this layout.
+   *
+   * @return array
+   *   An associative array of margin options.
+   */
+  protected function getHorizontalMarginOptions(): array {
+    return $this->getScaleOptions();
+  }
+
+  /**
+   * Returns the available vertical margin options for this layout.
+   *
+   * @return array
+   *   An associative array of margin options.
+   */
+  protected function getVerticalMarginOptions(): array {
     return $this->getScaleOptions();
   }
 
@@ -458,6 +466,148 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
+   * Returns the available border width options.
+   *
+   * @return array
+   *   An associative array of border width options.
+   */
+  protected function getBorderWidthOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None'),
+      'sm' => $this->t('Small (1px)'),
+      'md' => $this->t('Medium (2px)'),
+      'lg' => $this->t('Large (4px)'),
+    ];
+  }
+
+  /**
+   * Returns the available border style options.
+   *
+   * @return array
+   *   An associative array of border style options.
+   */
+  protected function getBorderStyleOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None'),
+      'solid' => $this->t('Solid'),
+      'dashed' => $this->t('Dashed'),
+      'dotted' => $this->t('Dotted'),
+    ];
+  }
+
+  /**
+   * Returns the available border radius options.
+   *
+   * @return array
+   *   An associative array of border radius options.
+   */
+  protected function getBorderRadiusOptions(): array {
+    $options = $this->getScaleOptions();
+    $options['full'] = $this->t('Full (Pill/Circle)');
+    return $options;
+  }
+
+  /**
+   * Returns the available animation type options.
+   *
+   * @return array
+   *   An associative array of animation type options.
+   */
+  protected function getAnimationTypeOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None'),
+      'fade-in' => $this->t('Fade In'),
+    // Generic slide-in.
+      'slide-in' => $this->t('Slide In'),
+    ];
+  }
+
+  /**
+   * Returns the available slide direction options.
+   *
+   * Note: 'left' means it comes from the right and 'right' means it comes from
+   * the left.
+   *
+   * @return array
+   *   An associative array of slide direction options.
+   */
+  protected function getSlideDirectionOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None'),
+      'up' => $this->t('From Bottom'),
+      'down' => $this->t('From Top'),
+      'left' => $this->t('From Right'),
+      'right' => $this->t('From Left'),
+    ];
+  }
+
+  /**
+   * Returns the available transition property options.
+   *
+   * @return array
+   *   An associative array of transition property options.
+   */
+  protected function getTransitionPropertyOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('Default (opacity, transform)'),
+      'opacity' => $this->t('Opacity only'),
+      'transform' => $this->t('Transform only'),
+      'all' => $this->t('All properties'),
+      'opacity, transform' => $this->t('Opacity and Transform'),
+    ];
+  }
+
+  /**
+   * Returns the available transition duration options.
+   *
+   * @return array
+   *   An associative array of transition duration options.
+   */
+  protected function getTransitionDurationOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('Default (600ms)'),
+      '150ms' => $this->t('150ms'),
+      '300ms' => $this->t('300ms'),
+      '500ms' => $this->t('500ms'),
+      '750ms' => $this->t('750ms'),
+      '1s' => $this->t('1s'),
+    ];
+  }
+
+  /**
+   * Returns the available transition timing function options.
+   *
+   * @return array
+   *   An associative array of transition timing function options.
+   */
+  protected function getTransitionTimingFunctionOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('Default (ease-out)'),
+      'ease' => $this->t('ease'),
+      'ease-in' => $this->t('ease-in'),
+      'ease-in-out' => $this->t('ease-in-out'),
+      'linear' => $this->t('linear'),
+    ];
+  }
+
+  /**
+   * Returns the available transition delay options.
+   *
+   * @return array
+   *   An associative array of transition delay options.
+   */
+  protected function getTransitionDelayOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None'),
+      '150ms' => $this->t('150ms'),
+      '300ms' => $this->t('300ms'),
+      '500ms' => $this->t('500ms'),
+      '750ms' => $this->t('750ms'),
+      '1s' => $this->t('1s'),
+    ];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
@@ -480,7 +630,13 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['border_style_option'] = $values['colors_borders']['border_style_option'];
     $this->configuration['border_radius_option'] = $values['colors_borders']['border_radius_option'];
 
-    $this->configuration['animation_option'] = $values['display_options']['animation_option'];
+    $this->configuration['animation_type'] = $values['animation']['animation_type'];
+    // New save.
+    $this->configuration['slide_direction'] = $values['animation']['slide_direction'];
+    $this->configuration['transition_property'] = $values['animation']['transition_property'];
+    $this->configuration['transition_duration'] = $values['animation']['transition_duration'];
+    $this->configuration['transition_timing_function'] = $values['animation']['transition_timing_function'];
+    $this->configuration['transition_delay'] = $values['animation']['transition_delay'];
   }
 
   /**
@@ -552,41 +708,29 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     }
 
     // Apply animation.
-    $animation = $this->configuration['animation_option'];
-    if ($animation !== self::NONE_OPTION_KEY) {
+    $animation_type = $this->configuration['animation_type'];
+    $slide_direction = $this->configuration['slide_direction'];
+
+    if ($animation_type !== self::NONE_OPTION_KEY) {
       $build['#attached']['library'][] = 'kingly_layouts/kingly_animations';
       $build['#attributes']['class'][] = 'kingly-animate';
-      $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_option');
+
+      // Apply animation type class.
+      $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_type');
+
+      // If it's a slide animation, apply the direction class.
+      if ($animation_type === 'slide-in' && $slide_direction !== self::NONE_OPTION_KEY) {
+        $this->applyClassFromConfig($build, 'kingly-animate--direction-', 'slide_direction');
+      }
+
+      // Apply transition properties as inline styles to override CSS defaults.
+      $this->applyInlineStyleFromOption($build, 'transition-property', 'transition_property');
+      $this->applyInlineStyleFromOption($build, 'transition-duration', 'transition_duration');
+      $this->applyInlineStyleFromOption($build, 'transition-timing-function', 'transition_timing_function');
+      $this->applyInlineStyleFromOption($build, 'transition-delay', 'transition_delay');
     }
 
     return $build;
-  }
-
-  /**
-   * Retrieves the hex color value from a Kingly CSS Color taxonomy term.
-   *
-   * @param string $term_id
-   *   The ID of the taxonomy term.
-   *
-   * @return string|null
-   *   The hex color string if found and valid, NULL otherwise.
-   */
-  protected function getTermColorHex(string $term_id): ?string {
-    if (empty($term_id) || $term_id === self::NONE_OPTION_KEY) {
-      return NULL;
-    }
-
-    /** @var \Drupal\taxonomy\TermInterface $term */
-    $term = $this->termStorage->load($term_id);
-
-    if ($term instanceof TermInterface &&
-      $term->bundle() === self::KINGLY_CSS_COLOR_VOCABULARY &&
-      $term->hasField(self::KINGLY_CSS_COLOR_FIELD) &&
-      !$term->get(self::KINGLY_CSS_COLOR_FIELD)->isEmpty()) {
-      return $term->get(self::KINGLY_CSS_COLOR_FIELD)->value;
-    }
-
-    return NULL;
   }
 
   /**
@@ -621,6 +765,50 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $color_hex = $this->getTermColorHex($this->configuration[$config_key]);
     if ($color_hex) {
       $build['#attributes']['style'][] = $style_property . ': ' . $color_hex . ';';
+    }
+  }
+
+  /**
+   * Retrieves the hex color value from a Kingly CSS Color taxonomy term.
+   *
+   * @param string $term_id
+   *   The ID of the taxonomy term.
+   *
+   * @return string|null
+   *   The hex color string if found and valid, NULL otherwise.
+   */
+  protected function getTermColorHex(string $term_id): ?string {
+    if (empty($term_id) || $term_id === self::NONE_OPTION_KEY) {
+      return NULL;
+    }
+
+    /** @var \Drupal\taxonomy\TermInterface $term */
+    $term = $this->termStorage->load($term_id);
+
+    if ($term instanceof TermInterface &&
+      $term->bundle() === self::KINGLY_CSS_COLOR_VOCABULARY &&
+      $term->hasField(self::KINGLY_CSS_COLOR_FIELD) &&
+      !$term->get(self::KINGLY_CSS_COLOR_FIELD)->isEmpty()) {
+      return $term->get(self::KINGLY_CSS_COLOR_FIELD)->value;
+    }
+
+    return NULL;
+  }
+
+  /**
+   * Helper to apply a generic inline style from a configuration option.
+   *
+   * @param array &$build
+   *   The render array.
+   * @param string $style_property
+   *   The CSS property to set (e.g., 'transition-duration').
+   * @param string $config_key
+   *   The configuration key whose value will be used.
+   */
+  private function applyInlineStyleFromOption(array &$build, string $style_property, string $config_key): void {
+    $value = $this->configuration[$config_key];
+    if (!empty($value) && $value !== self::NONE_OPTION_KEY) {
+      $build['#attributes']['style'][] = $style_property . ': ' . $value . ';';
     }
   }
 

@@ -5,12 +5,15 @@
 
 /* Base class for all animated elements. Defines the transition. */
 .kingly-animate {
+  /* Default transition properties, can be overridden by inline styles from PHP. */
   transition-property: opacity, transform;
   transition-duration: 0.6s;
   transition-timing-function: ease-out;
 }
 
-/* --- Fade In Animation --- */
+/* --- Animation Types --- */
+
+/* Fade In Animation */
 .kingly-animate--fade-in {
   opacity: 0;
 }
@@ -18,45 +21,38 @@
   opacity: 1;
 }
 
-/* --- Slide In From Bottom Animation --- */
-.kingly-animate--slide-in-up {
+/* Slide In Animation (Base) */
+.kingly-animate--slide-in {
   opacity: 0;
+  /* Initial transform will be set by direction classes */
+}
+.kingly-animate--slide-in.is-visible {
+  opacity: 1;
+  transform: translate(0, 0); /* Reset transform to origin */
+}
+
+/* --- Slide Directions (applied in conjunction with kingly-animate--slide-in) --- */
+
+/* Slide In From Bottom */
+.kingly-animate--direction-up {
   transform: translateY(40px);
 }
-.kingly-animate--slide-in-up.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+
+/* Slide In From Top */
+.kingly-animate--direction-down {
+  transform: translateY(-40px);
 }
 
-/* --- Slide In From Top Animation --- */
-.kingly-animate--slide-in-down {
-  opacity: 0;
-  transform: translateY(-40px); /* Starts above and slides down */
-}
-.kingly-animate--slide-in-down.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+/* Slide In From Right (moves left) */
+.kingly-animate--direction-right {
+  transform: translateX(40px);
 }
 
-/* --- Slide In From Left Animation --- */
-.kingly-animate--slide-in-left {
-  opacity: 0;
+/* Slide In From Left (moves right) */
+.kingly-animate--direction-left {
   transform: translateX(-40px);
 }
-.kingly-animate--slide-in-left.is-visible {
-  opacity: 1;
-  transform: translateX(0);
-}
 
-/* --- Slide In From Right Animation --- */
-.kingly-animate--slide-in-right {
-  opacity: 0;
-  transform: translateX(40px); /* Starts to the right and slides left */
-}
-.kingly-animate--slide-in-right.is-visible {
-  opacity: 1;
-  transform: translateX(0);
-}
 
 /*
  * Respect user preference for reduced motion.
