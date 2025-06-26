@@ -262,7 +262,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Sizing and Spacing.
     $form['sizing_spacing'] = [
       '#type' => 'details',
-      '#title' => $this->t('Sizing & Spacing'),
+      '#title' => $this->t('Spacing'),
       '#open' => FALSE,
     ];
     $form['sizing_spacing']['horizontal_padding_option'] = [
