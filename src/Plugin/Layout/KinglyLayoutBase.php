@@ -175,14 +175,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       ];
       $form['color_info'] = [
         '#type' => 'item',
-        '#markup' => $this->t('Colors are managed in the <a href="/admin/structure/taxonomy/manage/css_color/overview" target="_blank">CSS Color</a> vocabulary.'),
+        '#markup' => $this->t('Colors are managed in the <a href="/admin/structure/taxonomy/manage/kingly_css_color/overview" target="_blank">Kingly CSS Color</a> vocabulary.'),
       ];
     }
     else {
       $form['color_info'] = [
         '#type' => 'item',
         '#title' => $this->t('Color Options'),
-        '#markup' => $this->t('No colors defined. Please <a href="/admin/structure/taxonomy/manage/css_color/add" target="_blank">add terms</a> to the "CSS Color" vocabulary.'),
+        '#markup' => $this->t('No colors defined. Please <a href="/admin/structure/taxonomy/manage/kingly_css_color/add" target="_blank">add terms</a> to the "Kingly CSS Color" vocabulary.'),
       ];
     }
 
@@ -210,17 +210,18 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
-   * Returns color options from the 'css_color' vocabulary.
+   * Returns color options from the 'kingly_css_color' vocabulary.
    *
    * @return array
    *   An associative array of color options.
    */
   protected function getColorOptions(): array {
     $options = ['_none' => $this->t('None')];
-    if (!$this->entityTypeManager->getStorage('taxonomy_vocabulary')->load('css_color')) {
+    if (!$this->entityTypeManager->getStorage('taxonomy_vocabulary')
+      ->load('kingly_css_color')) {
       return $options;
     }
-    $terms = $this->termStorage->loadTree('css_color', 0, NULL, TRUE);
+    $terms = $this->termStorage->loadTree('kingly_css_color', 0, NULL, TRUE);
     foreach ($terms as $term) {
       $options[$term->id()] = $term->getName();
     }
@@ -274,8 +275,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     if (!empty($background_tid) && $background_tid !== '_none') {
       /** @var \Drupal\taxonomy\TermInterface $term */
       $term = $this->termStorage->load($background_tid);
-      if ($term && $term->bundle() === 'css_color' && $term->hasField('field_css_color') && !$term->get('field_css_color')->isEmpty()) {
-        $hex_color = $term->get('field_css_color')->value;
+      if ($term && $term->bundle() === 'kingly_css_color' && $term->hasField('field_kingly_css_color') && !$term->get('field_kingly_css_color')
+        ->isEmpty()) {
+        $hex_color = $term->get('field_kingly_css_color')->value;
         $build['#attributes']['style'][] = 'background-color: ' . $hex_color . ';';
       }
     }
@@ -284,8 +286,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     if (!empty($foreground_tid) && $foreground_tid !== '_none') {
       /** @var \Drupal\taxonomy\TermInterface $term */
       $term = $this->termStorage->load($foreground_tid);
-      if ($term && $term->bundle() === 'css_color' && $term->hasField('field_css_color') && !$term->get('field_css_color')->isEmpty()) {
-        $hex_color = $term->get('field_css_color')->value;
+      if ($term && $term->bundle() === 'kingly_css_color' && $term->hasField('field_kingly_css_color') && !$term->get('field_kingly_css_color')
+        ->isEmpty()) {
+        $hex_color = $term->get('field_kingly_css_color')->value;
         $build['#attributes']['style'][] = 'color: ' . $hex_color . ';';
       }
     }
