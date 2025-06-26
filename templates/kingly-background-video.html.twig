@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Template for the background video element.
+ *
+ * This template creates the wrapper and video elements that are styled by
+ * kingly-utilities.css to act as a background for the layout.
+ *
+ * Available variables:
+ * - video_url: The URL of the video file.
+ * - loop: Boolean, whether the video should loop.
+ * - autoplay: Boolean, whether the video should autoplay.
+ * - muted: Boolean, whether the video should be muted.
+ */
+#}
+<div class="kingly-layout__video-wrapper">
+  <video class="kingly-layout__video"
+         {% if autoplay %}autoplay{% endif %}
+    {% if loop %}loop{% endif %}
+    {% if muted %}muted{% endif %}
+         playsinline
+  >
+    <source src="{{ video_url }}" type="video/mp4">
+    {# You could add more source types here for other formats like .webm #}
+    Your browser does not support the video tag.
+  </video>
+</div>

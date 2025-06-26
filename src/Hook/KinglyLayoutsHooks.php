@@ -5,18 +5,26 @@ namespace Drupal\kingly_layouts\Hook;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
- * Hook implementations for Kingly Layouts.
+ * Implements hook_theme() for the Kingly Layouts module.
  */
 class KinglyLayoutsHooks {
 
   /**
-   * Implements hook_theme().
+   * {@inheritdoc}
    */
   #[Hook('theme')]
   public function theme(): array {
-    // Get theme implementations from the layout plugin manager.
-    return \Drupal::service('plugin.manager.core.layout')
-      ->getThemeImplementations();
+    return [
+      'kingly_background_video' => [
+        'variables' => [
+          'video_url' => NULL,
+          'loop' => FALSE,
+          'autoplay' => TRUE,
+          'muted' => TRUE,
+        ],
+        'template' => 'kingly-background-video',
+      ],
+    ];
   }
 
 }

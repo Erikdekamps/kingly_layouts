@@ -18,6 +18,14 @@
 ] %}
 {% if content %}
   <div{{ attributes.addClass(classes) }}>
+    {#
+    Render any top-level elements that are not regions.
+    This will automatically render `#video_background` and `#overlay`
+    if they exist in the content array, respecting their weights.
+    This is more maintainable than checking for each element individually.
+    #}
+    {{ content|without('content') }}
+
     {% if content.content %}
       <div {{ region_attributes.content.addClass('layout__region', 'layout__region--content') }}>
         {{ content.content }}

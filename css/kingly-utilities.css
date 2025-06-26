@@ -1,9 +1,32 @@
-/**
+/*
  * @file
- * Provides reusable padding utility classes for Kingly Layouts.
+ * Provides utility styles for Kingly Layouts.
  */
 
-/* --- Horizontal Padding Utilities --- */
+/* --- Container Types --- */
+
+/* Common full-bleed styles for both container types */
+.kingly-layout--full-width,
+.kingly-layout--edge-to-edge {
+  /* 1. Pull the container out to the viewport edges. */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  box-sizing: border-box; /* Crucial for padding calculations */
+}
+
+/*
+ * For "Full Width (Background Only)", we also push the inner content back
+ * to the original container alignment.
+ */
+.kingly-layout--full-width {
+  /* 2. Push the inner content back to the original container alignment. */
+  padding-left: calc(50vw - 50%);
+  padding-right: calc(50vw - 50%);
+}
+
+/* --- Spacing Utilities (Padding & Margin) --- */
+
+/* Padding X */
 .kingly-layout-padding-x-xs {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -25,7 +48,7 @@
   padding-right: 4rem;
 }
 
-/* --- Vertical Padding Utilities --- */
+/* Padding Y */
 .kingly-layout-padding-y-xs {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
@@ -47,7 +70,7 @@
   padding-bottom: 4rem;
 }
 
-/* --- Gap Utilities --- */
+/* Gap (for flex/grid containers) */
 .kingly-layout-gap-xs {
   gap: 0.25rem;
 }
@@ -64,7 +87,7 @@
   gap: 4rem;
 }
 
-/* --- Horizontal Margin Utilities --- */
+/* Margin X */
 .kingly-layout-margin-x-xs {
   margin-left: 0.25rem;
   margin-right: 0.25rem;
@@ -86,7 +109,7 @@
   margin-right: 4rem;
 }
 
-/* --- Vertical Margin Utilities --- */
+/* Margin Y */
 .kingly-layout-margin-y-xs {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
@@ -108,7 +131,9 @@
   margin-bottom: 4rem;
 }
 
-/* --- Border Radius Utilities --- */
+/* --- Border Utilities --- */
+
+/* Border Radius */
 .kingly-layout-border-radius-xs {
   border-radius: 0.25rem;
 }
@@ -125,10 +150,10 @@
   border-radius: 4rem;
 }
 .kingly-layout-border-radius-full {
-  border-radius: 9999px; /* A large value ensures a pill/circle shape */
-}
+  border-radius: 9999px;
+} /* Large value for pill/circle effect */
 
-/* --- Border Width Utilities --- */
+/* Border Width */
 .kingly-layout-border-width-sm {
   border-width: 1px;
 }
@@ -139,7 +164,7 @@
   border-width: 4px;
 }
 
-/* --- Border Style Utilities --- */
+/* Border Style */
 .kingly-layout-border-style-solid {
   border-style: solid;
 }
@@ -150,34 +175,103 @@
   border-style: dotted;
 }
 
+/* --- Background Media Utilities --- */
 
-/* --- Full Width Utility --- */
-/*
- * The .kingly-layout--full-width class creates a "full bleed" effect for the background.
- * 1. The negative margin pulls the container's edges out to the viewport edges.
- *    The calculation `calc(50% - 50vw)` determines the exact negative margin
- *    needed to escape the parent container.
- * 2. The positive padding pushes the *content* back in to align with the site's main grid.
- */
-.kingly-layout--full-width {
-  /* 1. Pull the container out to the viewport edges. */
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  /* 2. Push the inner content back to the original container alignment. */
-  padding-left: calc(50vw - 50%);
-  padding-right: calc(50vw - 50%);
+/* Background Video Container */
+.kingly-layout--has-bg-video {
+  position: relative;
+  overflow: hidden; /* Ensure video doesn't overflow */
+  z-index: 0; /* Establish a new stacking context. */
+}
+.kingly-layout--has-bg-video > .kingly-layout__video-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2; /* Place at the very back, behind the overlay. */
+  pointer-events: none; /* Allow clicks to pass through to content */
+  overflow: hidden;
+}
+.kingly-layout--has-bg-video > .kingly-layout__video-wrapper > .kingly-layout__video {
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  object-fit: cover; /* Ensure video covers the area */
 }
 
-/* --- Edge to Edge Utility --- */
-/*
- * The .kingly-layout--edge-to-edge class creates a "full bleed" effect for both
- * the background and the content, stretching everything to the viewport edges.
- * 1. The negative margin pulls the container's edges out to the viewport edges.
- * 2. Horizontal padding can be applied separately using padding utility classes.
- */
-.kingly-layout--edge-to-edge {
-  /* 1. Pull the container out to the viewport edges. */
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  /* 2. Padding is now handled by the .kingly-layout-padding-x-* utilities. */
+/* Background Overlay */
+.kingly-layout--has-bg-overlay {
+  position: relative; /* Ensure overlay is positioned relative to this */
+  z-index: 0; /* Establish a new stacking context. */
+}
+.kingly-layout--has-bg-overlay > .kingly-layout__bg-overlay {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Place above video/image, but still behind content. */
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+/* --- Shadows & Effects Utilities --- */
+
+/* Box Shadow */
+.kingly-layout-shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.kingly-layout-shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.kingly-layout-shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.kingly-layout-shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+.kingly-layout-shadow-inner {
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Filter */
+.kingly-layout-filter-grayscale {
+  filter: grayscale(100%);
+}
+.kingly-layout-filter-blur {
+  filter: blur(5px);
+}
+.kingly-layout-filter-sepia {
+  filter: sepia(100%);
+}
+.kingly-layout-filter-brightness {
+  filter: brightness(1.5);
+}
+
+/* --- Responsiveness Utilities --- */
+
+/* Hide on Breakpoint */
+/* Using common breakpoints, adjust as per theme's actual breakpoints */
+@media (max-width: 767px) { /* Mobile */
+  .kingly-layout-hide-on-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) { /* Tablet */
+  .kingly-layout-hide-on-tablet {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) { /* Desktop */
+  .kingly-layout-hide-on-desktop {
+    display: none !important;
+  }
 }
