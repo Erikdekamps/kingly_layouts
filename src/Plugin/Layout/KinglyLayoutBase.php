@@ -83,6 +83,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
     // Add default for full width option.
     $configuration['full_width'] = FALSE;
+    $configuration['edge_to_edge'] = FALSE;
 
     return $configuration;
   }
@@ -141,7 +142,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Horizontal Padding'),
       '#options' => $this->getHorizontalPaddingOptions(),
       '#default_value' => $this->configuration['horizontal_padding_option'],
-      '#description' => $this->t('Select the desired horizontal padding (left and right) for the layout container.'),
+      '#description' => $this->t('Select the horizontal padding for the layout. For "Edge to Edge" layouts, this padding is applied from the viewport edge.'),
     ];
 
     $form['vertical_padding_option'] = [
@@ -189,12 +190,32 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       ];
     }
 
-    // ADDED: Full width option.
+    // Edge to Edge option.
+    $form['edge_to_edge'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Edge to Edge (Full Bleed)'),
+      '#description' => $this->t('When checked, this layout and its content will span the full width of the viewport, breaking out of any parent containers. Horizontal padding will be applied relative to the viewport edges. This option disables "Full Width (Background Only)".'),
+      '#default_value' => $this->configuration['edge_to_edge'],
+      '#id' => 'kingly-layout-edge-to-edge-checkbox',
+      '#states' => [
+        'disabled' => [
+          '#kingly-layout-full-width-checkbox' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
+    // Full width option.
     $form['full_width'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Full Width'),
-      '#description' => $this->t('Check this to make the layout span the full width of the viewport, breaking out of its container.'),
+      '#title' => $this->t('Full Width (Background Only)'),
+      '#description' => $this->t('When checked, the background of this layout will span the full width of the viewport, breaking out of its container. The content within the layout will remain aligned with the site\'s main content grid. This option disables "Edge to Edge (Full Bleed)".'),
       '#default_value' => $this->configuration['full_width'],
+      '#id' => 'kingly-layout-full-width-checkbox',
+      '#states' => [
+        'disabled' => [
+          '#kingly-layout-edge-to-edge-checkbox' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     return $form;
@@ -242,6 +263,22 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   /**
    * {@inheritdoc}
    */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
+    parent::validateConfigurationForm($form, $form_state);
+
+    $edge_to_edge = $form_state->getValue('edge_to_edge');
+    $full_width = $form_state->getValue('full_width');
+
+    // Ensure that only one of "Edge to Edge" or "Full Width" is selected.
+    if ($edge_to_edge && $full_width) {
+      $form_state->setErrorByName('edge_to_edge', $this->t('You cannot select both "Edge to Edge" and "Full Width (Background Only)". Please choose only one or neither.'));
+      $form_state->setErrorByName('full_width', $this->t('You cannot select both "Edge to Edge" and "Full Width (Background Only)". Please choose only one or neither.'));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['sizing_option'] = $form_state->getValue('sizing_option');
@@ -251,6 +288,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['background_color'] = $form_state->getValue('background_color');
     $this->configuration['foreground_color'] = $form_state->getValue('foreground_color');
     $this->configuration['full_width'] = $form_state->getValue('full_width');
+    $this->configuration['edge_to_edge'] = $form_state->getValue('edge_to_edge');
   }
 
   /**
@@ -268,21 +306,40 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $build['#attributes']['class'][] = 'layout--' . $layout_id . '--' . $this->configuration['sizing_option'];
     }
 
-    $h_padding = $this->configuration['horizontal_padding_option'];
-    if (!empty($h_padding) && $h_padding !== '_none') {
-      $build['#attributes']['class'][] = 'kingly-layout-padding-x-' . $h_padding;
+    // Start with the user-selected horizontal padding.
+    $h_padding_effective = $this->configuration['horizontal_padding_option'];
+
+    // Apply full width or edge-to-edge class if enabled.
+    if (!empty($this->configuration['edge_to_edge'])) {
+      // 'Edge to Edge' uses custom padding from the viewport edge.
+      // The `kingly-layout-padding-x-*` class will be added below.
+      $build['#attributes']['class'][] = 'kingly-layout--edge-to-edge';
+    }
+    elseif (!empty($this->configuration['full_width'])) {
+      // 'Full Width' uses its own `calc()` padding to align with the site grid.
+      // We must prevent the padding utility class from being added.
+      $build['#attributes']['class'][] = 'kingly-layout--full-width';
+      $h_padding_effective = '_none';
     }
 
+    // Apply horizontal padding class if it's not been disabled.
+    if (!empty($h_padding_effective) && $h_padding_effective !== '_none') {
+      $build['#attributes']['class'][] = 'kingly-layout-padding-x-' . $h_padding_effective;
+    }
+
+    // Apply vertical padding class.
     $v_padding = $this->configuration['vertical_padding_option'];
     if (!empty($v_padding) && $v_padding !== '_none') {
       $build['#attributes']['class'][] = 'kingly-layout-padding-y-' . $v_padding;
     }
 
+    // Apply gap class.
     $gap = $this->configuration['gap_option'];
     if (!empty($gap) && $gap !== '_none') {
       $build['#attributes']['class'][] = 'kingly-layout-gap-' . $gap;
     }
 
+    // Apply background color.
     $background_tid = $this->configuration['background_color'];
     if (!empty($background_tid) && $background_tid !== '_none') {
       /** @var \Drupal\taxonomy\TermInterface $term */
@@ -294,6 +351,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       }
     }
 
+    // Apply foreground color.
     $foreground_tid = $this->configuration['foreground_color'];
     if (!empty($foreground_tid) && $foreground_tid !== '_none') {
       /** @var \Drupal\taxonomy\TermInterface $term */
@@ -303,14 +361,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         $hex_color = $term->get('field_kingly_css_color')->value;
         $build['#attributes']['style'][] = 'color: ' . $hex_color . ';';
       }
-    }
-
-    // Apply full width class if enabled.
-    if (!empty($this->configuration['full_width'])) {
-      // We add a class instead of an inline style. This is cleaner and
-      // allows us to manage the full-width behavior and the inner container
-      // padding in one place in our CSS.
-      $build['#attributes']['class'][] = 'kingly-layout--full-width';
     }
 
     return $build;

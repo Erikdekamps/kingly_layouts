@@ -66,20 +66,31 @@
 
 /* --- Full Width Utility --- */
 /*
- * The .kingly-layout--full-width class creates a "full bleed" effect.
+ * The .kingly-layout--full-width class creates a "full bleed" effect for the background.
  * 1. The negative margin pulls the container's edges out to the viewport edges.
  *    The calculation `calc(50% - 50vw)` determines the exact negative margin
  *    needed to escape the parent container.
- * 2. The positive padding pushes the *content* back in by the same amount.
- *    This makes the layout's background span the full width, while the
- *    content inside aligns with the site's main grid.
+ * 2. The positive padding pushes the *content* back in to align with the site's main grid.
  */
 .kingly-layout--full-width {
   /* 1. Pull the container out to the viewport edges. */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-
   /* 2. Push the inner content back to the original container alignment. */
   padding-left: calc(50vw - 50%);
   padding-right: calc(50vw - 50%);
+}
+
+/* --- Edge to Edge Utility --- */
+/*
+ * The .kingly-layout--edge-to-edge class creates a "full bleed" effect for both
+ * the background and the content, stretching everything to the viewport edges.
+ * 1. The negative margin pulls the container's edges out to the viewport edges.
+ * 2. Horizontal padding can be applied separately using padding utility classes.
+ */
+.kingly-layout--edge-to-edge {
+  /* 1. Pull the container out to the viewport edges. */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  /* 2. Padding is now handled by the .kingly-layout-padding-x-* utilities. */
 }
