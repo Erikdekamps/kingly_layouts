@@ -64,6 +64,50 @@
   gap: 4rem;
 }
 
+/* --- Horizontal Margin Utilities --- */
+.kingly-layout-margin-x-xs {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+.kingly-layout-margin-x-sm {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+.kingly-layout-margin-x-md {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+.kingly-layout-margin-x-lg {
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+.kingly-layout-margin-x-xl {
+  margin-left: 4rem;
+  margin-right: 4rem;
+}
+
+/* --- Vertical Margin Utilities --- */
+.kingly-layout-margin-y-xs {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.kingly-layout-margin-y-sm {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.kingly-layout-margin-y-md {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.kingly-layout-margin-y-lg {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+.kingly-layout-margin-y-xl {
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+}
+
 /* --- Full Width Utility --- */
 /*
  * The .kingly-layout--full-width class creates a "full bleed" effect for the background.

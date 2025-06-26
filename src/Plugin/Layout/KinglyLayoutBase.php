@@ -105,6 +105,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $gap_options = $this->getGapOptions();
     $configuration['gap_option'] = key($gap_options);
 
+    // Add defaults for margin options.
+    $configuration['horizontal_margin_option'] = self::NONE_OPTION_KEY;
+    $configuration['vertical_margin_option'] = self::NONE_OPTION_KEY;
+
     // Default to no background or foreground color.
     $configuration['background_color'] = self::NONE_OPTION_KEY;
     $configuration['foreground_color'] = self::NONE_OPTION_KEY;
@@ -152,6 +156,26 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
+   * Returns the available horizontal margin options for this layout.
+   *
+   * @return array
+   *   An associative array of margin options.
+   */
+  protected function getHorizontalMarginOptions(): array {
+    return $this->getScaleOptions();
+  }
+
+  /**
+   * Returns the available vertical margin options for this layout.
+   *
+   * @return array
+   *   An associative array of margin options.
+   */
+  protected function getVerticalMarginOptions(): array {
+    return $this->getScaleOptions();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
@@ -187,6 +211,22 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#options' => $this->getGapOptions(),
       '#default_value' => $this->configuration['gap_option'],
       '#description' => $this->t('Select the desired gap between layout columns/regions.'),
+    ];
+
+    $form['horizontal_margin_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Horizontal Margin'),
+      '#options' => $this->getHorizontalMarginOptions(),
+      '#default_value' => $this->configuration['horizontal_margin_option'],
+      '#description' => $this->t('Select the horizontal margin for the layout. This margin will not be applied if "Full Width" or "Edge to Edge" is selected.'),
+    ];
+
+    $form['vertical_margin_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Vertical Margin'),
+      '#options' => $this->getVerticalMarginOptions(),
+      '#default_value' => $this->configuration['vertical_margin_option'],
+      '#description' => $this->t('Select the desired vertical margin (top and bottom) for the layout container.'),
     ];
 
     $color_options = $this->getColorOptions();
@@ -326,6 +366,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['horizontal_padding_option'] = $form_state->getValue('horizontal_padding_option');
     $this->configuration['vertical_padding_option'] = $form_state->getValue('vertical_padding_option');
     $this->configuration['gap_option'] = $form_state->getValue('gap_option');
+    $this->configuration['horizontal_margin_option'] = $form_state->getValue('horizontal_margin_option');
+    $this->configuration['vertical_margin_option'] = $form_state->getValue('vertical_margin_option');
     $this->configuration['background_color'] = $form_state->getValue('background_color');
     $this->configuration['foreground_color'] = $form_state->getValue('foreground_color');
     $this->configuration['full_width'] = $form_state->getValue('full_width');
@@ -379,6 +421,23 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $gap = $this->configuration['gap_option'];
     if (!empty($gap) && $gap !== self::NONE_OPTION_KEY) {
       $build['#attributes']['class'][] = 'kingly-layout-gap-' . $gap;
+    }
+
+    // Apply horizontal margin class.
+    $h_margin = $this->configuration['horizontal_margin_option'];
+    if (!empty($h_margin) && $h_margin !== self::NONE_OPTION_KEY) {
+      // Horizontal margins should not be applied if full_width or edge_to_edge
+      // are active, as they conflict with the negative margins used for full
+      // bleed.
+      if (empty($this->configuration['edge_to_edge']) && empty($this->configuration['full_width'])) {
+        $build['#attributes']['class'][] = 'kingly-layout-margin-x-' . $h_margin;
+      }
+    }
+
+    // Apply vertical margin class.
+    $v_margin = $this->configuration['vertical_margin_option'];
+    if (!empty($v_margin) && $v_margin !== self::NONE_OPTION_KEY) {
+      $build['#attributes']['class'][] = 'kingly-layout-margin-y-' . $v_margin;
     }
 
     // Apply background color.
