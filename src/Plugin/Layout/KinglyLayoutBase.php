@@ -237,68 +237,77 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Select the desired vertical margin (top and bottom) for the layout container.'),
     ];
 
-    // Colors and Borders.
-    $form['colors_borders'] = [
+    // Colors.
+    $form['colors'] = [
       '#type' => 'details',
-      '#title' => $this->t('Colors & Borders'),
+      '#title' => $this->t('Colors'),
       '#open' => FALSE,
     ];
     $color_options = $this->getColorOptions();
     if (count($color_options) > 1) {
-      $form['colors_borders']['background_color'] = [
+      $form['colors']['background_color'] = [
         '#type' => 'select',
         '#title' => $this->t('Background Color'),
         '#options' => $color_options,
         '#default_value' => $this->configuration['background_color'],
       ];
-      $form['colors_borders']['foreground_color'] = [
+      $form['colors']['foreground_color'] = [
         '#type' => 'select',
         '#title' => $this->t('Foreground Color'),
         '#options' => $color_options,
         '#default_value' => $this->configuration['foreground_color'],
       ];
-      $form['colors_borders']['border_color'] = [
+      $form['colors']['color_info'] = [
+        '#type' => 'item',
+        '#markup' => $this->t('Colors are managed in the <a href="/admin/structure/taxonomy/manage/@vocab_id/overview" target="_blank">Kingly CSS Color</a> vocabulary.', ['@vocab_id' => self::KINGLY_CSS_COLOR_VOCABULARY]),
+      ];
+    }
+    else {
+      $form['colors']['color_info'] = [
+        '#type' => 'item',
+        '#title' => $this->t('Color Options'),
+        '#markup' => $this->t('No colors defined. Please <a href="/admin/structure/taxonomy/manage/@vocab_id/add" target="_blank">add terms</a> to the "Kingly CSS Color" vocabulary.', ['@vocab_id' => self::KINGLY_CSS_COLOR_VOCABULARY]),
+      ];
+    }
+
+    // Borders.
+    $form['borders'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Borders'),
+      '#open' => FALSE,
+    ];
+    if (count($color_options) > 1) {
+      $form['borders']['border_color'] = [
         '#type' => 'select',
         '#title' => $this->t('Border Color'),
         '#options' => $color_options,
         '#default_value' => $this->configuration['border_color'],
         '#description' => $this->t('Selecting a color will enable the border options below.'),
       ];
-      $form['colors_borders']['color_info'] = [
-        '#type' => 'item',
-        '#markup' => $this->t('Colors are managed in the <a href="/admin/structure/taxonomy/manage/@vocab_id/overview" target="_blank">Kingly CSS Color</a> vocabulary.', ['@vocab_id' => self::KINGLY_CSS_COLOR_VOCABULARY]),
-      ];
     }
-    else {
-      $form['colors_borders']['color_info'] = [
-        '#type' => 'item',
-        '#title' => $this->t('Color Options'),
-        '#markup' => $this->t('No colors defined. Please <a href="/admin/structure/taxonomy/manage/@vocab_id/add" target="_blank">add terms</a> to the "Kingly CSS Color" vocabulary.', ['@vocab_id' => self::KINGLY_CSS_COLOR_VOCABULARY]),
-      ];
-    }
-    $form['colors_borders']['border_width_option'] = [
+    $form['borders']['border_width_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Width'),
       '#options' => $this->getBorderWidthOptions(),
       '#default_value' => $this->configuration['border_width_option'],
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[colors_borders][border_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+          ':input[name="layout_settings[borders][border_color]"]' => ['!value' => self::NONE_OPTION_KEY],
         ],
       ],
     ];
-    $form['colors_borders']['border_style_option'] = [
+    $form['borders']['border_style_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Style'),
       '#options' => $this->getBorderStyleOptions(),
       '#default_value' => $this->configuration['border_style_option'],
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[colors_borders][border_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+          ':input[name="layout_settings[borders][border_color]"]' => ['!value' => self::NONE_OPTION_KEY],
         ],
       ],
     ];
-    $form['colors_borders']['border_radius_option'] = [
+    $form['borders']['border_radius_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Radius'),
       '#options' => $this->getBorderRadiusOptions(),
@@ -517,7 +526,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     return [
       self::NONE_OPTION_KEY => $this->t('None'),
       'fade-in' => $this->t('Fade In'),
-    // Generic slide-in.
+      // Generic slide-in.
       'slide-in' => $this->t('Slide In'),
     ];
   }
@@ -623,12 +632,12 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['horizontal_margin_option'] = $values['spacing']['horizontal_margin_option'];
     $this->configuration['vertical_margin_option'] = $values['spacing']['vertical_margin_option'];
 
-    $this->configuration['background_color'] = $values['colors_borders']['background_color'];
-    $this->configuration['foreground_color'] = $values['colors_borders']['foreground_color'];
-    $this->configuration['border_color'] = $values['colors_borders']['border_color'];
-    $this->configuration['border_width_option'] = $values['colors_borders']['border_width_option'];
-    $this->configuration['border_style_option'] = $values['colors_borders']['border_style_option'];
-    $this->configuration['border_radius_option'] = $values['colors_borders']['border_radius_option'];
+    $this->configuration['background_color'] = $values['colors']['background_color'] ?? self::NONE_OPTION_KEY;
+    $this->configuration['foreground_color'] = $values['colors']['foreground_color'] ?? self::NONE_OPTION_KEY;
+    $this->configuration['border_color'] = $values['borders']['border_color'] ?? self::NONE_OPTION_KEY;
+    $this->configuration['border_width_option'] = $values['borders']['border_width_option'];
+    $this->configuration['border_style_option'] = $values['borders']['border_style_option'];
+    $this->configuration['border_radius_option'] = $values['borders']['border_radius_option'];
 
     $this->configuration['animation_type'] = $values['animation']['animation_type'];
     // New save.
