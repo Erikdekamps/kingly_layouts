@@ -113,9 +113,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['background_color'] = self::NONE_OPTION_KEY;
     $configuration['foreground_color'] = self::NONE_OPTION_KEY;
 
-    // Add default for full width option.
-    $configuration['full_width'] = FALSE;
-    $configuration['edge_to_edge'] = FALSE;
+    // Add default for container type.
+    $configuration['container_type'] = 'boxed';
 
     // Add defaults for border options.
     $configuration['border_radius_option'] = self::NONE_OPTION_KEY;
@@ -244,6 +243,20 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
+   * Returns the available container type options.
+   *
+   * @return array
+   *   An associative array of container type options.
+   */
+  protected function getContainerTypeOptions(): array {
+    return [
+      'boxed' => $this->t('Boxed'),
+      'full' => $this->t('Full Width (Background Only)'),
+      'edge-to-edge' => $this->t('Edge to Edge (Full Bleed)'),
+    ];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
@@ -259,41 +272,51 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#weight' => -10,
     ];
 
-    // Sizing and Spacing.
-    $form['sizing_spacing'] = [
+    // Container Type (now at the top level).
+    $form['container_type'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Container Type'),
+      '#options' => $this->getContainerTypeOptions(),
+      '#default_value' => $this->configuration['container_type'],
+      '#description' => $this->t('Select how the layout container should behave.'),
+      '#weight' => -9,
+    ];
+
+    // Spacing.
+    $form['spacing'] = [
       '#type' => 'details',
       '#title' => $this->t('Spacing'),
       '#open' => FALSE,
     ];
-    $form['sizing_spacing']['horizontal_padding_option'] = [
+    $form['spacing']['horizontal_padding_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Horizontal Padding'),
       '#options' => $this->getHorizontalPaddingOptions(),
       '#default_value' => $this->configuration['horizontal_padding_option'],
       '#description' => $this->t('Select the horizontal padding for the layout. For "Edge to Edge" layouts, this padding is applied from the viewport edge.'),
     ];
-    $form['sizing_spacing']['vertical_padding_option'] = [
+    $form['spacing']['vertical_padding_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Vertical Padding'),
       '#options' => $this->getVerticalPaddingOptions(),
       '#default_value' => $this->configuration['vertical_padding_option'],
       '#description' => $this->t('Select the desired vertical padding (top and bottom) for the layout container.'),
     ];
-    $form['sizing_spacing']['gap_option'] = [
+    $form['spacing']['gap_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Gap'),
       '#options' => $this->getGapOptions(),
       '#default_value' => $this->configuration['gap_option'],
       '#description' => $this->t('Select the desired gap between layout columns/regions.'),
     ];
-    $form['sizing_spacing']['horizontal_margin_option'] = [
+    $form['spacing']['horizontal_margin_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Horizontal Margin'),
       '#options' => $this->getHorizontalMarginOptions(),
       '#default_value' => $this->configuration['horizontal_margin_option'],
       '#description' => $this->t('Select the horizontal margin for the layout. This margin will not be applied if "Full Width" or "Edge to Edge" is selected.'),
     ];
-    $form['sizing_spacing']['vertical_margin_option'] = [
+    $form['spacing']['vertical_margin_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Vertical Margin'),
       '#options' => $this->getVerticalMarginOptions(),
@@ -375,30 +398,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Display Options'),
       '#open' => FALSE,
     ];
-    $form['display_options']['edge_to_edge'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Edge to Edge (Full Bleed)'),
-      '#description' => $this->t('When checked, this layout and its content will span the full width of the viewport, breaking out of any parent containers. Horizontal padding will be applied relative to the viewport edges. This option disables "Full Width (Background Only)".'),
-      '#default_value' => $this->configuration['edge_to_edge'],
-      '#id' => 'kingly-layout-edge-to-edge-checkbox',
-      '#states' => [
-        'disabled' => [
-          '#kingly-layout-full-width-checkbox' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    $form['display_options']['full_width'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Full Width (Background Only)'),
-      '#description' => $this->t('When checked, the background of this layout will span the full width of the viewport, breaking out of its container. The content within the layout will remain aligned with the site\'s main content grid. This option disables "Edge to Edge (Full Bleed)".'),
-      '#default_value' => $this->configuration['full_width'],
-      '#id' => 'kingly-layout-full-width-checkbox',
-      '#states' => [
-        'disabled' => [
-          '#kingly-layout-edge-to-edge-checkbox' => ['checked' => TRUE],
-        ],
-      ],
-    ];
     $form['display_options']['animation_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Animation'),
@@ -461,33 +460,18 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
-    parent::validateConfigurationForm($form, $form_state);
-
-    $values = $form_state->getValues();
-    $edge_to_edge = $values['display_options']['edge_to_edge'];
-    $full_width = $values['display_options']['full_width'];
-
-    if ($edge_to_edge && $full_width) {
-      $message = $this->t('You cannot select both "Edge to Edge" and "Full Width (Background Only)". Please choose only one or neither.');
-      $form_state->setErrorByName('display_options][edge_to_edge', $message);
-      $form_state->setErrorByName('display_options][full_width', $message);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::submitConfigurationForm($form, $form_state);
 
     $values = $form_state->getValues();
     $this->configuration['sizing_option'] = $values['sizing_option'];
-    $this->configuration['horizontal_padding_option'] = $values['sizing_spacing']['horizontal_padding_option'];
-    $this->configuration['vertical_padding_option'] = $values['sizing_spacing']['vertical_padding_option'];
-    $this->configuration['gap_option'] = $values['sizing_spacing']['gap_option'];
-    $this->configuration['horizontal_margin_option'] = $values['sizing_spacing']['horizontal_margin_option'];
-    $this->configuration['vertical_margin_option'] = $values['sizing_spacing']['vertical_margin_option'];
+    $this->configuration['container_type'] = $values['container_type'];
+
+    $this->configuration['horizontal_padding_option'] = $values['spacing']['horizontal_padding_option'];
+    $this->configuration['vertical_padding_option'] = $values['spacing']['vertical_padding_option'];
+    $this->configuration['gap_option'] = $values['spacing']['gap_option'];
+    $this->configuration['horizontal_margin_option'] = $values['spacing']['horizontal_margin_option'];
+    $this->configuration['vertical_margin_option'] = $values['spacing']['vertical_margin_option'];
 
     $this->configuration['background_color'] = $values['colors_borders']['background_color'];
     $this->configuration['foreground_color'] = $values['colors_borders']['foreground_color'];
@@ -496,8 +480,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['border_style_option'] = $values['colors_borders']['border_style_option'];
     $this->configuration['border_radius_option'] = $values['colors_borders']['border_radius_option'];
 
-    $this->configuration['full_width'] = $values['display_options']['full_width'];
-    $this->configuration['edge_to_edge'] = $values['display_options']['edge_to_edge'];
     $this->configuration['animation_option'] = $values['display_options']['animation_option'];
   }
 
@@ -517,15 +499,24 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $build['#attributes']['class'][] = 'layout--' . $layout_id . '--' . $this->configuration['sizing_option'];
     }
 
-    // Determine effective horizontal padding and apply full width/edge-to-edge
-    // classes.
+    // Apply container type classes and adjust padding/margin behavior.
+    $container_type = $this->configuration['container_type'];
     $h_padding_effective = $this->configuration['horizontal_padding_option'];
-    if (!empty($this->configuration['edge_to_edge'])) {
-      $build['#attributes']['class'][] = 'kingly-layout--edge-to-edge';
-    }
-    elseif (!empty($this->configuration['full_width'])) {
-      $build['#attributes']['class'][] = 'kingly-layout--full-width';
-      $h_padding_effective = self::NONE_OPTION_KEY;
+    $apply_horizontal_margin = TRUE;
+
+    switch ($container_type) {
+      case 'full':
+        $build['#attributes']['class'][] = 'kingly-layout--full-width';
+        // Padding is handled by the full-width class itself to align content.
+        $h_padding_effective = self::NONE_OPTION_KEY;
+        $apply_horizontal_margin = FALSE;
+        break;
+
+      case 'edge-to-edge':
+        $build['#attributes']['class'][] = 'kingly-layout--edge-to-edge';
+        // Padding is applied from the viewport edge via utility class.
+        $apply_horizontal_margin = FALSE;
+        break;
     }
 
     // Apply spacing utility classes.
@@ -534,8 +525,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->applyClassFromConfig($build, 'kingly-layout-gap-', 'gap_option');
     $this->applyClassFromConfig($build, 'kingly-layout-margin-y-', 'vertical_margin_option');
 
-    // Apply horizontal margin class only if not full width.
-    if (empty($this->configuration['edge_to_edge']) && empty($this->configuration['full_width'])) {
+    // Apply horizontal margin class only if container is boxed.
+    if ($apply_horizontal_margin) {
       $this->applyClassFromConfig($build, 'kingly-layout-margin-x-', 'horizontal_margin_option');
     }
 
