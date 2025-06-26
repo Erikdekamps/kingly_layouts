@@ -96,7 +96,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['sizing_option'] = key($sizing_options);
 
     // Add defaults for padding options.
-    $padding_options = $this->getPaddingScaleOptions();
+    $padding_options = $this->getScaleOptions();
     $default_padding = key($padding_options);
     $configuration['horizontal_padding_option'] = $default_padding;
     $configuration['vertical_padding_option'] = $default_padding;
@@ -130,14 +130,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    * @return array
    *   An associative array of padding scale options.
    */
-  protected function getPaddingScaleOptions(): array {
+  protected function getScaleOptions(): array {
     return [
       self::NONE_OPTION_KEY => $this->t('None'),
-      'xs' => $this->t('Extra Small (0.125rem)'),
-      'sm' => $this->t('Small (0.25rem)'),
-      'md' => $this->t('Medium (0.5rem)'),
-      'lg' => $this->t('Large (1rem)'),
-      'xl' => $this->t('Extra Large (2rem)'),
+      'xs' => $this->t('Extra Small (0.25rem)'),
+      'sm' => $this->t('Small (0.5rem)'),
+      'md' => $this->t('Medium (1rem)'),
+      'lg' => $this->t('Large (2rem)'),
+      'xl' => $this->t('Extra Large (4rem)'),
     ];
   }
 
@@ -148,7 +148,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   An associative array of gap options.
    */
   protected function getGapOptions(): array {
-    return $this->getPaddingScaleOptions();
+    return $this->getScaleOptions();
   }
 
   /**
@@ -256,7 +256,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   An associative array of padding options.
    */
   protected function getHorizontalPaddingOptions(): array {
-    return $this->getPaddingScaleOptions();
+    return $this->getScaleOptions();
   }
 
   /**
@@ -266,7 +266,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   An associative array of padding options.
    */
   protected function getVerticalPaddingOptions(): array {
-    return $this->getPaddingScaleOptions();
+    return $this->getScaleOptions();
   }
 
   /**

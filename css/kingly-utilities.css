@@ -5,63 +5,63 @@
 
 /* --- Horizontal Padding Utilities --- */
 .kingly-layout-padding-x-xs {
-  padding-left: 0.125rem;
-  padding-right: 0.125rem;
-}
-.kingly-layout-padding-x-sm {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 }
-.kingly-layout-padding-x-md {
+.kingly-layout-padding-x-sm {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
-.kingly-layout-padding-x-lg {
+.kingly-layout-padding-x-md {
   padding-left: 1rem;
   padding-right: 1rem;
 }
-.kingly-layout-padding-x-xl {
+.kingly-layout-padding-x-lg {
   padding-left: 2rem;
   padding-right: 2rem;
+}
+.kingly-layout-padding-x-xl {
+  padding-left: 4rem;
+  padding-right: 4rem;
 }
 
 /* --- Vertical Padding Utilities --- */
 .kingly-layout-padding-y-xs {
-  padding-top: 0.125rem;
-  padding-bottom: 0.125rem;
-}
-.kingly-layout-padding-y-sm {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
 }
-.kingly-layout-padding-y-md {
+.kingly-layout-padding-y-sm {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
-.kingly-layout-padding-y-lg {
+.kingly-layout-padding-y-md {
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
-.kingly-layout-padding-y-xl {
+.kingly-layout-padding-y-lg {
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+.kingly-layout-padding-y-xl {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
 }
 
 /* --- Gap Utilities --- */
 .kingly-layout-gap-xs {
-  gap: 0.125rem;
-}
-.kingly-layout-gap-sm {
   gap: 0.25rem;
 }
-.kingly-layout-gap-md {
+.kingly-layout-gap-sm {
   gap: 0.5rem;
 }
-.kingly-layout-gap-lg {
+.kingly-layout-gap-md {
   gap: 1rem;
 }
-.kingly-layout-gap-xl {
+.kingly-layout-gap-lg {
   gap: 2rem;
+}
+.kingly-layout-gap-xl {
+  gap: 4rem;
 }
 
 /* --- Full Width Utility --- */
