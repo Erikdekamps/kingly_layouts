@@ -124,6 +124,32 @@
 .kingly-layout-border-radius-xl {
   border-radius: 4rem;
 }
+.kingly-layout-border-radius-full {
+  border-radius: 9999px; /* A large value ensures a pill/circle shape */
+}
+
+/* --- Border Width Utilities --- */
+.kingly-layout-border-width-sm {
+  border-width: 1px;
+}
+.kingly-layout-border-width-md {
+  border-width: 2px;
+}
+.kingly-layout-border-width-lg {
+  border-width: 4px;
+}
+
+/* --- Border Style Utilities --- */
+.kingly-layout-border-style-solid {
+  border-style: solid;
+}
+.kingly-layout-border-style-dashed {
+  border-style: dashed;
+}
+.kingly-layout-border-style-dotted {
+  border-style: dotted;
+}
+
 
 /* --- Full Width Utility --- */
 /*

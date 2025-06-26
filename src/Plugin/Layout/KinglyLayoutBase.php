@@ -120,6 +120,11 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Add defaults for border options.
     $configuration['border_radius_option'] = self::NONE_OPTION_KEY;
     $configuration['border_color'] = self::NONE_OPTION_KEY;
+    $configuration['border_width_option'] = self::NONE_OPTION_KEY;
+    $configuration['border_style_option'] = self::NONE_OPTION_KEY;
+
+    // Add default for animation option.
+    $configuration['animation_option'] = self::NONE_OPTION_KEY;
 
     return $configuration;
   }
@@ -186,7 +191,56 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   An associative array of border radius options.
    */
   protected function getBorderRadiusOptions(): array {
-    return $this->getScaleOptions();
+    $options = $this->getScaleOptions();
+    $options['full'] = $this->t('Full (Pill/Circle)');
+    return $options;
+  }
+
+  /**
+   * Returns the available border width options.
+   *
+   * @return array
+   *   An associative array of border width options.
+   */
+  protected function getBorderWidthOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None'),
+      'sm' => $this->t('Small (1px)'),
+      'md' => $this->t('Medium (2px)'),
+      'lg' => $this->t('Large (4px)'),
+    ];
+  }
+
+  /**
+   * Returns the available border style options.
+   *
+   * @return array
+   *   An associative array of border style options.
+   */
+  protected function getBorderStyleOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None'),
+      'solid' => $this->t('Solid'),
+      'dashed' => $this->t('Dashed'),
+      'dotted' => $this->t('Dotted'),
+    ];
+  }
+
+  /**
+   * Returns the available animation options.
+   *
+   * @return array
+   *   An associative array of animation options.
+   */
+  protected function getAnimationOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None'),
+      'fade-in' => $this->t('Fade In'),
+      'slide-in-up' => $this->t('Slide In From Bottom'),
+      'slide-in-down' => $this->t('Slide In From Top'),
+      'slide-in-left' => $this->t('Slide In From Left'),
+      'slide-in-right' => $this->t('Slide In From Right'),
+    ];
   }
 
   /**
@@ -195,47 +249,51 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form = parent::buildConfigurationForm($form, $form_state);
 
+    // Column Sizing (now at the top level).
     $form['sizing_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Column sizing'),
       '#options' => $this->getSizingOptions(),
       '#default_value' => $this->configuration['sizing_option'],
       '#description' => $this->t('Select the desired column width distribution.'),
+      '#weight' => -10,
     ];
 
-    $form['horizontal_padding_option'] = [
+    // Sizing and Spacing.
+    $form['sizing_spacing'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Sizing & Spacing'),
+      '#open' => FALSE,
+    ];
+    $form['sizing_spacing']['horizontal_padding_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Horizontal Padding'),
       '#options' => $this->getHorizontalPaddingOptions(),
       '#default_value' => $this->configuration['horizontal_padding_option'],
       '#description' => $this->t('Select the horizontal padding for the layout. For "Edge to Edge" layouts, this padding is applied from the viewport edge.'),
     ];
-
-    $form['vertical_padding_option'] = [
+    $form['sizing_spacing']['vertical_padding_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Vertical Padding'),
       '#options' => $this->getVerticalPaddingOptions(),
       '#default_value' => $this->configuration['vertical_padding_option'],
       '#description' => $this->t('Select the desired vertical padding (top and bottom) for the layout container.'),
     ];
-
-    $form['gap_option'] = [
+    $form['sizing_spacing']['gap_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Gap'),
       '#options' => $this->getGapOptions(),
       '#default_value' => $this->configuration['gap_option'],
       '#description' => $this->t('Select the desired gap between layout columns/regions.'),
     ];
-
-    $form['horizontal_margin_option'] = [
+    $form['sizing_spacing']['horizontal_margin_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Horizontal Margin'),
       '#options' => $this->getHorizontalMarginOptions(),
       '#default_value' => $this->configuration['horizontal_margin_option'],
       '#description' => $this->t('Select the horizontal margin for the layout. This margin will not be applied if "Full Width" or "Edge to Edge" is selected.'),
     ];
-
-    $form['vertical_margin_option'] = [
+    $form['sizing_spacing']['vertical_margin_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Vertical Margin'),
       '#options' => $this->getVerticalMarginOptions(),
@@ -243,52 +301,81 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Select the desired vertical margin (top and bottom) for the layout container.'),
     ];
 
+    // Colors and Borders.
+    $form['colors_borders'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Colors & Borders'),
+      '#open' => FALSE,
+    ];
     $color_options = $this->getColorOptions();
     if (count($color_options) > 1) {
-      $form['background_color'] = [
+      $form['colors_borders']['background_color'] = [
         '#type' => 'select',
         '#title' => $this->t('Background Color'),
         '#options' => $color_options,
         '#default_value' => $this->configuration['background_color'],
-        '#description' => $this->t('Select a background color.'),
       ];
-      $form['foreground_color'] = [
+      $form['colors_borders']['foreground_color'] = [
         '#type' => 'select',
         '#title' => $this->t('Foreground Color'),
         '#options' => $color_options,
         '#default_value' => $this->configuration['foreground_color'],
-        '#description' => $this->t('Select a foreground (text) color.'),
       ];
-      $form['border_color'] = [
+      $form['colors_borders']['border_color'] = [
         '#type' => 'select',
         '#title' => $this->t('Border Color'),
         '#options' => $color_options,
         '#default_value' => $this->configuration['border_color'],
-        '#description' => $this->t('Select a border color. A border will only appear if a border color is selected.'),
+        '#description' => $this->t('Selecting a color will enable the border options below.'),
       ];
-      $form['color_info'] = [
+      $form['colors_borders']['color_info'] = [
         '#type' => 'item',
         '#markup' => $this->t('Colors are managed in the <a href="/admin/structure/taxonomy/manage/@vocab_id/overview" target="_blank">Kingly CSS Color</a> vocabulary.', ['@vocab_id' => self::KINGLY_CSS_COLOR_VOCABULARY]),
       ];
     }
     else {
-      $form['color_info'] = [
+      $form['colors_borders']['color_info'] = [
         '#type' => 'item',
         '#title' => $this->t('Color Options'),
         '#markup' => $this->t('No colors defined. Please <a href="/admin/structure/taxonomy/manage/@vocab_id/add" target="_blank">add terms</a> to the "Kingly CSS Color" vocabulary.', ['@vocab_id' => self::KINGLY_CSS_COLOR_VOCABULARY]),
       ];
     }
-
-    $form['border_radius_option'] = [
+    $form['colors_borders']['border_width_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Border Width'),
+      '#options' => $this->getBorderWidthOptions(),
+      '#default_value' => $this->configuration['border_width_option'],
+      '#states' => [
+        'visible' => [
+          ':input[name="layout_settings[colors_borders][border_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+        ],
+      ],
+    ];
+    $form['colors_borders']['border_style_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Border Style'),
+      '#options' => $this->getBorderStyleOptions(),
+      '#default_value' => $this->configuration['border_style_option'],
+      '#states' => [
+        'visible' => [
+          ':input[name="layout_settings[colors_borders][border_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+        ],
+      ],
+    ];
+    $form['colors_borders']['border_radius_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Radius'),
       '#options' => $this->getBorderRadiusOptions(),
       '#default_value' => $this->configuration['border_radius_option'],
-      '#description' => $this->t('Select the desired border radius for the layout container.'),
     ];
 
-    // Edge to Edge option.
-    $form['edge_to_edge'] = [
+    // Display Options.
+    $form['display_options'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Display Options'),
+      '#open' => FALSE,
+    ];
+    $form['display_options']['edge_to_edge'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Edge to Edge (Full Bleed)'),
       '#description' => $this->t('When checked, this layout and its content will span the full width of the viewport, breaking out of any parent containers. Horizontal padding will be applied relative to the viewport edges. This option disables "Full Width (Background Only)".'),
@@ -300,9 +387,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         ],
       ],
     ];
-
-    // Full width option.
-    $form['full_width'] = [
+    $form['display_options']['full_width'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Full Width (Background Only)'),
       '#description' => $this->t('When checked, the background of this layout will span the full width of the viewport, breaking out of its container. The content within the layout will remain aligned with the site\'s main content grid. This option disables "Edge to Edge (Full Bleed)".'),
@@ -313,6 +398,13 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
           '#kingly-layout-edge-to-edge-checkbox' => ['checked' => TRUE],
         ],
       ],
+    ];
+    $form['display_options']['animation_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Animation'),
+      '#options' => $this->getAnimationOptions(),
+      '#default_value' => $this->configuration['animation_option'],
+      '#description' => $this->t('Select an animation to apply when the layout scrolls into view.'),
     ];
 
     return $form;
@@ -346,7 +438,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    */
   protected function getColorOptions(): array {
     $cid = 'kingly_layouts:color_options';
-    // New: Try to load from cache.
     if ($cache = $this->cache->get($cid)) {
       return $cache->data;
     }
@@ -354,7 +445,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $options = [self::NONE_OPTION_KEY => $this->t('None')];
     if (!$this->entityTypeManager->getStorage('taxonomy_vocabulary')
       ->load(self::KINGLY_CSS_COLOR_VOCABULARY)) {
-      // New: Cache empty options if vocabulary doesn't exist.
       $this->cache->set($cid, $options, CacheBackendInterface::CACHE_PERMANENT, ['taxonomy_term_list']);
       return $options;
     }
@@ -363,7 +453,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $options[$term->id()] = $term->getName();
     }
 
-    // New: Store in cache with a cache tag for invalidation.
     $this->cache->set($cid, $options, CacheBackendInterface::CACHE_PERMANENT, ['taxonomy_term_list']);
 
     return $options;
@@ -375,14 +464,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::validateConfigurationForm($form, $form_state);
 
-    $edge_to_edge = $form_state->getValue('edge_to_edge');
-    $full_width = $form_state->getValue('full_width');
+    $values = $form_state->getValues();
+    $edge_to_edge = $values['display_options']['edge_to_edge'];
+    $full_width = $values['display_options']['full_width'];
 
-    // Ensure that only one of "Edge to Edge" or "Full Width" is selected.
     if ($edge_to_edge && $full_width) {
       $message = $this->t('You cannot select both "Edge to Edge" and "Full Width (Background Only)". Please choose only one or neither.');
-      $form_state->setErrorByName('edge_to_edge', $message);
-      $form_state->setErrorByName('full_width', $message);
+      $form_state->setErrorByName('display_options][edge_to_edge', $message);
+      $form_state->setErrorByName('display_options][full_width', $message);
     }
   }
 
@@ -391,18 +480,25 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::submitConfigurationForm($form, $form_state);
-    $this->configuration['sizing_option'] = $form_state->getValue('sizing_option');
-    $this->configuration['horizontal_padding_option'] = $form_state->getValue('horizontal_padding_option');
-    $this->configuration['vertical_padding_option'] = $form_state->getValue('vertical_padding_option');
-    $this->configuration['gap_option'] = $form_state->getValue('gap_option');
-    $this->configuration['horizontal_margin_option'] = $form_state->getValue('horizontal_margin_option');
-    $this->configuration['vertical_margin_option'] = $form_state->getValue('vertical_margin_option');
-    $this->configuration['background_color'] = $form_state->getValue('background_color');
-    $this->configuration['foreground_color'] = $form_state->getValue('foreground_color');
-    $this->configuration['full_width'] = $form_state->getValue('full_width');
-    $this->configuration['edge_to_edge'] = $form_state->getValue('edge_to_edge');
-    $this->configuration['border_radius_option'] = $form_state->getValue('border_radius_option');
-    $this->configuration['border_color'] = $form_state->getValue('border_color');
+
+    $values = $form_state->getValues();
+    $this->configuration['sizing_option'] = $values['sizing_option'];
+    $this->configuration['horizontal_padding_option'] = $values['sizing_spacing']['horizontal_padding_option'];
+    $this->configuration['vertical_padding_option'] = $values['sizing_spacing']['vertical_padding_option'];
+    $this->configuration['gap_option'] = $values['sizing_spacing']['gap_option'];
+    $this->configuration['horizontal_margin_option'] = $values['sizing_spacing']['horizontal_margin_option'];
+    $this->configuration['vertical_margin_option'] = $values['sizing_spacing']['vertical_margin_option'];
+
+    $this->configuration['background_color'] = $values['colors_borders']['background_color'];
+    $this->configuration['foreground_color'] = $values['colors_borders']['foreground_color'];
+    $this->configuration['border_color'] = $values['colors_borders']['border_color'];
+    $this->configuration['border_width_option'] = $values['colors_borders']['border_width_option'];
+    $this->configuration['border_style_option'] = $values['colors_borders']['border_style_option'];
+    $this->configuration['border_radius_option'] = $values['colors_borders']['border_radius_option'];
+
+    $this->configuration['full_width'] = $values['display_options']['full_width'];
+    $this->configuration['edge_to_edge'] = $values['display_options']['edge_to_edge'];
+    $this->configuration['animation_option'] = $values['display_options']['animation_option'];
   }
 
   /**
@@ -426,75 +522,50 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $h_padding_effective = $this->configuration['horizontal_padding_option'];
     if (!empty($this->configuration['edge_to_edge'])) {
       $build['#attributes']['class'][] = 'kingly-layout--edge-to-edge';
-      // Edge to Edge uses custom padding from the viewport edge, so the utility
-      // class for horizontal padding will be applied below based on
-      // $h_padding_effective.
     }
     elseif (!empty($this->configuration['full_width'])) {
       $build['#attributes']['class'][] = 'kingly-layout--full-width';
-      // Full Width uses its own `calc()` padding to align with the site grid,
-      // so we prevent the padding utility class from being added.
       $h_padding_effective = self::NONE_OPTION_KEY;
     }
 
-    // Apply horizontal padding class.
-    if (!empty($h_padding_effective) && $h_padding_effective !== self::NONE_OPTION_KEY) {
-      $build['#attributes']['class'][] = 'kingly-layout-padding-x-' . $h_padding_effective;
-    }
+    // Apply spacing utility classes.
+    $this->applyClassFromConfig($build, 'kingly-layout-padding-x-', $h_padding_effective);
+    $this->applyClassFromConfig($build, 'kingly-layout-padding-y-', 'vertical_padding_option');
+    $this->applyClassFromConfig($build, 'kingly-layout-gap-', 'gap_option');
+    $this->applyClassFromConfig($build, 'kingly-layout-margin-y-', 'vertical_margin_option');
 
-    // Apply vertical padding class.
-    $v_padding = $this->configuration['vertical_padding_option'];
-    if (!empty($v_padding) && $v_padding !== self::NONE_OPTION_KEY) {
-      $build['#attributes']['class'][] = 'kingly-layout-padding-y-' . $v_padding;
-    }
-
-    // Apply gap class.
-    $gap = $this->configuration['gap_option'];
-    if (!empty($gap) && $gap !== self::NONE_OPTION_KEY) {
-      $build['#attributes']['class'][] = 'kingly-layout-gap-' . $gap;
-    }
-
-    // Apply horizontal margin class.
-    $h_margin = $this->configuration['horizontal_margin_option'];
-    if (!empty($h_margin) && $h_margin !== self::NONE_OPTION_KEY) {
-      // Horizontal margins should not be applied if full_width or edge_to_edge
-      // are active, as they conflict with the negative margins used for full
-      // bleed.
-      if (empty($this->configuration['edge_to_edge']) && empty($this->configuration['full_width'])) {
-        $build['#attributes']['class'][] = 'kingly-layout-margin-x-' . $h_margin;
-      }
-    }
-
-    // Apply vertical margin class.
-    $v_margin = $this->configuration['vertical_margin_option'];
-    if (!empty($v_margin) && $v_margin !== self::NONE_OPTION_KEY) {
-      $build['#attributes']['class'][] = 'kingly-layout-margin-y-' . $v_margin;
+    // Apply horizontal margin class only if not full width.
+    if (empty($this->configuration['edge_to_edge']) && empty($this->configuration['full_width'])) {
+      $this->applyClassFromConfig($build, 'kingly-layout-margin-x-', 'horizontal_margin_option');
     }
 
     // Apply border radius class.
-    $border_radius = $this->configuration['border_radius_option'];
-    if (!empty($border_radius) && $border_radius !== self::NONE_OPTION_KEY) {
-      $build['#attributes']['class'][] = 'kingly-layout-border-radius-' . $border_radius;
-    }
+    $this->applyClassFromConfig($build, 'kingly-layout-border-radius-', 'border_radius_option');
 
-    // Apply background color.
-    $background_color_hex = $this->getTermColorHex($this->configuration['background_color']);
-    if ($background_color_hex) {
-      $build['#attributes']['style'][] = 'background-color: ' . $background_color_hex . ';';
-    }
+    // Apply background and foreground colors.
+    $this->applyStyleFromConfig($build, 'background-color', 'background_color');
+    $this->applyStyleFromConfig($build, 'color', 'foreground_color');
 
-    // Apply foreground color.
-    $foreground_color_hex = $this->getTermColorHex($this->configuration['foreground_color']);
-    if ($foreground_color_hex) {
-      $build['#attributes']['style'][] = 'color: ' . $foreground_color_hex . ';';
-    }
-
-    // Apply border color.
+    // Apply border styles.
     $border_color_hex = $this->getTermColorHex($this->configuration['border_color']);
     if ($border_color_hex) {
-      // If a border color is selected, apply a default 1px solid border.
-      // For more control, you could add options for border width and style.
-      $build['#attributes']['style'][] = 'border: 1px solid ' . $border_color_hex . ';';
+      $build['#attributes']['style'][] = 'border-color: ' . $border_color_hex . ';';
+
+      // Default to 'sm' width and 'solid' style if a color is set but they are
+      // not.
+      $border_width = $this->configuration['border_width_option'] !== self::NONE_OPTION_KEY ? $this->configuration['border_width_option'] : 'sm';
+      $border_style = $this->configuration['border_style_option'] !== self::NONE_OPTION_KEY ? $this->configuration['border_style_option'] : 'solid';
+
+      $this->applyClassFromConfig($build, 'kingly-layout-border-width-', $border_width);
+      $this->applyClassFromConfig($build, 'kingly-layout-border-style-', $border_style);
+    }
+
+    // Apply animation.
+    $animation = $this->configuration['animation_option'];
+    if ($animation !== self::NONE_OPTION_KEY) {
+      $build['#attached']['library'][] = 'kingly_layouts/kingly_animations';
+      $build['#attributes']['class'][] = 'kingly-animate';
+      $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_option');
     }
 
     return $build;
@@ -517,8 +588,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     /** @var \Drupal\taxonomy\TermInterface $term */
     $term = $this->termStorage->load($term_id);
 
-    // Ensure the term exists, is of the correct bundle, has the color field,
-    // and the field is not empty.
     if ($term instanceof TermInterface &&
       $term->bundle() === self::KINGLY_CSS_COLOR_VOCABULARY &&
       $term->hasField(self::KINGLY_CSS_COLOR_FIELD) &&
@@ -527,6 +596,41 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     }
 
     return NULL;
+  }
+
+  /**
+   * Helper to apply a CSS class from a configuration value.
+   *
+   * @param array &$build
+   *   The render array.
+   * @param string $class_prefix
+   *   The prefix for the CSS class.
+   * @param string $config_key_or_value
+   *   The configuration key or a direct value to use for the class suffix.
+   */
+  private function applyClassFromConfig(array &$build, string $class_prefix, string $config_key_or_value): void {
+    // Check if the provided string is a config key or a direct value.
+    $value = $this->configuration[$config_key_or_value] ?? $config_key_or_value;
+    if (!empty($value) && $value !== self::NONE_OPTION_KEY) {
+      $build['#attributes']['class'][] = $class_prefix . $value;
+    }
+  }
+
+  /**
+   * Helper to apply an inline style from a configuration value.
+   *
+   * @param array &$build
+   *   The render array.
+   * @param string $style_property
+   *   The CSS property to set.
+   * @param string $config_key
+   *   The configuration key for the color term ID.
+   */
+  private function applyStyleFromConfig(array &$build, string $style_property, string $config_key): void {
+    $color_hex = $this->getTermColorHex($this->configuration[$config_key]);
+    if ($color_hex) {
+      $build['#attributes']['style'][] = $style_property . ': ' . $color_hex . ';';
+    }
   }
 
 }

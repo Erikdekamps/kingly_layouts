@@ -1,7 +1,19 @@
 kingly_utilities:
   css:
     theme:
-      css/kingly-utilities.css: { }
+      css/kingly-utilities.css: {}
+
+# New library for animations.
+kingly_animations:
+  version: 1.x
+  js:
+    js/kingly-animations.js: {}
+  css:
+    theme:
+      css/kingly-animations.css: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 # Library for the one-column layout.
 kingly_onecol:
