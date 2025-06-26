@@ -108,6 +108,23 @@
   margin-bottom: 4rem;
 }
 
+/* --- Border Radius Utilities --- */
+.kingly-layout-border-radius-xs {
+  border-radius: 0.25rem;
+}
+.kingly-layout-border-radius-sm {
+  border-radius: 0.5rem;
+}
+.kingly-layout-border-radius-md {
+  border-radius: 1rem;
+}
+.kingly-layout-border-radius-lg {
+  border-radius: 2rem;
+}
+.kingly-layout-border-radius-xl {
+  border-radius: 4rem;
+}
+
 /* --- Full Width Utility --- */
 /*
  * The .kingly-layout--full-width class creates a "full bleed" effect for the background.

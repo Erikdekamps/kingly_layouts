@@ -117,6 +117,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['full_width'] = FALSE;
     $configuration['edge_to_edge'] = FALSE;
 
+    // Add defaults for border options.
+    $configuration['border_radius_option'] = self::NONE_OPTION_KEY;
+    $configuration['border_color'] = self::NONE_OPTION_KEY;
+
     return $configuration;
   }
 
@@ -172,6 +176,16 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   An associative array of margin options.
    */
   protected function getVerticalMarginOptions(): array {
+    return $this->getScaleOptions();
+  }
+
+  /**
+   * Returns the available border radius options.
+   *
+   * @return array
+   *   An associative array of border radius options.
+   */
+  protected function getBorderRadiusOptions(): array {
     return $this->getScaleOptions();
   }
 
@@ -245,6 +259,13 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         '#default_value' => $this->configuration['foreground_color'],
         '#description' => $this->t('Select a foreground (text) color.'),
       ];
+      $form['border_color'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Border Color'),
+        '#options' => $color_options,
+        '#default_value' => $this->configuration['border_color'],
+        '#description' => $this->t('Select a border color. A border will only appear if a border color is selected.'),
+      ];
       $form['color_info'] = [
         '#type' => 'item',
         '#markup' => $this->t('Colors are managed in the <a href="/admin/structure/taxonomy/manage/@vocab_id/overview" target="_blank">Kingly CSS Color</a> vocabulary.', ['@vocab_id' => self::KINGLY_CSS_COLOR_VOCABULARY]),
@@ -257,6 +278,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         '#markup' => $this->t('No colors defined. Please <a href="/admin/structure/taxonomy/manage/@vocab_id/add" target="_blank">add terms</a> to the "Kingly CSS Color" vocabulary.', ['@vocab_id' => self::KINGLY_CSS_COLOR_VOCABULARY]),
       ];
     }
+
+    $form['border_radius_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Border Radius'),
+      '#options' => $this->getBorderRadiusOptions(),
+      '#default_value' => $this->configuration['border_radius_option'],
+      '#description' => $this->t('Select the desired border radius for the layout container.'),
+    ];
 
     // Edge to Edge option.
     $form['edge_to_edge'] = [
@@ -372,6 +401,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['foreground_color'] = $form_state->getValue('foreground_color');
     $this->configuration['full_width'] = $form_state->getValue('full_width');
     $this->configuration['edge_to_edge'] = $form_state->getValue('edge_to_edge');
+    $this->configuration['border_radius_option'] = $form_state->getValue('border_radius_option');
+    $this->configuration['border_color'] = $form_state->getValue('border_color');
   }
 
   /**
@@ -440,6 +471,12 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $build['#attributes']['class'][] = 'kingly-layout-margin-y-' . $v_margin;
     }
 
+    // Apply border radius class.
+    $border_radius = $this->configuration['border_radius_option'];
+    if (!empty($border_radius) && $border_radius !== self::NONE_OPTION_KEY) {
+      $build['#attributes']['class'][] = 'kingly-layout-border-radius-' . $border_radius;
+    }
+
     // Apply background color.
     $background_color_hex = $this->getTermColorHex($this->configuration['background_color']);
     if ($background_color_hex) {
@@ -450,6 +487,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $foreground_color_hex = $this->getTermColorHex($this->configuration['foreground_color']);
     if ($foreground_color_hex) {
       $build['#attributes']['style'][] = 'color: ' . $foreground_color_hex . ';';
+    }
+
+    // Apply border color.
+    $border_color_hex = $this->getTermColorHex($this->configuration['border_color']);
+    if ($border_color_hex) {
+      // If a border color is selected, apply a default 1px solid border.
+      // For more control, you could add options for border width and style.
+      $build['#attributes']['style'][] = 'border: 1px solid ' . $border_color_hex . ';';
     }
 
     return $build;
