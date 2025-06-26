@@ -1,0 +1,48 @@
+/**
+ * @file
+ * Provides reusable padding utility classes for Kingly Layouts.
+ */
+
+/* --- Horizontal Padding Utilities --- */
+.kingly-layout-padding-x-xs {
+  padding-left: 0.125rem;
+  padding-right: 0.125rem;
+}
+.kingly-layout-padding-x-sm {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+.kingly-layout-padding-x-md {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.kingly-layout-padding-x-lg {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.kingly-layout-padding-x-xl {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+/* --- Vertical Padding Utilities --- */
+.kingly-layout-padding-y-xs {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+}
+.kingly-layout-padding-y-sm {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.kingly-layout-padding-y-md {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.kingly-layout-padding-y-lg {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.kingly-layout-padding-y-xl {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}

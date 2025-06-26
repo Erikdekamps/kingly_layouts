@@ -1,3 +1,8 @@
+padding:
+  css:
+    theme:
+      css/padding.css: {}
+
 # Library for the one-column layout.
 kingly_onecol:
   css:

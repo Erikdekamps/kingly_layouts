@@ -67,6 +67,12 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $sizing_options = $this->getSizingOptions();
     $configuration['sizing_option'] = key($sizing_options);
 
+    // Add defaults for padding options.
+    $padding_options = $this->getPaddingScaleOptions();
+    $default_padding = key($padding_options);
+    $configuration['horizontal_padding_option'] = $default_padding;
+    $configuration['vertical_padding_option'] = $default_padding;
+
     // Default to no background color.
     $configuration['background_color'] = '_none';
 
@@ -80,6 +86,43 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   An associative array of sizing options.
    */
   abstract protected function getSizingOptions(): array;
+
+  /**
+   * Returns the available padding scale options.
+   *
+   * @return array
+   *   An associative array of padding scale options.
+   */
+  protected function getPaddingScaleOptions(): array {
+    return [
+      '_none' => $this->t('None'),
+      'xs' => $this->t('Extra Small (0.125rem)'),
+      'sm' => $this->t('Small (0.25rem)'),
+      'md' => $this->t('Medium (0.5rem)'),
+      'lg' => $this->t('Large (1rem)'),
+      'xl' => $this->t('Extra Large (2rem)'),
+    ];
+  }
+
+  /**
+   * Returns the available horizontal padding options for this layout.
+   *
+   * @return array
+   *   An associative array of padding options.
+   */
+  protected function getHorizontalPaddingOptions(): array {
+    return $this->getPaddingScaleOptions();
+  }
+
+  /**
+   * Returns the available vertical padding options for this layout.
+   *
+   * @return array
+   *   An associative array of padding options.
+   */
+  protected function getVerticalPaddingOptions(): array {
+    return $this->getPaddingScaleOptions();
+  }
 
   /**
    * Returns background color options from the 'background_color' vocabulary.
@@ -110,6 +153,24 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Select the desired column width distribution.'),
     ];
 
+    // Add the horizontal padding option.
+    $form['horizontal_padding_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Horizontal Padding'),
+      '#options' => $this->getHorizontalPaddingOptions(),
+      '#default_value' => $this->configuration['horizontal_padding_option'],
+      '#description' => $this->t('Select the desired horizontal padding (left and right) for the layout container.'),
+    ];
+
+    // Add the vertical padding option.
+    $form['vertical_padding_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Vertical Padding'),
+      '#options' => $this->getVerticalPaddingOptions(),
+      '#default_value' => $this->configuration['vertical_padding_option'],
+      '#description' => $this->t('Select the desired vertical padding (top and bottom) for the layout container.'),
+    ];
+
     $background_options = $this->getBackgroundOptions();
     if (count($background_options) > 1) {
       $form['background_color'] = [
@@ -137,6 +198,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['sizing_option'] = $form_state->getValue('sizing_option');
+    // Save the new padding options.
+    $this->configuration['horizontal_padding_option'] = $form_state->getValue('horizontal_padding_option');
+    $this->configuration['vertical_padding_option'] = $form_state->getValue('vertical_padding_option');
     $this->configuration['background_color'] = $form_state->getValue('background_color');
   }
 
@@ -146,12 +210,28 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function build(array $regions): array {
     $build = parent::build($regions);
 
+    // Attach the shared padding library.
+    $build['#attached']['library'][] = 'kingly_layouts/padding';
+
     $plugin_definition = $this->getPluginDefinition();
+    // e.g., 'kingly_fourcol'.
     $layout_id = $plugin_definition->id();
 
-    // Add the sizing option as a class.
+    // Add the sizing option as a class (this remains layout-specific).
     if (!empty($this->configuration['sizing_option'])) {
       $build['#attributes']['class'][] = 'layout--' . $layout_id . '--' . $this->configuration['sizing_option'];
+    }
+
+    // Add the horizontal padding option as a generic utility class.
+    $h_padding = $this->configuration['horizontal_padding_option'];
+    if (!empty($h_padding) && $h_padding !== '_none') {
+      $build['#attributes']['class'][] = 'kingly-layout-padding-x-' . $h_padding;
+    }
+
+    // Add the vertical padding option as a generic utility class.
+    $v_padding = $this->configuration['vertical_padding_option'];
+    if (!empty($v_padding) && $v_padding !== '_none') {
+      $build['#attributes']['class'][] = 'kingly-layout-padding-y-' . $v_padding;
     }
 
     // Add the background color as an inline style.
