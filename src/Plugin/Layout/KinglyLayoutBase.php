@@ -122,6 +122,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['border_width_option'] = self::NONE_OPTION_KEY;
     $configuration['border_style_option'] = self::NONE_OPTION_KEY;
 
+    // Add default for vertical alignment.
+    $configuration['vertical_alignment'] = 'stretch';
+
     // Add defaults for animation options.
     $configuration['animation_type'] = self::NONE_OPTION_KEY;
     $configuration['slide_direction'] = self::NONE_OPTION_KEY;
@@ -334,6 +337,20 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Border Radius'),
       '#options' => $this->getBorderRadiusOptions(),
       '#default_value' => $this->configuration['border_radius_option'],
+    ];
+
+    // Alignment.
+    $form['alignment'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Alignment'),
+      '#open' => FALSE,
+    ];
+    $form['alignment']['vertical_alignment'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Vertical Alignment'),
+      '#options' => $this->getVerticalAlignmentOptions(),
+      '#default_value' => $this->configuration['vertical_alignment'],
+      '#description' => $this->t('Align content vertically within the layout. This assumes the layout uses Flexbox or Grid. "Stretch" makes columns in the same row equal height.'),
     ];
 
     // Animation Options.
@@ -721,6 +738,22 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
+   * Returns the available vertical alignment options.
+   *
+   * @return array
+   *   An associative array of vertical alignment options.
+   */
+  protected function getVerticalAlignmentOptions(): array {
+    return [
+      'stretch' => $this->t('Stretch (Default)'),
+      'flex-start' => $this->t('Top'),
+      'center' => $this->t('Middle'),
+      'flex-end' => $this->t('Bottom'),
+      'baseline' => $this->t('Baseline'),
+    ];
+  }
+
+  /**
    * Returns the available animation type options.
    *
    * @return array
@@ -980,6 +1013,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['border_style_option'] = $values['borders']['border_style_option'];
     $this->configuration['border_radius_option'] = $values['borders']['border_radius_option'];
 
+    $this->configuration['vertical_alignment'] = $values['alignment']['vertical_alignment'];
+
     $this->configuration['animation_type'] = $values['animation']['animation_type'];
     $this->configuration['slide_direction'] = $values['animation']['slide_direction'];
     $this->configuration['transition_property'] = $values['animation']['transition_property'];
@@ -1058,6 +1093,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     if ($apply_horizontal_margin) {
       $this->applyClassFromConfig($build, 'kingly-layout-margin-x-', 'horizontal_margin_option');
     }
+
+    // Apply alignment class.
+    $this->applyClassFromConfig($build, 'kingly-layout-align-content-', 'vertical_alignment');
 
     // Apply border radius class.
     $this->applyClassFromConfig($build, 'kingly-layout-border-radius-', 'border_radius_option');

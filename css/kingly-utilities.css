@@ -175,6 +175,28 @@
   border-style: dotted;
 }
 
+/* --- Alignment Utilities --- */
+
+/*
+ * These utilities require the layout container to be a flex or grid container.
+ * They control the vertical alignment of items (regions) within the container.
+ */
+.kingly-layout-align-content-flex-start {
+  align-content: flex-start;
+}
+.kingly-layout-align-content-center {
+  align-content: center;
+}
+.kingly-layout-align-content-flex-end {
+  align-content: flex-end;
+}
+.kingly-layout-align-content-stretch {
+  align-content: stretch;
+}
+.kingly-layout-align-content-baseline {
+  align-content: baseline;
+}
+
 /* --- Background Media Utilities --- */
 
 /* Background Video Container */
