@@ -1,0 +1,19 @@
+uuid: 7b6a5b4d-5e4d-4c0b-2e1f-4a5b6c7d8e9f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_kingly_css_color
+    - taxonomy.vocabulary.kingly_css_color
+id: taxonomy_term.kingly_css_color.field_kingly_css_color
+field_name: field_kingly_css_color
+entity_type: taxonomy_term
+bundle: kingly_css_color
+label: 'CSS Color'
+description: 'Enter the hex code for the color (e.g., #ffffff).'
+required: true
+translatable: false
+default_value: { }
+default_value_callback: ''
+settings: { }
+field_type: string

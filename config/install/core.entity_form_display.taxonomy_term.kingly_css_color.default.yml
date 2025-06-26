@@ -1,16 +1,16 @@
-uuid: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+uuid: 6a5b4d3c-4d3c-4b0a-3d2e-5b6c7d8e9f0a
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.taxonomy_term.background_color.field_css_color
-    - taxonomy.vocabulary.background_color
-id: taxonomy_term.background_color.default
+    - field.field.taxonomy_term.kingly_css_color.field_kingly_css_color
+    - taxonomy.vocabulary.kingly_css_color
+id: taxonomy_term.kingly_css_color.default
 targetEntityType: taxonomy_term
-bundle: background_color
+bundle: kingly_css_color
 mode: default
 content:
-  field_css_color:
+  field_kingly_css_color:
     type: string_textfield
     weight: 1
     region: content

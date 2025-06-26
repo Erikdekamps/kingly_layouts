@@ -77,8 +77,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $gap_options = $this->getGapOptions();
     $configuration['gap_option'] = key($gap_options);
 
-    // Default to no background color.
+    // Default to no background or foreground color.
     $configuration['background_color'] = '_none';
+    $configuration['foreground_color'] = '_none';
 
     return $configuration;
   }
@@ -132,7 +133,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Select the desired column width distribution.'),
     ];
 
-    // Add the horizontal padding option.
     $form['horizontal_padding_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Horizontal Padding'),
@@ -141,7 +141,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Select the desired horizontal padding (left and right) for the layout container.'),
     ];
 
-    // Add the vertical padding option.
     $form['vertical_padding_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Vertical Padding'),
@@ -150,7 +149,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Select the desired vertical padding (top and bottom) for the layout container.'),
     ];
 
-    // Add the gap option.
     $form['gap_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Gap'),
@@ -159,21 +157,32 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Select the desired gap between layout columns/regions.'),
     ];
 
-    $background_options = $this->getBackgroundOptions();
-    if (count($background_options) > 1) {
+    $color_options = $this->getColorOptions();
+    if (count($color_options) > 1) {
       $form['background_color'] = [
         '#type' => 'select',
         '#title' => $this->t('Background Color'),
-        '#options' => $background_options,
+        '#options' => $color_options,
         '#default_value' => $this->configuration['background_color'],
-        '#description' => $this->t('Select a background color. Colors are managed in the <a href="/admin/structure/taxonomy/manage/background_color/overview" target="_blank">Background Color</a> vocabulary.'),
+        '#description' => $this->t('Select a background color.'),
+      ];
+      $form['foreground_color'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Foreground Color'),
+        '#options' => $color_options,
+        '#default_value' => $this->configuration['foreground_color'],
+        '#description' => $this->t('Select a foreground (text) color.'),
+      ];
+      $form['color_info'] = [
+        '#type' => 'item',
+        '#markup' => $this->t('Colors are managed in the <a href="/admin/structure/taxonomy/manage/css_color/overview" target="_blank">CSS Color</a> vocabulary.'),
       ];
     }
     else {
-      $form['background_color_info'] = [
+      $form['color_info'] = [
         '#type' => 'item',
-        '#title' => $this->t('Background Color'),
-        '#markup' => $this->t('No background colors defined. Please <a href="/admin/structure/taxonomy/manage/background_color/add" target="_blank">add terms</a> to the "Background Color" vocabulary.'),
+        '#title' => $this->t('Color Options'),
+        '#markup' => $this->t('No colors defined. Please <a href="/admin/structure/taxonomy/manage/css_color/add" target="_blank">add terms</a> to the "CSS Color" vocabulary.'),
       ];
     }
 
@@ -201,14 +210,17 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
-   * Returns background color options from the 'background_color' vocabulary.
+   * Returns color options from the 'css_color' vocabulary.
    *
    * @return array
-   *   An associative array of background color options.
+   *   An associative array of color options.
    */
-  protected function getBackgroundOptions(): array {
+  protected function getColorOptions(): array {
     $options = ['_none' => $this->t('None')];
-    $terms = $this->termStorage->loadTree('background_color', 0, NULL, TRUE);
+    if (!$this->entityTypeManager->getStorage('taxonomy_vocabulary')->load('css_color')) {
+      return $options;
+    }
+    $terms = $this->termStorage->loadTree('css_color', 0, NULL, TRUE);
     foreach ($terms as $term) {
       $options[$term->id()] = $term->getName();
     }
@@ -221,12 +233,11 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['sizing_option'] = $form_state->getValue('sizing_option');
-    // Save the new padding options.
     $this->configuration['horizontal_padding_option'] = $form_state->getValue('horizontal_padding_option');
     $this->configuration['vertical_padding_option'] = $form_state->getValue('vertical_padding_option');
-    // Save the new gap option.
     $this->configuration['gap_option'] = $form_state->getValue('gap_option');
     $this->configuration['background_color'] = $form_state->getValue('background_color');
+    $this->configuration['foreground_color'] = $form_state->getValue('foreground_color');
   }
 
   /**
@@ -235,76 +246,51 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function build(array $regions): array {
     $build = parent::build($regions);
 
-    // Attach the shared padding library.
     $build['#attached']['library'][] = 'kingly_layouts/padding';
 
     $plugin_definition = $this->getPluginDefinition();
     $layout_id = $plugin_definition->id();
 
-    // Add the sizing option as a class (this remains layout-specific).
     if (!empty($this->configuration['sizing_option'])) {
       $build['#attributes']['class'][] = 'layout--' . $layout_id . '--' . $this->configuration['sizing_option'];
     }
 
-    // Add the horizontal padding option as a generic utility class.
     $h_padding = $this->configuration['horizontal_padding_option'];
     if (!empty($h_padding) && $h_padding !== '_none') {
       $build['#attributes']['class'][] = 'kingly-layout-padding-x-' . $h_padding;
     }
 
-    // Add the vertical padding option as a generic utility class.
     $v_padding = $this->configuration['vertical_padding_option'];
     if (!empty($v_padding) && $v_padding !== '_none') {
       $build['#attributes']['class'][] = 'kingly-layout-padding-y-' . $v_padding;
     }
 
-    // Add the gap option as a generic utility class.
     $gap = $this->configuration['gap_option'];
     if (!empty($gap) && $gap !== '_none') {
       $build['#attributes']['class'][] = 'kingly-layout-gap-' . $gap;
     }
 
-    // Add the background color as an inline style.
     $background_tid = $this->configuration['background_color'];
     if (!empty($background_tid) && $background_tid !== '_none') {
       /** @var \Drupal\taxonomy\TermInterface $term */
       $term = $this->termStorage->load($background_tid);
-      if ($term && $term->bundle() === 'background_color' && $term->hasField('field_css_color') && !$term->get('field_css_color')
-        ->isEmpty()) {
+      if ($term && $term->bundle() === 'css_color' && $term->hasField('field_css_color') && !$term->get('field_css_color')->isEmpty()) {
         $hex_color = $term->get('field_css_color')->value;
         $build['#attributes']['style'][] = 'background-color: ' . $hex_color . ';';
-        // Set text color for contrast.
-        $build['#attributes']['style'][] = 'color: ' . $this->getContrastColor($hex_color) . ';';
+      }
+    }
+
+    $foreground_tid = $this->configuration['foreground_color'];
+    if (!empty($foreground_tid) && $foreground_tid !== '_none') {
+      /** @var \Drupal\taxonomy\TermInterface $term */
+      $term = $this->termStorage->load($foreground_tid);
+      if ($term && $term->bundle() === 'css_color' && $term->hasField('field_css_color') && !$term->get('field_css_color')->isEmpty()) {
+        $hex_color = $term->get('field_css_color')->value;
+        $build['#attributes']['style'][] = 'color: ' . $hex_color . ';';
       }
     }
 
     return $build;
-  }
-
-  /**
-   * Determines if text should be black or white based on background color.
-   *
-   * @param string $hex_color
-   *   The hex color code (e.g., '#RRGGBB').
-   *
-   * @return string
-   *   Returns '#000000' (black) or '#ffffff' (white).
-   */
-  protected function getContrastColor(string $hex_color): string {
-    $hex_color = ltrim($hex_color, '#');
-    if (strlen($hex_color) === 3) {
-      $hex_color = str_repeat($hex_color[0], 2) . str_repeat($hex_color[1], 2) . str_repeat($hex_color[2], 2);
-    }
-    if (strlen($hex_color) !== 6) {
-      // Default to black for invalid hex.
-      return '#000000';
-    }
-    $r = hexdec(substr($hex_color, 0, 2));
-    $g = hexdec(substr($hex_color, 2, 2));
-    $b = hexdec(substr($hex_color, 4, 2));
-    // Formula from http://www.w3.org/TR/AERT#color-contrast
-    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-    return ($yiq >= 128) ? '#000000' : '#ffffff';
   }
 
 }
