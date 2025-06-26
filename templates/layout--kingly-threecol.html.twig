@@ -16,12 +16,10 @@
  * @ingroup themeable
  */
 #}
-{%
-  set classes = [
+{% set classes = [
   'kingly-layout',
   'layout--kingly_threecol'
-]
-%}
+] %}
 {% if content %}
   <div{{ attributes.addClass(classes) }}>
     {% if content.first %}

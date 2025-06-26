@@ -13,7 +13,11 @@
 }
 
 /* Sizing variations for larger screens */
-@media screen and (min-width: 40em) { /* Example breakpoint */
+@media screen and (min-width: 40em) {
+  /* Example breakpoint */
+  .layout--kingly_twocol {
+    flex-wrap: nowrap; /* Prevent wrapping on larger screens */
+  }
   .layout--kingly_twocol--50-50 > .layout__region--first,
   .layout--kingly_twocol--50-50 > .layout__region--second {
     flex: 0 0 50%; /* Fixed width */

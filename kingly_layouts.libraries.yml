@@ -1,28 +1,28 @@
 padding:
   css:
     theme:
-      css/padding.css: {}
+      css/padding.css: { }
 
 # Library for the one-column layout.
 kingly_onecol:
   css:
     theme:
-      css/kingly-onecol.css: {}
+      css/kingly-onecol.css: { }
 
 # Library for the two-column layout.
 kingly_twocol:
   css:
     theme:
-      css/kingly-twocol.css: {}
+      css/kingly-twocol.css: { }
 
 # Library for the three-column layout.
 kingly_threecol:
   css:
     theme:
-      css/kingly-threecol.css: {}
+      css/kingly-threecol.css: { }
 
 # Library for the four-column layout.
 kingly_fourcol:
   css:
     theme:
-      css/kingly-fourcol.css: {}
+      css/kingly-fourcol.css: { }

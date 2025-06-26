@@ -12,7 +12,11 @@
 }
 
 /* Sizing variations for larger screens */
-@media screen and (min-width: 40em) { /* Example breakpoint */
+@media screen and (min-width: 40em) {
+  /* Example breakpoint */
+  .layout--kingly_threecol {
+    flex-wrap: nowrap; /* Prevent wrapping on larger screens */
+  }
   .layout--kingly_threecol--33-34-33 > .layout__region--first,
   .layout--kingly_threecol--33-34-33 > .layout__region--third {
     flex: 0 0 33.333%;

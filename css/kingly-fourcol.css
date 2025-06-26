@@ -12,7 +12,11 @@
 }
 
 /* Sizing variations for larger screens */
-@media screen and (min-width: 40em) { /* Example breakpoint */
+@media screen and (min-width: 40em) {
+  /* Example breakpoint */
+  .layout--kingly_fourcol {
+    flex-wrap: nowrap; /* Prevent wrapping on larger screens */
+  }
   .layout--kingly_fourcol--25-25-25-25 > .layout__region {
     flex: 0 0 25%;
   }
