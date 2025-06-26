@@ -1,7 +1,7 @@
-padding:
+kingly_utilities:
   css:
     theme:
-      css/padding.css: { }
+      css/kingly-utilities.css: { }
 
 # Library for the one-column layout.
 kingly_onecol:

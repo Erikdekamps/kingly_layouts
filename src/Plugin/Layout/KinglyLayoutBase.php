@@ -81,6 +81,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['background_color'] = '_none';
     $configuration['foreground_color'] = '_none';
 
+    // Add default for full width option.
+    $configuration['full_width'] = FALSE;
+
     return $configuration;
   }
 
@@ -186,6 +189,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       ];
     }
 
+    // ADDED: Full width option.
+    $form['full_width'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Full Width'),
+      '#description' => $this->t('Check this to make the layout span the full width of the viewport, breaking out of its container.'),
+      '#default_value' => $this->configuration['full_width'],
+    ];
+
     return $form;
   }
 
@@ -239,6 +250,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['gap_option'] = $form_state->getValue('gap_option');
     $this->configuration['background_color'] = $form_state->getValue('background_color');
     $this->configuration['foreground_color'] = $form_state->getValue('foreground_color');
+    $this->configuration['full_width'] = $form_state->getValue('full_width');
   }
 
   /**
@@ -247,7 +259,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function build(array $regions): array {
     $build = parent::build($regions);
 
-    $build['#attached']['library'][] = 'kingly_layouts/padding';
+    $build['#attached']['library'][] = 'kingly_layouts/kingly_utilities';
 
     $plugin_definition = $this->getPluginDefinition();
     $layout_id = $plugin_definition->id();
@@ -291,6 +303,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         $hex_color = $term->get('field_kingly_css_color')->value;
         $build['#attributes']['style'][] = 'color: ' . $hex_color . ';';
       }
+    }
+
+    // Apply full width class if enabled.
+    if (!empty($this->configuration['full_width'])) {
+      // We add a class instead of an inline style. This is cleaner and
+      // allows us to manage the full-width behavior and the inner container
+      // padding in one place in our CSS.
+      $build['#attributes']['class'][] = 'kingly-layout--full-width';
     }
 
     return $build;
