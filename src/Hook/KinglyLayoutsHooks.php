@@ -21,6 +21,7 @@ class KinglyLayoutsHooks {
           'loop' => FALSE,
           'autoplay' => TRUE,
           'muted' => TRUE,
+          'preload' => 'auto',
         ],
         'template' => 'kingly-background-video',
       ],

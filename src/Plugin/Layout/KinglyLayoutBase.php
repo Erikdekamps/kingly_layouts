@@ -141,6 +141,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['background_video_loop'] = FALSE;
     $configuration['background_video_autoplay'] = TRUE;
     $configuration['background_video_muted'] = TRUE;
+    $configuration['background_video_preload'] = 'auto';
     $configuration['background_overlay_color'] = self::NONE_OPTION_KEY;
     $configuration['background_overlay_opacity'] = self::NONE_OPTION_KEY;
 
@@ -420,6 +421,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Background Type'),
       '#options' => $this->getBackgroundTypeOptions(),
       '#default_value' => $this->configuration['background_type'],
+      '#description' => $this->t('Choose the type of background for this layout section.'),
     ];
 
     // URL field for background media.
@@ -466,24 +468,28 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Image Position'),
       '#options' => $this->getBackgroundImagePositionOptions(),
       '#default_value' => $this->configuration['background_image_position'],
+      '#description' => $this->t("Select the starting position of the background image. This is most noticeable when the image is not set to 'cover' or 'contain'."),
     ];
     $form['background_media']['image_settings']['background_image_repeat'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Repeat'),
       '#options' => $this->getBackgroundImageRepeatOptions(),
       '#default_value' => $this->configuration['background_image_repeat'],
+      '#description' => $this->t('Define if and how the background image should repeat.'),
     ];
     $form['background_media']['image_settings']['background_image_size'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Size'),
       '#options' => $this->getBackgroundImageSizeOptions(),
       '#default_value' => $this->configuration['background_image_size'],
+      '#description' => $this->t("'Cover' will fill the entire area, potentially cropping the image. 'Contain' will show the entire image, potentially leaving empty space."),
     ];
     $form['background_media']['image_settings']['background_image_attachment'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Attachment'),
       '#options' => $this->getBackgroundImageAttachmentOptions(),
       '#default_value' => $this->configuration['background_image_attachment'],
+      '#description' => $this->t("Define how the background image behaves when scrolling. 'Fixed' creates a parallax-like effect."),
     ];
     // Video settings.
     $form['background_media']['video_settings'] = [
@@ -498,16 +504,30 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#type' => 'checkbox',
       '#title' => $this->t('Loop video'),
       '#default_value' => $this->configuration['background_video_loop'],
+      '#description' => $this->t('If checked, the video will automatically restart from the beginning after it ends.'),
     ];
     $form['background_media']['video_settings']['background_video_autoplay'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Autoplay video'),
       '#default_value' => $this->configuration['background_video_autoplay'],
+      '#description' => $this->t('If checked, the video will attempt to play automatically. For this to work reliably across browsers, the video must also be muted.'),
     ];
     $form['background_media']['video_settings']['background_video_muted'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Mute video'),
       '#default_value' => $this->configuration['background_video_muted'],
+      '#description' => $this->t("If checked, the video's audio will be muted. This is required for autoplay to work in most modern browsers."),
+    ];
+    $form['background_media']['video_settings']['background_video_preload'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Preload video'),
+      '#options' => [
+        'auto' => $this->t('Auto'),
+        'metadata' => $this->t('Metadata only'),
+        'none' => $this->t('None'),
+      ],
+      '#default_value' => $this->configuration['background_video_preload'],
+      '#description' => $this->t('Specifies if and how the video should be loaded when the page loads. The "preload" attribute is often ignored if "Autoplay" is enabled, but setting it to "Auto" is still best practice.'),
     ];
     // Overlay settings.
     $form['background_media']['overlay_settings'] = [
@@ -525,12 +545,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Background Overlay Color'),
       '#options' => $this->getColorOptions(),
       '#default_value' => $this->configuration['background_overlay_color'],
+      '#description' => $this->t('Select a color for the overlay. The overlay sits on top of the background image or video, but behind the content.'),
     ];
     $form['background_media']['overlay_settings']['background_overlay_opacity'] = [
       '#type' => 'select',
       '#title' => $this->t('Background Overlay Opacity'),
       '#options' => $this->getBackgroundOverlayOpacityOptions(),
       '#default_value' => $this->configuration['background_overlay_opacity'],
+      '#description' => $this->t('Set the opacity for the overlay color. This requires an overlay color to be selected.'),
       '#states' => [
         'visible' => [
           ':input[name="layout_settings[background_media][overlay_settings][background_overlay_color]"]' => ['!value' => self::NONE_OPTION_KEY],
@@ -976,6 +998,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['background_video_loop'] = $values['background_media']['video_settings']['background_video_loop'];
     $this->configuration['background_video_autoplay'] = $values['background_media']['video_settings']['background_video_autoplay'];
     $this->configuration['background_video_muted'] = $values['background_media']['video_settings']['background_video_muted'];
+    $this->configuration['background_video_preload'] = $values['background_media']['video_settings']['background_video_preload'];
     $this->configuration['background_overlay_color'] = $values['background_media']['overlay_settings']['background_overlay_color'];
     $this->configuration['background_overlay_opacity'] = $values['background_media']['overlay_settings']['background_overlay_opacity'];
 
@@ -1118,67 +1141,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
-   * Helper to apply an inline style from a configuration value.
-   *
-   * @param array &$build
-   *   The render array.
-   * @param string $style_property
-   *   The CSS property to set.
-   * @param string $config_key
-   *   The configuration key for the color term ID.
-   */
-  private function applyStyleFromConfig(array &$build, string $style_property, string $config_key): void {
-    $color_hex = $this->getTermColorHex($this->configuration[$config_key]);
-    if ($color_hex) {
-      $build['#attributes']['style'][] = $style_property . ': ' . $color_hex . ';';
-    }
-  }
-
-  /**
-   * Retrieves the hex color value from a Kingly CSS Color taxonomy term.
-   *
-   * @param string $term_id
-   *   The ID of the taxonomy term.
-   *
-   * @return string|null
-   *   The hex color string if found and valid, NULL otherwise.
-   */
-  protected function getTermColorHex(string $term_id): ?string {
-    if (empty($term_id) || $term_id === self::NONE_OPTION_KEY) {
-      return NULL;
-    }
-
-    /** @var \Drupal\taxonomy\TermInterface $term */
-    $term = $this->termStorage->load($term_id);
-
-    if ($term instanceof TermInterface &&
-      $term->bundle() === self::KINGLY_CSS_COLOR_VOCABULARY &&
-      $term->hasField(self::KINGLY_CSS_COLOR_FIELD) &&
-      !$term->get(self::KINGLY_CSS_COLOR_FIELD)->isEmpty()) {
-      return $term->get(self::KINGLY_CSS_COLOR_FIELD)->value;
-    }
-
-    return NULL;
-  }
-
-  /**
-   * Helper to apply a generic inline style from a configuration option.
-   *
-   * @param array &$build
-   *   The render array.
-   * @param string $style_property
-   *   The CSS property to set (e.g., 'transition-duration').
-   * @param string $config_key
-   *   The configuration key whose value will be used.
-   */
-  private function applyInlineStyleFromOption(array &$build, string $style_property, string $config_key): void {
-    $value = $this->configuration[$config_key];
-    if (!empty($value) && $value !== self::NONE_OPTION_KEY) {
-      $build['#attributes']['style'][] = $style_property . ': ' . $value . ';';
-    }
-  }
-
-  /**
    * Applies background media styles and elements to the build array.
    *
    * @param array &$build
@@ -1217,6 +1179,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
           '#loop' => $this->configuration['background_video_loop'],
           '#autoplay' => $this->configuration['background_video_autoplay'],
           '#muted' => $this->configuration['background_video_muted'],
+          '#preload' => $this->configuration['background_video_preload'],
           '#weight' => -100,
         ];
       }
@@ -1242,6 +1205,67 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
           '#weight' => -99,
         ];
       }
+    }
+  }
+
+  /**
+   * Helper to apply a generic inline style from a configuration option.
+   *
+   * @param array &$build
+   *   The render array.
+   * @param string $style_property
+   *   The CSS property to set (e.g., 'transition-duration').
+   * @param string $config_key
+   *   The configuration key whose value will be used.
+   */
+  private function applyInlineStyleFromOption(array &$build, string $style_property, string $config_key): void {
+    $value = $this->configuration[$config_key];
+    if (!empty($value) && $value !== self::NONE_OPTION_KEY) {
+      $build['#attributes']['style'][] = $style_property . ': ' . $value . ';';
+    }
+  }
+
+  /**
+   * Retrieves the hex color value from a Kingly CSS Color taxonomy term.
+   *
+   * @param string $term_id
+   *   The ID of the taxonomy term.
+   *
+   * @return string|null
+   *   The hex color string if found and valid, NULL otherwise.
+   */
+  protected function getTermColorHex(string $term_id): ?string {
+    if (empty($term_id) || $term_id === self::NONE_OPTION_KEY) {
+      return NULL;
+    }
+
+    /** @var \Drupal\taxonomy\TermInterface $term */
+    $term = $this->termStorage->load($term_id);
+
+    if ($term instanceof TermInterface &&
+      $term->bundle() === self::KINGLY_CSS_COLOR_VOCABULARY &&
+      $term->hasField(self::KINGLY_CSS_COLOR_FIELD) &&
+      !$term->get(self::KINGLY_CSS_COLOR_FIELD)->isEmpty()) {
+      return $term->get(self::KINGLY_CSS_COLOR_FIELD)->value;
+    }
+
+    return NULL;
+  }
+
+  /**
+   * Helper to apply an inline style from a configuration value.
+   *
+   * @param array &$build
+   *   The render array.
+   * @param string $style_property
+   *   The CSS property to set.
+   * @param string $config_key
+   *   The configuration key for the color term ID.
+   */
+  private function applyStyleFromConfig(array &$build, string $style_property, string $config_key): void {
+    $color_hex = $this->getTermColorHex($this->configuration[$config_key]);
+    if ($color_hex) {
+      $build['#attributes']['style'][] = $style_property . ': ' . $color_hex . ';';
     }
   }
 
