@@ -250,8 +250,9 @@
 
 /*
  * These utilities require the layout container to be a flex or grid container.
- * They control the vertical alignment of items (regions) within the container.
  */
+
+/* Vertical Alignment (align-content) */
 .kingly-layout-align-content-flex-start {
   align-content: flex-start;
 }
@@ -266,6 +267,26 @@
 }
 .kingly-layout-align-content-baseline {
   align-content: baseline;
+}
+
+/* Horizontal Alignment (justify-content) */
+.kingly-layout-justify-content-start {
+  justify-content: flex-start;
+}
+.kingly-layout-justify-content-center {
+  justify-content: center;
+}
+.kingly-layout-justify-content-end {
+  justify-content: flex-end;
+}
+.kingly-layout-justify-content-space-between {
+  justify-content: space-between;
+}
+.kingly-layout-justify-content-space-around {
+  justify-content: space-around;
+}
+.kingly-layout-justify-content-space-evenly {
+  justify-content: space-evenly;
 }
 
 /* --- Background Media Utilities --- */

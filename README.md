@@ -73,6 +73,9 @@ from `None` to `Extra Large`.
 
 * **Vertical Alignment**: Align the content of all columns vertically (Top,
   Middle, Bottom). Especially useful for columns of different heights.
+* **Horizontal Content Alignment**: Justify the content within the layout
+  section horizontally (e.g., Start/Left, Center, End/Right, or space between
+  items). This is most effective on layouts that behave as flex containers.
 
 ### Background
 

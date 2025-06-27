@@ -259,6 +259,13 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#default_value' => $this->configuration['vertical_alignment'],
       '#description' => $this->t('Align content vertically within the layout. This assumes the layout uses Flexbox or Grid. "Stretch" makes columns in the same row equal height.'),
     ];
+    $form['alignment']['horizontal_alignment'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Horizontal Alignment'),
+      '#options' => $this->getOptions('horizontal_alignment'),
+      '#default_value' => $this->configuration['horizontal_alignment'],
+      '#description' => $this->t('Justify content horizontally within the layout. This assumes the layout uses Flexbox or Grid.'),
+    ];
 
     // Animation Options.
     $form['animation'] = [
@@ -771,6 +778,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         'flex-end' => $this->t('Bottom'),
         'baseline' => $this->t('Baseline'),
       ],
+      'horizontal_alignment' => [
+        'start' => $this->t('Start (Left)'),
+        'center' => $this->t('Center'),
+        'end' => $this->t('End (Right)'),
+        'space-between' => $this->t('Space Between'),
+        'space-around' => $this->t('Space Around'),
+        'space-evenly' => $this->t('Space Evenly'),
+      ],
       'animation_type' => $none + [
         'fade-in' => $this->t('Fade In'),
         'slide-in' => $this->t('Slide In'),
@@ -991,6 +1006,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     }
 
     $this->configuration['vertical_alignment'] = $values['alignment']['vertical_alignment'];
+    $this->configuration['horizontal_alignment'] = $values['alignment']['horizontal_alignment'];
 
     foreach ([
       'animation_type',
@@ -1125,6 +1141,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
     // Add default for vertical alignment.
     $configuration['vertical_alignment'] = 'middle';
+    $configuration['horizontal_alignment'] = 'start';
 
     // Add defaults for animation options.
     $configuration['animation_type'] = self::NONE_OPTION_KEY;
@@ -1228,6 +1245,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Apply classes from a map.
     $class_map = [
       'vertical_alignment' => 'kingly-layout-align-content-',
+      'horizontal_alignment' => 'kingly-layout-justify-content-',
       'border_radius_option' => 'kingly-layout-border-radius-',
       'box_shadow_option' => 'kingly-layout-shadow-',
       'filter_option' => 'kingly-layout-filter-',
