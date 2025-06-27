@@ -359,6 +359,28 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Choose the type of background for this layout section.'),
     ];
 
+    // Consolidated background_media_min_height field.
+    $form['background']['background_media_min_height'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Minimum Height'),
+      '#default_value' => $this->configuration['background_media_min_height'],
+      '#description' => $this->t('Set a minimum height for the section. Include the unit (e.g., 400px, 50vh). Leave blank for default height.'),
+      '#states' => [
+        'visible' => [
+          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'image']],
+          'or',
+          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'video']],
+          'or',
+          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'gradient']],
+        ],
+        'disabled' => [
+          ':input[name="layout_settings[container_type]"]' => ['value' => 'hero'],
+        ],
+      ],
+      // Place after background_type.
+      '#weight' => 1,
+    ];
+
     // --- Color Settings ---
     $form['background']['color_settings'] = [
       '#type' => 'details',
@@ -443,17 +465,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#default_value' => $this->configuration['background_media_url'],
       '#description' => $this->t('Enter the full, absolute URL for the background image.'),
     ];
-    $form['background']['image_settings']['background_media_min_height'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Minimum Height'),
-      '#default_value' => $this->configuration['background_media_min_height'],
-      '#description' => $this->t('Set a minimum height for the section. Include the unit (e.g., 400px, 50vh). Leave blank for default height.'),
-      '#states' => [
-        'disabled' => [
-          ':input[name="layout_settings[container_type]"]' => ['value' => 'hero'],
-        ],
-      ],
-    ];
     $form['background']['image_settings']['background_image_position'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Position'),
@@ -500,17 +511,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#default_value' => $this->configuration['background_media_url'],
       '#description' => $this->t('Enter the full, absolute URL for the video file (e.g., https://example.com/video.mp4). YouTube or Vimeo URLs are not supported.'),
     ];
-    $form['background']['video_settings']['background_media_min_height'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Minimum Height'),
-      '#default_value' => $this->configuration['background_media_min_height'],
-      '#description' => $this->t('Set a minimum height for the section. Include the unit (e.g., 400px, 50vh). Leave blank for default height.'),
-      '#states' => [
-        'disabled' => [
-          ':input[name="layout_settings[container_type]"]' => ['value' => 'hero'],
-        ],
-      ],
-    ];
     $form['background']['video_settings']['background_video_loop'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Loop video'),
@@ -545,17 +545,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#states' => [
         'visible' => [
           ':input[name="layout_settings[background][background_type]"]' => ['value' => 'gradient'],
-        ],
-      ],
-    ];
-    $form['background']['gradient_settings']['background_media_min_height'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Minimum Height'),
-      '#default_value' => $this->configuration['background_media_min_height'],
-      '#description' => $this->t('Set a minimum height for the section. Include the unit (e.g., 400px, 50vh). Leave blank for default height.'),
-      '#states' => [
-        'disabled' => [
-          ':input[name="layout_settings[container_type]"]' => ['value' => 'hero'],
         ],
       ],
     ];
@@ -774,7 +763,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       'vertical_alignment' => [
         'stretch' => $this->t('Stretch'),
         'flex-start' => $this->t('Top'),
-        'center' => $this->t('Middle (Default)'),
+        'center' => $this->t('Center (Default)'),
         'flex-end' => $this->t('Bottom'),
         'baseline' => $this->t('Baseline'),
       ],
@@ -1025,21 +1014,20 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
     // Consolidate shared fields based on background type.
     $media_url = '';
-    $min_height = '';
+    // background_media_min_height is now directly under $background_values.
+    $min_height = $background_values['background_media_min_height'] ?? '';
 
     switch ($this->configuration['background_type']) {
       case 'image':
         $media_url = $background_values['image_settings']['background_media_url'] ?? '';
-        $min_height = $background_values['image_settings']['background_media_min_height'] ?? '';
         break;
 
       case 'video':
         $media_url = $background_values['video_settings']['background_media_url'] ?? '';
-        $min_height = $background_values['video_settings']['background_media_min_height'] ?? '';
         break;
 
       case 'gradient':
-        $min_height = $background_values['gradient_settings']['background_media_min_height'] ?? '';
+        // No media URL for gradient.
         break;
     }
 
@@ -1140,7 +1128,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['border_style_option'] = self::NONE_OPTION_KEY;
 
     // Add default for vertical alignment.
-    $configuration['vertical_alignment'] = 'middle';
+    $configuration['vertical_alignment'] = 'center';
     $configuration['horizontal_alignment'] = 'start';
 
     // Add defaults for animation options.
@@ -1345,12 +1333,17 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   /**
    * Helper to apply a CSS class from a configuration value.
    *
+   * The suffix for the class is determined by the value of the configuration
+   * key provided. This method can also accept a direct string value instead of
+   * a configuration key.
+   *
    * @param array &$build
    *   The render array.
    * @param string $class_prefix
-   *   The prefix for the CSS class.
+   *   The prefix for the CSS class (e.g., 'kingly-layout-padding-x-').
    * @param string $config_key_or_value
-   *   The configuration key or a direct value to use for the class suffix.
+   *   The configuration key (e.g., 'horizontal_padding_option') or a direct
+   *   string value (e.g., 'sm') to use for the class suffix.
    */
   private function applyClassFromConfig(array &$build, string $class_prefix, string $config_key_or_value): void {
     // Check if the provided string is a config key or a direct value.
