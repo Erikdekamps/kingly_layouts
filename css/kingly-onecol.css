@@ -2,10 +2,26 @@
  * @file
  * Provides the layout styles for kingly_onecol.
  */
-.layout--kingly-onecol {
-  /* Add basic styling for the one column layout if needed */
+.layout--kingly_onecol--100 {
+  /*
+   * By setting display to grid, we ensure this layout behaves consistently
+   * with other multi-column layouts in the system.
+   * The alignment and gap utilities from kingly-utilities.css will apply
+   * correctly to this grid container.
+   */
+  display: grid;
+
+  /*
+   * We explicitly define a single column track that takes up all available
+   * space (1 fraction). This ensures the single region within this layout
+   * spans the full width of the container.
+   */
+  grid-template-columns: 1fr;
 }
 
-.layout--kingly-onecol > .layout__region {
-  /* Add styling for the content region if needed */
-}
+/*
+  Note on .layout__region styles:
+  No specific styling is needed for the region itself for layout purposes.
+  The parent grid container (.layout--kingly-onecol) controls the width
+  and positioning of its direct children (the regions).
+*/
