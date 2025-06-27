@@ -216,7 +216,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Container Type'),
       '#options' => $this->getContainerTypeOptions(),
       '#default_value' => $this->configuration['container_type'],
-      '#description' => $this->t('Select how the layout container should behave.'),
+      '#description' => $this->t('Select how the layout container should behave: <br> <strong>Boxed:</strong> Standard container with a maximum width. <br> <strong>Full Width (Background Only):</strong> The background spans the full viewport width, but the content remains boxed. <br> <strong>Edge to Edge (Full Bleed):</strong> Both the background and content span the full viewport width. <br> <strong>Full Screen Hero:</strong> The section fills the entire viewport height and width.'),
       '#weight' => -9,
     ];
 
