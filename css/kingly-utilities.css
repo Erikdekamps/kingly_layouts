@@ -55,6 +55,25 @@
   padding-right: calc(50vw - 50%);
 }
 
+.kingly-layout--hero {
+  /* Basic full-screen styles.  You'll likely want to customize this further. */
+  min-height: 100vh; /* This will now be the default from CSS */
+  width: 100vw;      /* This will now be the default from CSS */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--kingly-spacing-md);
+}
+
+/* If you want to ensure content within the hero doesn't get too wide */
+.kingly-layout--hero > .layout__region {
+  max-width: 1200px; /* Example max width, adjust as needed */
+  width: 100%;
+}
+
 /* --- Spacing Utilities (Padding & Margin) --- */
 
 /* Padding X */

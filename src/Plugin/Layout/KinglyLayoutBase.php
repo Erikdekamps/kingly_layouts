@@ -468,6 +468,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
           'or',
           [':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'video']],
         ],
+        // Add this new state to hide/disable when container_type is 'hero'.
+        'disabled' => [
+          ':input[name="layout_settings[container_type]"]' => ['value' => 'hero'],
+        ],
       ],
     ];
 
@@ -624,6 +628,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       'boxed' => $this->t('Boxed'),
       'full' => $this->t('Full Width (Background Only)'),
       'edge-to-edge' => $this->t('Edge to Edge (Full Bleed)'),
+      'hero' => $this->t('Full Screen Hero'),
     ];
   }
 
@@ -1025,7 +1030,15 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Background Media.
     $this->configuration['background_type'] = $values['background_media']['background_type'];
     $this->configuration['background_media_url'] = $values['background_media']['background_media_url'] ?? '';
-    $this->configuration['background_media_min_height'] = $values['background_media']['background_media_min_height'] ?? '';
+
+    // Clear background_media_min_height if container type is 'hero'.
+    if ($values['container_type'] === 'hero') {
+      $this->configuration['background_media_min_height'] = '';
+    }
+    else {
+      $this->configuration['background_media_min_height'] = $values['background_media']['background_media_min_height'] ?? '';
+    }
+
     $this->configuration['background_image_position'] = $values['background_media']['image_settings']['background_image_position'];
     $this->configuration['background_image_repeat'] = $values['background_media']['image_settings']['background_image_repeat'];
     $this->configuration['background_image_size'] = $values['background_media']['image_settings']['background_image_size'];
@@ -1078,6 +1091,14 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         $build['#attributes']['class'][] = 'kingly-layout--edge-to-edge';
         // For "Edge to Edge", we remove the horizontal padding so that the
         // content can truly span the full bleed area.
+        $h_padding_effective = self::NONE_OPTION_KEY;
+        $apply_horizontal_margin = FALSE;
+        break;
+
+      // New case for hero.
+      case 'hero':
+        $build['#attributes']['class'][] = 'kingly-layout--hero';
+        // Typically, heroes are edge-to-edge.
         $h_padding_effective = self::NONE_OPTION_KEY;
         $apply_horizontal_margin = FALSE;
         break;
