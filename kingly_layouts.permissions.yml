@@ -1,0 +1,54 @@
+administer kingly layouts sizing:
+  title: 'Administer Kingly Layouts: Column Sizing'
+  description: 'Allow users to configure the column sizing option for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts container type:
+  title: 'Administer Kingly Layouts: Container Type'
+  description: 'Allow users to configure the container type for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts spacing:
+  title: 'Administer Kingly Layouts: Spacing'
+  description: 'Allow users to configure spacing options (padding, margin, gap) for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts colors:
+  title: 'Administer Kingly Layouts: Colors'
+  description: 'Allow users to configure foreground and background colors for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts border:
+  title: 'Administer Kingly Layouts: Border'
+  description: 'Allow users to configure border options for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts alignment:
+  title: 'Administer Kingly Layouts: Alignment'
+  description: 'Allow users to configure content alignment for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts animation:
+  title: 'Administer Kingly Layouts: Animation'
+  description: 'Allow users to configure animation options for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts background:
+  title: 'Administer Kingly Layouts: Background'
+  description: 'Allow users to configure background media (image, video, gradient) and overlay options for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts shadows effects:
+  title: 'Administer Kingly Layouts: Shadows & Effects'
+  description: 'Allow users to configure box shadows, filters, opacity, scale, and rotate effects for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts responsiveness:
+  title: 'Administer Kingly Layouts: Responsiveness'
+  description: 'Allow users to configure responsiveness options (hide on breakpoint) for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts custom attributes:
+  title: 'Administer Kingly Layouts: Custom Attributes'
+  description: 'Allow users to configure custom CSS ID and classes for Kingly layouts.'
+  restrict access: true
