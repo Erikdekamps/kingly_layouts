@@ -1,0 +1,26 @@
+services:
+  kingly_layouts.color_resolver:
+    class: Drupal\kingly_layouts\Service\ColorResolver
+    arguments: ['@entity_type.manager', '@cache.default']
+    # The @entity_type.manager and @cache.default services are needed
+    # for loading taxonomy terms and caching color options.
+
+  kingly_layouts.class_applier:
+    class: Drupal\kingly_layouts\Service\LayoutClassApplier
+    # This service primarily operates on the render array and configuration,
+    # so it doesn't have direct service dependencies from the container.
+
+  kingly_layouts.style_applier:
+    class: Drupal\kingly_layouts\Service\LayoutStyleApplier
+    arguments: ['@kingly_layouts.color_resolver']
+    # Depends on the color_resolver to get hex/RGB values.
+
+  kingly_layouts.background_media_builder:
+    class: Drupal\kingly_layouts\Service\BackgroundMediaBuilder
+    arguments: ['@kingly_layouts.color_resolver']
+    # Depends on the color_resolver for gradient and overlay colors.
+
+  kingly_layouts.animation_applier:
+    class: Drupal\kingly_layouts\Service\LayoutAnimationApplier
+    # This service primarily operates on the render array and configuration,
+    # so it doesn't have direct service dependencies from the container.

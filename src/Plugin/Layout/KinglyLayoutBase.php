@@ -9,7 +9,11 @@ use Drupal\Core\Layout\LayoutDefault;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\taxonomy\TermInterface;
+use Drupal\kingly_layouts\Service\BackgroundMediaBuilder;
+use Drupal\kingly_layouts\Service\ColorResolver;
+use Drupal\kingly_layouts\Service\LayoutAnimationApplier;
+use Drupal\kingly_layouts\Service\LayoutClassApplier;
+use Drupal\kingly_layouts\Service\LayoutStyleApplier;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -61,6 +65,41 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   protected $currentUser;
 
   /**
+   * The color resolver service.
+   *
+   * @var \Drupal\kingly_layouts\Service\ColorResolver
+   */
+  protected $colorResolver;
+
+  /**
+   * The layout class applier service.
+   *
+   * @var \Drupal\kingly_layouts\Service\LayoutClassApplier
+   */
+  protected $classApplier;
+
+  /**
+   * The layout style applier service.
+   *
+   * @var \Drupal\kingly_layouts\Service\LayoutStyleApplier
+   */
+  protected $styleApplier;
+
+  /**
+   * The background media builder service.
+   *
+   * @var \Drupal\kingly_layouts\Service\BackgroundMediaBuilder
+   */
+  protected $backgroundMediaBuilder;
+
+  /**
+   * The animation applier service.
+   *
+   * @var \Drupal\kingly_layouts\Service\LayoutAnimationApplier
+   */
+  protected $animationApplier;
+
+  /**
    * Constructs a new KinglyLayoutBase object.
    *
    * @param array $configuration
@@ -75,13 +114,41 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   The cache backend.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\kingly_layouts\Service\ColorResolver $color_resolver
+   *   The color resolver service.
+   * @param \Drupal\kingly_layouts\Service\LayoutClassApplier $class_applier
+   *   The layout class applier service.
+   * @param \Drupal\kingly_layouts\Service\LayoutStyleApplier $style_applier
+   *   The layout style applier service.
+   * @param \Drupal\kingly_layouts\Service\BackgroundMediaBuilder $background_media_builder
+   *   The background media builder service.
+   * @param \Drupal\kingly_layouts\Service\LayoutAnimationApplier $animation_applier
+   *   The animation applier service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache_backend, AccountInterface $current_user) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityTypeManagerInterface $entity_type_manager,
+    CacheBackendInterface $cache_backend,
+    AccountInterface $current_user,
+    ColorResolver $color_resolver,
+    LayoutClassApplier $class_applier,
+    LayoutStyleApplier $style_applier,
+    BackgroundMediaBuilder $background_media_builder,
+    LayoutAnimationApplier $animation_applier,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
     $this->termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
     $this->cache = $cache_backend;
     $this->currentUser = $current_user;
+    // Assign new services.
+    $this->colorResolver = $color_resolver;
+    $this->classApplier = $class_applier;
+    $this->styleApplier = $style_applier;
+    $this->backgroundMediaBuilder = $background_media_builder;
+    $this->animationApplier = $animation_applier;
   }
 
   /**
@@ -94,7 +161,12 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('cache.default'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('kingly_layouts.color_resolver'),
+      $container->get('kingly_layouts.class_applier'),
+      $container->get('kingly_layouts.style_applier'),
+      $container->get('kingly_layouts.background_media_builder'),
+      $container->get('kingly_layouts.animation_applier')
     );
   }
 
@@ -1198,346 +1270,26 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    */
   public function build(array $regions): array {
     $build = parent::build($regions);
+    $config = $this->configuration;
 
     $build['#attached']['library'][] = 'kingly_layouts/kingly_utilities';
 
     $plugin_definition = $this->getPluginDefinition();
     $layout_id = $plugin_definition->id();
 
-    // Add layout-specific sizing class.
-    if (!empty($this->configuration['sizing_option'])) {
-      $build['#attributes']['class'][] = 'layout--' . $layout_id . '--' . $this->configuration['sizing_option'];
-    }
+    // Delegate class application to the LayoutClassApplier service.
+    $this->classApplier->applyClasses($build, $layout_id, $config);
 
-    // Apply container type classes and adjust padding/margin behavior.
-    $container_type = $this->configuration['container_type'];
-    $h_padding_effective = $this->configuration['horizontal_padding_option'];
-    $apply_horizontal_margin = TRUE;
+    // Delegate inline style application to the LayoutStyleApplier service.
+    $this->styleApplier->applyStyles($build, $config);
 
-    switch ($container_type) {
-      case 'full':
-        $build['#attributes']['class'][] = 'kingly-layout--full-width';
-        $apply_horizontal_margin = FALSE;
-        break;
+    // Delegate background media building to the BackgroundMediaBuilder service.
+    $this->backgroundMediaBuilder->buildBackgroundMedia($build, $config);
 
-      case 'edge-to-edge':
-        $build['#attributes']['class'][] = 'kingly-layout--edge-to-edge';
-        $h_padding_effective = self::NONE_OPTION_KEY;
-        $apply_horizontal_margin = FALSE;
-        break;
-
-      case 'hero':
-        $build['#attributes']['class'][] = 'kingly-layout--hero';
-        $h_padding_effective = self::NONE_OPTION_KEY;
-        $apply_horizontal_margin = FALSE;
-        break;
-    }
-
-    // Apply spacing utility classes.
-    $this->applyClassFromConfig($build, 'kingly-layout-padding-x-', $h_padding_effective);
-    $this->applyClassFromConfig($build, 'kingly-layout-padding-y-', 'vertical_padding_option');
-    $this->applyClassFromConfig($build, 'kingly-layout-gap-', 'gap_option');
-    $this->applyClassFromConfig($build, 'kingly-layout-margin-y-', 'vertical_margin_option');
-
-    if ($apply_horizontal_margin) {
-      $this->applyClassFromConfig($build, 'kingly-layout-margin-x-', 'horizontal_margin_option');
-    }
-
-    // Apply classes from a map.
-    $class_map = [
-      'vertical_alignment' => 'kingly-layout-align-content-',
-      'horizontal_alignment' => 'kingly-layout-justify-content-',
-      'border_radius_option' => 'kingly-layout-border-radius-',
-      'box_shadow_option' => 'kingly-layout-shadow-',
-      'filter_option' => 'kingly-layout-filter-',
-    ];
-    foreach ($class_map as $config_key => $prefix) {
-      $this->applyClassFromConfig($build, $prefix, $config_key);
-    }
-
-    // Apply background media (image, video, or gradient).
-    $this->applyBackgroundMedia($build);
-
-    // Apply inline styles from a map.
-    $style_map = [
-      'opacity_option' => 'opacity',
-    ];
-    foreach ($style_map as $config_key => $property) {
-      $this->applyInlineStyleFromOption($build, $property, $config_key);
-    }
-
-    // Handle combined transforms.
-    $transforms = [];
-    if (($scale_value = $this->configuration['transform_scale_option']) !== self::NONE_OPTION_KEY) {
-      $transforms[] = 'scale(' . $scale_value . ')';
-    }
-    if (($rotate_value = $this->configuration['transform_rotate_option']) !== self::NONE_OPTION_KEY) {
-      $transforms[] = 'rotate(' . $rotate_value . 'deg)';
-    }
-    if (!empty($transforms)) {
-      $build['#attributes']['style'][] = 'transform: ' . implode(' ', $transforms) . ';';
-    }
-
-    // Apply responsiveness classes.
-    if (!empty($this->configuration['hide_on_breakpoint'])) {
-      foreach ($this->configuration['hide_on_breakpoint'] as $breakpoint) {
-        if ($breakpoint) {
-          $build['#attributes']['class'][] = 'kingly-layout-hide-on-' . $breakpoint;
-        }
-      }
-    }
-
-    // Apply background color with opacity.
-    if ($this->configuration['background_type'] === 'color' && ($background_color_hex = $this->getTermColorHex($this->configuration['background_color']))) {
-      $background_opacity_value = $this->configuration['background_opacity'];
-      if ($background_opacity_value !== self::NONE_OPTION_KEY && ($rgb = $this->hexToRgb($background_color_hex))) {
-        $alpha = (float) $background_opacity_value / 100;
-        $build['#attributes']['style'][] = "background-color: rgba({$rgb[0]}, {$rgb[1]}, {$rgb[2]}, {$alpha});";
-      }
-      else {
-        $build['#attributes']['style'][] = 'background-color: ' . $background_color_hex . ';';
-      }
-    }
-
-    // Apply foreground color.
-    $this->applyStyleFromConfig($build, 'color', 'foreground_color');
-
-    // Apply border styles.
-    if ($border_color_hex = $this->getTermColorHex($this->configuration['border_color'])) {
-      $build['#attributes']['style'][] = 'border-color: ' . $border_color_hex . ';';
-      $border_width = $this->configuration['border_width_option'] !== self::NONE_OPTION_KEY ? $this->configuration['border_width_option'] : 'sm';
-      $border_style = $this->configuration['border_style_option'] !== self::NONE_OPTION_KEY ? $this->configuration['border_style_option'] : 'solid';
-      $this->applyClassFromConfig($build, 'kingly-layout-border-width-', $border_width);
-      $this->applyClassFromConfig($build, 'kingly-layout-border-style-', $border_style);
-    }
-
-    // Apply animation.
-    if ($this->configuration['animation_type'] !== self::NONE_OPTION_KEY) {
-      $build['#attached']['library'][] = 'kingly_layouts/kingly_animations';
-      $build['#attributes']['class'][] = 'kingly-animate';
-      $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_type');
-
-      if ($this->configuration['animation_type'] === 'slide-in' && $this->configuration['slide_direction'] !== self::NONE_OPTION_KEY) {
-        $this->applyClassFromConfig($build, 'kingly-animate--direction-', 'slide_direction');
-      }
-
-      $animation_style_map = [
-        'transition_property' => 'transition-property',
-        'transition_duration' => 'transition-duration',
-        'transition_timing_function' => 'transition-timing-function',
-        'transition_delay' => 'transition-delay',
-      ];
-      foreach ($animation_style_map as $config_key => $property) {
-        $this->applyInlineStyleFromOption($build, $property, $config_key);
-      }
-    }
-
-    // Apply custom CSS ID and classes.
-    if (!empty($this->configuration['custom_css_id'])) {
-      $build['#attributes']['id'] = $this->configuration['custom_css_id'];
-    }
-    if (!empty($this->configuration['custom_css_class'])) {
-      $build['#attributes']['class'] = array_merge($build['#attributes']['class'], explode(' ', $this->configuration['custom_css_class']));
-    }
+    // Delegate animation application to the LayoutAnimationApplier service.
+    $this->animationApplier->applyAnimation($build, $config);
 
     return $build;
-  }
-
-  /**
-   * Helper to apply a CSS class from a configuration value.
-   *
-   * The suffix for the class is determined by the value of the configuration
-   * key provided. This method can also accept a direct string value instead of
-   * a configuration key.
-   *
-   * @param array &$build
-   *   The render array.
-   * @param string $class_prefix
-   *   The prefix for the CSS class (e.g., 'kingly-layout-padding-x-').
-   * @param string $config_key_or_value
-   *   The configuration key (e.g., 'horizontal_padding_option') or a direct
-   *   string value (e.g., 'sm') to use for the class suffix.
-   */
-  private function applyClassFromConfig(array &$build, string $class_prefix, string $config_key_or_value): void {
-    // Check if the provided string is a config key or a direct value.
-    $value = $this->configuration[$config_key_or_value] ?? $config_key_or_value;
-    if (!empty($value) && $value !== self::NONE_OPTION_KEY) {
-      $build['#attributes']['class'][] = $class_prefix . $value;
-    }
-  }
-
-  /**
-   * Applies background media styles and elements to the build array.
-   *
-   * @param array &$build
-   *   The render array.
-   */
-  private function applyBackgroundMedia(array &$build): void {
-    $background_type = $this->configuration['background_type'];
-    $media_url = $this->configuration['background_media_url'];
-    $min_height = $this->configuration['background_media_min_height'];
-
-    // Apply min-height if set for a media background (image, video, or
-    // gradient).
-    if (!empty($min_height) && in_array($background_type, [
-      'image',
-      'video',
-      'gradient',
-    ])) {
-      $build['#attributes']['style'][] = 'min-height: ' . $min_height . ';';
-    }
-
-    // Handle background image or video.
-    if (!empty($media_url)) {
-      if ($background_type === 'image') {
-        $build['#attributes']['style'][] = 'background-image: url("' . $media_url . '");';
-        $this->applyInlineStyleFromOption($build, 'background-position', 'background_image_position');
-        $this->applyInlineStyleFromOption($build, 'background-repeat', 'background_image_repeat');
-        $this->applyInlineStyleFromOption($build, 'background-size', 'background_image_size');
-        $this->applyInlineStyleFromOption($build, 'background-attachment', 'background_image_attachment');
-      }
-      elseif ($background_type === 'video') {
-        $build['#attributes']['class'][] = 'kingly-layout--has-bg-video';
-        $build['video_background'] = [
-          '#theme' => 'kingly_background_video',
-          '#video_url' => $media_url,
-          '#loop' => $this->configuration['background_video_loop'],
-          '#autoplay' => $this->configuration['background_video_autoplay'],
-          '#muted' => $this->configuration['background_video_muted'],
-          '#preload' => $this->configuration['background_video_preload'],
-          '#weight' => -100,
-        ];
-      }
-    }
-    // Handle background gradient.
-    elseif ($background_type === 'gradient') {
-      $start_color_hex = $this->getTermColorHex($this->configuration['background_gradient_start_color']);
-      $end_color_hex = $this->getTermColorHex($this->configuration['background_gradient_end_color']);
-
-      if ($start_color_hex && $end_color_hex) {
-        $gradient_type = $this->configuration['background_gradient_type'];
-        if ($gradient_type === 'linear') {
-          $direction = $this->configuration['background_gradient_linear_direction'];
-          $gradient_css = "linear-gradient({$direction}, {$start_color_hex}, {$end_color_hex})";
-        }
-        else {
-          $shape = $this->configuration['background_gradient_radial_shape'];
-          $position = $this->configuration['background_gradient_radial_position'];
-          $gradient_css = "radial-gradient({$shape} at {$position}, {$start_color_hex}, {$end_color_hex})";
-        }
-        $build['#attributes']['style'][] = 'background-image: ' . $gradient_css . ';';
-      }
-    }
-
-    // Handle overlay for image, video, or gradient backgrounds.
-    if (in_array($background_type, ['image', 'video', 'gradient'])) {
-      $overlay_color_hex = $this->getTermColorHex($this->configuration['background_overlay_color']);
-      $overlay_opacity_value = $this->configuration['background_overlay_opacity'];
-
-      if ($overlay_color_hex && $overlay_opacity_value !== self::NONE_OPTION_KEY) {
-        $build['#attributes']['class'][] = 'kingly-layout--has-bg-overlay';
-        $build['overlay'] = [
-          '#type' => 'container',
-          '#attributes' => [
-            'class' => ['kingly-layout__bg-overlay'],
-            'style' => [
-              'background-color: ' . $overlay_color_hex . ';',
-              'opacity: ' . ((float) $overlay_opacity_value / 100) . ';',
-            ],
-          ],
-          '#weight' => -99,
-        ];
-      }
-    }
-  }
-
-  /**
-   * Helper to apply a generic inline style from a configuration option.
-   *
-   * @param array &$build
-   *   The render array.
-   * @param string $style_property
-   *   The CSS property to set (e.g., 'transition-duration').
-   * @param string $config_key
-   *   The configuration key whose value will be used.
-   */
-  private function applyInlineStyleFromOption(array &$build, string $style_property, string $config_key): void {
-    $value = $this->configuration[$config_key];
-    if ($value !== self::NONE_OPTION_KEY) {
-      $build['#attributes']['style'][] = $style_property . ': ' . $value . ';';
-    }
-  }
-
-  /**
-   * Retrieves the hex color value from a Kingly CSS Color taxonomy term.
-   *
-   * @param string $term_id
-   *   The ID of the taxonomy term.
-   *
-   * @return string|null
-   *   The hex color string if found and valid, NULL otherwise.
-   */
-  protected function getTermColorHex(string $term_id): ?string {
-    if (empty($term_id) || $term_id === self::NONE_OPTION_KEY) {
-      return NULL;
-    }
-
-    /** @var \Drupal\taxonomy\TermInterface $term */
-    $term = $this->termStorage->load($term_id);
-
-    if ($term instanceof TermInterface &&
-      $term->bundle() === self::KINGLY_CSS_COLOR_VOCABULARY &&
-      $term->hasField(self::KINGLY_CSS_COLOR_FIELD) &&
-      !$term->get(self::KINGLY_CSS_COLOR_FIELD)->isEmpty()) {
-      return $term->get(self::KINGLY_CSS_COLOR_FIELD)->value;
-    }
-
-    return NULL;
-  }
-
-  /**
-   * Converts a hex color string to an RGB array.
-   *
-   * @param string $hex
-   *   The hex color string (e.g., "#RRGGBB" or "RRGGBB").
-   *
-   * @return array|null
-   *   An array [R, G, B] if successful, NULL otherwise.
-   */
-  protected function hexToRgb(string $hex): ?array {
-    $hex = ltrim($hex, '#');
-
-    if (strlen($hex) === 3) {
-      $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
-      $g = hexdec(str_repeat(substr($hex, 1, 1), 2));
-      $b = hexdec(str_repeat(substr($hex, 2, 1), 2));
-    }
-    elseif (strlen($hex) === 6) {
-      $r = hexdec(substr($hex, 0, 2));
-      $g = hexdec(substr($hex, 2, 2));
-      $b = hexdec(substr($hex, 4, 2));
-    }
-    else {
-      return NULL;
-    }
-
-    return [$r, $g, $b];
-  }
-
-  /**
-   * Helper to apply an inline style from a configuration value.
-   *
-   * @param array &$build
-   *   The render array.
-   * @param string $style_property
-   *   The CSS property to set.
-   * @param string $config_key
-   *   The configuration key for the color term ID.
-   */
-  private function applyStyleFromConfig(array &$build, string $style_property, string $config_key): void {
-    if ($color_hex = $this->getTermColorHex($this->configuration[$config_key])) {
-      $build['#attributes']['style'][] = $style_property . ': ' . $color_hex . ';';
-    }
   }
 
 }
