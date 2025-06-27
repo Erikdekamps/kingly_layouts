@@ -109,8 +109,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['horizontal_margin_option'] = self::NONE_OPTION_KEY;
     $configuration['vertical_margin_option'] = self::NONE_OPTION_KEY;
 
-    // Default to no background or foreground color.
+    // Default to no background or foreground color, and no background opacity.
     $configuration['background_color'] = self::NONE_OPTION_KEY;
+    $configuration['background_opacity'] = self::NONE_OPTION_KEY;
     $configuration['foreground_color'] = self::NONE_OPTION_KEY;
 
     // Add default for container type.
@@ -275,6 +276,19 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         '#options' => $color_options,
         '#default_value' => $this->configuration['background_color'],
         '#description' => $this->t('This color is used as a fallback if a background image or video is not set.'),
+      ];
+      // Added new background opacity field.
+      $form['colors']['background_opacity'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Background Opacity'),
+        '#options' => $this->getBackgroundOpacityOptions(),
+        '#default_value' => $this->configuration['background_opacity'],
+        '#description' => $this->t('Set the opacity for the background color. This requires a background color to be selected.'),
+        '#states' => [
+          'visible' => [
+            ':input[name="layout_settings[colors][background_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+          ],
+        ],
       ];
       $form['colors']['foreground_color'] = [
         '#type' => 'select',
@@ -684,18 +698,23 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       return $cache->data;
     }
 
-    $options = [self::NONE_OPTION_KEY => $this->t('None')];
-    if (!$this->entityTypeManager->getStorage('taxonomy_vocabulary')
-      ->load(self::KINGLY_CSS_COLOR_VOCABULARY)) {
-      $this->cache->set($cid, $options, CacheBackendInterface::CACHE_PERMANENT, ['config:taxonomy.vocabulary.' . self::KINGLY_CSS_COLOR_VOCABULARY]);
-      return $options;
-    }
-    $terms = $this->termStorage->loadTree(self::KINGLY_CSS_COLOR_VOCABULARY, 0, NULL, TRUE);
-    foreach ($terms as $term) {
-      $options[$term->id()] = $term->getName();
+    $options = [
+      self::NONE_OPTION_KEY => $this->t('None'),
+    ];
+
+    // The vocabulary config entity itself is a cache dependency.
+    $cache_tags = ['config:taxonomy.vocabulary.' . self::KINGLY_CSS_COLOR_VOCABULARY];
+
+    if ($this->entityTypeManager->getStorage('taxonomy_vocabulary')->load(self::KINGLY_CSS_COLOR_VOCABULARY)) {
+      // The list of terms in the vocabulary is also a cache dependency.
+      $cache_tags[] = 'taxonomy_term_list:' . self::KINGLY_CSS_COLOR_VOCABULARY;
+      $terms = $this->termStorage->loadTree(self::KINGLY_CSS_COLOR_VOCABULARY, 0, NULL, TRUE);
+      foreach ($terms as $term) {
+        $options[$term->id()] = $term->getName();
+      }
     }
 
-    $this->cache->set($cid, $options, CacheBackendInterface::CACHE_PERMANENT, ['taxonomy_term_list:' . self::KINGLY_CSS_COLOR_VOCABULARY]);
+    $this->cache->set($cid, $options, CacheBackendInterface::CACHE_PERMANENT, $cache_tags);
 
     return $options;
   }
@@ -949,6 +968,23 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
+   * Returns the available background opacity options.
+   *
+   * @return array
+   *   An associative array of opacity options.
+   */
+  protected function getBackgroundOpacityOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('100% (Default)'),
+      '90' => $this->t('90%'),
+      '75' => $this->t('75%'),
+      '50' => $this->t('50%'),
+      '25' => $this->t('25%'),
+      '0' => $this->t('0% (Transparent)'),
+    ];
+  }
+
+  /**
    * Returns the available box shadow options.
    *
    * @return array
@@ -1012,6 +1048,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['vertical_margin_option'] = $values['spacing']['vertical_margin_option'];
 
     $this->configuration['background_color'] = $values['colors']['background_color'] ?? self::NONE_OPTION_KEY;
+    $this->configuration['background_opacity'] = $values['colors']['background_opacity'] ?? self::NONE_OPTION_KEY;
     $this->configuration['foreground_color'] = $values['colors']['foreground_color'] ?? self::NONE_OPTION_KEY;
     $this->configuration['border_color'] = $values['borders']['border_color'] ?? self::NONE_OPTION_KEY;
     $this->configuration['border_width_option'] = $values['borders']['border_width_option'];
@@ -1080,6 +1117,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $apply_horizontal_margin = TRUE;
 
     switch ($container_type) {
+      case 'boxed':
+        // No specific class for boxed, it's the default.
+        break;
+
       case 'full':
         $build['#attributes']['class'][] = 'kingly-layout--full-width';
         // For "Full Width (Background Only)", we keep the horizontal padding
@@ -1095,7 +1136,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         $apply_horizontal_margin = FALSE;
         break;
 
-      // New case for hero.
       case 'hero':
         $build['#attributes']['class'][] = 'kingly-layout--hero';
         // Typically, heroes are edge-to-edge.
@@ -1137,8 +1177,32 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       }
     }
 
-    // Apply background and foreground colors.
-    $this->applyStyleFromConfig($build, 'background-color', 'background_color');
+    // Apply background color with opacity.
+    $background_color_term_id = $this->configuration['background_color'];
+    $background_color_hex = $this->getTermColorHex($background_color_term_id);
+
+    if ($background_color_hex) {
+      $background_opacity_value = $this->configuration['background_opacity'];
+
+      // If an opacity is selected (and it's not the 'None' default)
+      if ($background_opacity_value !== self::NONE_OPTION_KEY) {
+        $rgb = $this->hexToRgb($background_color_hex);
+        if ($rgb) {
+          $alpha = (float) $background_opacity_value / 100;
+          $build['#attributes']['style'][] = 'background-color: rgba(' . $rgb[0] . ', ' . $rgb[1] . ', ' . $rgb[2] . ', ' . $alpha . ');';
+        }
+        else {
+          // Fallback to hex if RGB conversion fails.
+          $build['#attributes']['style'][] = 'background-color: ' . $background_color_hex . ';';
+        }
+      }
+      else {
+        // No specific opacity selected, use the hex color directly.
+        $build['#attributes']['style'][] = 'background-color: ' . $background_color_hex . ';';
+      }
+    }
+
+    // Apply foreground color.
     $this->applyStyleFromConfig($build, 'color', 'foreground_color');
 
     // Apply border styles.
@@ -1312,7 +1376,40 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
+   * Converts a hex color string to an RGB array.
+   *
+   * @param string $hex
+   *   The hex color string (e.g., "#RRGGBB" or "RRGGBB").
+   *
+   * @return array|null
+   *   An array [R, G, B] if successful, NULL otherwise.
+   */
+  protected function hexToRgb(string $hex): ?array {
+    $hex = ltrim($hex, '#');
+
+    if (strlen($hex) === 3) {
+      $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
+      $g = hexdec(str_repeat(substr($hex, 1, 1), 2));
+      $b = hexdec(str_repeat(substr($hex, 2, 1), 2));
+    }
+    elseif (strlen($hex) === 6) {
+      $r = hexdec(substr($hex, 0, 2));
+      $g = hexdec(substr($hex, 2, 2));
+      $b = hexdec(substr($hex, 4, 2));
+    }
+    else {
+      // Invalid hex format.
+      return NULL;
+    }
+
+    return [$r, $g, $b];
+  }
+
+  /**
    * Helper to apply an inline style from a configuration value.
+   *
+   * This method is now primarily used for foreground and border colors,
+   * as background color with opacity is handled directly in build().
    *
    * @param array &$build
    *   The render array.
