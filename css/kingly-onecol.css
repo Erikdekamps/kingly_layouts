@@ -10,7 +10,6 @@
    * correctly to this grid container.
    */
   display: grid;
-
   /*
    * We explicitly define a single column track that takes up all available
    * space (1 fraction). This ensures the single region within this layout
