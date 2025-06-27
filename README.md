@@ -89,3 +89,14 @@ from `None` to `Extra Large`.
 
 * **Hide on Breakpoint**: Choose to hide the entire layout section on specific
   screen sizes (Mobile, Tablet, or Desktop).
+
+### Custom Attributes
+
+* **Custom ID**: Assign a unique HTML `id` attribute to the layout section
+  (e.g., `my-unique-section`). This allows for specific targeting with CSS,
+  JavaScript, or anchor links. Must be unique on the page and contain only
+  letters, numbers, hyphens, and underscores.
+* **Custom CSS Classes**: Add one or more custom CSS classes to the layout
+  section, separated by spaces (e.g., `my-custom-class another-class`). This
+  provides a powerful way to apply highly specific styling or integrate with
+  external CSS frameworks.

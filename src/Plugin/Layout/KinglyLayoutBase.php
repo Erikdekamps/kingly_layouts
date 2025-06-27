@@ -160,6 +160,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Add defaults for responsiveness.
     $configuration['hide_on_breakpoint'] = [];
 
+    // Add defaults for custom CSS attributes.
+    $configuration['custom_css_id'] = '';
+    $configuration['custom_css_class'] = '';
+
     return $configuration;
   }
 
@@ -661,6 +665,26 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#options' => $this->getHideOnBreakpointOptions(),
       '#default_value' => $this->configuration['hide_on_breakpoint'],
       '#description' => $this->t('Hide this entire layout section on specific screen sizes.'),
+    ];
+
+    // Custom Attributes.
+    $form['custom_attributes'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Custom Attributes'),
+      '#open' => FALSE,
+      '#weight' => 100,
+    ];
+    $form['custom_attributes']['custom_css_id'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Custom ID'),
+      '#default_value' => $this->configuration['custom_css_id'],
+      '#description' => $this->t('Enter a unique ID for this layout section (e.g., `my-unique-section`). Must be unique on the page and contain only letters, numbers, hyphens, and underscores.'),
+    ];
+    $form['custom_attributes']['custom_css_class'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Custom CSS Classes'),
+      '#default_value' => $this->configuration['custom_css_class'],
+      '#description' => $this->t('Add one or more custom CSS classes to this layout section, separated by spaces (e.g., `my-custom-class another-class`).'),
     ];
 
     return $form;
@@ -1186,6 +1210,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
     // Responsiveness.
     $this->configuration['hide_on_breakpoint'] = array_filter($values['responsiveness']['hide_on_breakpoint']);
+
+    // Custom Attributes.
+    $this->configuration['custom_css_id'] = trim($values['custom_attributes']['custom_css_id']);
+    $this->configuration['custom_css_class'] = trim($values['custom_attributes']['custom_css_class']);
   }
 
   /**
@@ -1350,6 +1378,20 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $this->applyInlineStyleFromOption($build, 'transition-duration', 'transition_duration');
       $this->applyInlineStyleFromOption($build, 'transition-timing-function', 'transition_timing_function');
       $this->applyInlineStyleFromOption($build, 'transition-delay', 'transition_delay');
+    }
+
+    // Apply custom CSS ID and classes.
+    if (!empty($this->configuration['custom_css_id'])) {
+      $build['#attributes']['id'] = $this->configuration['custom_css_id'];
+    }
+    if (!empty($this->configuration['custom_css_class'])) {
+      // Split the string by spaces and add each as a separate class.
+      $custom_classes = explode(' ', $this->configuration['custom_css_class']);
+      foreach ($custom_classes as $class) {
+        if (!empty($class)) {
+          $build['#attributes']['class'][] = $class;
+        }
+      }
     }
 
     return $build;
