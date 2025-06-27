@@ -15,7 +15,7 @@ appearance and behavior, grouped into the following categories.
 * **Container Type**:
 * **Boxed**: Standard container with a maximum width.
 * **Full Width (Background Only)**: The background spans the full viewport
-  width, but the content remains boxed.
+  width, but the content remains aligned with the site's main content area.
 * **Edge to Edge (Full Bleed)**: Both the background and content span the full
   viewport width.
 * **Full Screen Hero**: The section fills the entire viewport height and width.
@@ -26,6 +26,10 @@ Control the space inside and around the layout. Options generally range
 from `None` to `Extra Large`.
 
 * **Horizontal & Vertical Padding**: Space inside the layout container.
+* For **Full Width (Background Only)** layouts, horizontal padding is added
+  *inside* the main content alignment, providing extra space around the content.
+* For **Edge to Edge** layouts, horizontal padding is applied from the viewport
+  edge.
 * **Gap**: Space between columns within the layout.
 * **Horizontal & Vertical Margin**: Space outside the layout container.
 

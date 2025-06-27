@@ -223,7 +223,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Container Type'),
       '#options' => $this->getContainerTypeOptions(),
       '#default_value' => $this->configuration['container_type'],
-      '#description' => $this->t('Select how the layout container should behave: <br> <strong>Boxed:</strong> Standard container with a maximum width. <br> <strong>Full Width (Background Only):</strong> The background spans the full viewport width, but the content remains boxed. <br> <strong>Edge to Edge (Full Bleed):</strong> Both the background and content span the full viewport width. <br> <strong>Full Screen Hero:</strong> The section fills the entire viewport height and width.'),
+      '#description' => $this->t("Select how the layout container should behave: <br> <strong>Boxed:</strong> Standard container with a maximum width. <br> <strong>Full Width (Background Only):</strong> The background spans the full viewport width, but the content remains aligned with the site's main content area. Horizontal padding will be applied *within* this content area. <br> <strong>Edge to Edge (Full Bleed):</strong> Both the background and content span the full viewport width. <br> <strong>Full Screen Hero:</strong> The section fills the entire viewport height and width."),
       '#weight' => -9,
     ];
 
@@ -238,7 +238,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Horizontal Padding'),
       '#options' => $this->getHorizontalPaddingOptions(),
       '#default_value' => $this->configuration['horizontal_padding_option'],
-      '#description' => $this->t('Select the horizontal padding for the layout. For "Edge to Edge" layouts, this padding is applied from the viewport edge.'),
+      '#description' => $this->t('Select the horizontal padding for the layout. For "Full Width (Background Only)" layouts, this padding is added to the default content alignment. For "Edge to Edge" layouts, this padding is applied from the viewport edge.'),
     ];
     $form['spacing']['vertical_padding_option'] = [
       '#type' => 'select',
@@ -429,10 +429,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     ];
 
     // Background.
-    // Renamed from background_media.
     $form['background'] = [
       '#type' => 'details',
-    // Renamed title.
       '#title' => $this->t('Background'),
       '#open' => FALSE,
     ];

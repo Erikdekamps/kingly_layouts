@@ -11,6 +11,12 @@
   --kingly-spacing-md: 1rem;
   --kingly-spacing-lg: 2rem;
   --kingly-spacing-xl: 4rem;
+  /*
+   * Additional horizontal padding.
+   * This variable is set by the padding-x utilities and consumed by the
+   * container type rules to prevent style clashes.
+   */
+  --kingly-padding-x-additional: 0rem;
   /* Border Radius Scale */
   --kingly-border-radius-xs: 0.25rem;
   --kingly-border-radius-sm: 0.5rem;
@@ -46,19 +52,22 @@
 }
 
 /*
- * For "Full Width (Background Only)", we also push the inner content back
- * to the original container alignment.
+ * For "Full Width (Background Only)", we calculate the base padding to
+ * align content with the site's container. We then add any user-selected
+ * horizontal padding (via --kingly-padding-x-additional) on top of that base.
+ * This prevents the padding utility classes from overriding the full-width
+ * alignment.
  */
 .kingly-layout--full-width {
-  /* 2. Push the inner content back to the original container alignment. */
-  padding-left: calc(50vw - 50%);
-  padding-right: calc(50vw - 50%);
+  /* 2. Push the inner content back, including any additional padding. */
+  padding-left: calc((50vw - 50%) + var(--kingly-padding-x-additional));
+  padding-right: calc((50vw - 50%) + var(--kingly-padding-x-additional));
 }
 
 .kingly-layout--hero {
   /* Basic full-screen styles.  You'll likely want to customize this further. */
   min-height: 100vh; /* This will now be the default from CSS */
-  width: 100vw;      /* This will now be the default from CSS */
+  width: 100vw; /* This will now be the default from CSS */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   box-sizing: border-box;
@@ -76,26 +85,38 @@
 
 /* --- Spacing Utilities (Padding & Margin) --- */
 
-/* Padding X */
+/*
+ * Padding X
+ * These utilities now only set the --kingly-padding-x-additional variable.
+ * This variable is then used by the container rules (e.g., for "Boxed" or
+ * "Full Width") to apply the final padding value correctly, making the
+ * padding additive and avoiding conflicts.
+ */
 .kingly-layout-padding-x-xs {
-  padding-left: var(--kingly-spacing-xs);
-  padding-right: var(--kingly-spacing-xs);
+  --kingly-padding-x-additional: var(--kingly-spacing-xs);
 }
 .kingly-layout-padding-x-sm {
-  padding-left: var(--kingly-spacing-sm);
-  padding-right: var(--kingly-spacing-sm);
+  --kingly-padding-x-additional: var(--kingly-spacing-sm);
 }
 .kingly-layout-padding-x-md {
-  padding-left: var(--kingly-spacing-md);
-  padding-right: var(--kingly-spacing-md);
+  --kingly-padding-x-additional: var(--kingly-spacing-md);
 }
 .kingly-layout-padding-x-lg {
-  padding-left: var(--kingly-spacing-lg);
-  padding-right: var(--kingly-spacing-lg);
+  --kingly-padding-x-additional: var(--kingly-spacing-lg);
 }
 .kingly-layout-padding-x-xl {
-  padding-left: var(--kingly-spacing-xl);
-  padding-right: var(--kingly-spacing-xl);
+  --kingly-padding-x-additional: var(--kingly-spacing-xl);
+}
+
+/*
+ * Apply the additional horizontal padding for any layout that is NOT
+ * full-width. The .kingly-layout--full-width rule handles its own padding
+ * calculation. This ensures that for "Boxed" layouts, the padding is applied
+ * as expected without interfering with the full-width logic.
+ */
+.layout[class*="kingly-layout-padding-x-"]:not(.kingly-layout--full-width) {
+  padding-left: var(--kingly-padding-x-additional);
+  padding-right: var(--kingly-padding-x-additional);
 }
 
 /* Padding Y */
