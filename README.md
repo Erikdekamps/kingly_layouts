@@ -36,7 +36,7 @@ from `None` to `Extra Large`.
 * **Background Opacity**: Apply a transparency level (from 100% down to 0%) to
   the background color, without affecting the content.
 
-### Borders
+### Border
 
 * **Border Color, Width, & Style**: Apply a border with a specific color,
   thickness, and style (solid, dashed, dotted).
@@ -66,6 +66,9 @@ from `None` to `Extra Large`.
   a sense of depth.
 * **Filter**: Apply a CSS filter to the layout, such as `Grayscale`, `Blur`,
   or `Sepia`.
+* **Opacity**: Adjust the overall transparency of the layout section.
+* **Scale**: Scale the size of the layout section.
+* **Rotate**: Rotate the layout section.
 
 ### Animation
 

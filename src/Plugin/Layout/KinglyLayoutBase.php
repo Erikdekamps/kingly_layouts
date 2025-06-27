@@ -152,6 +152,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Add defaults for shadows & effects.
     $configuration['box_shadow_option'] = self::NONE_OPTION_KEY;
     $configuration['filter_option'] = self::NONE_OPTION_KEY;
+    // New: Opacity, Scale, Rotate.
+    $configuration['opacity_option'] = self::NONE_OPTION_KEY;
+    $configuration['transform_scale_option'] = self::NONE_OPTION_KEY;
+    $configuration['transform_rotate_option'] = self::NONE_OPTION_KEY;
 
     // Add defaults for responsiveness.
     $configuration['hide_on_breakpoint'] = [];
@@ -310,13 +314,13 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     }
 
     // Borders.
-    $form['borders'] = [
+    $form['border'] = [
       '#type' => 'details',
-      '#title' => $this->t('Borders'),
+      '#title' => $this->t('Border'),
       '#open' => FALSE,
     ];
     if (count($color_options) > 1) {
-      $form['borders']['border_color'] = [
+      $form['border']['border_color'] = [
         '#type' => 'select',
         '#title' => $this->t('Border Color'),
         '#options' => $color_options,
@@ -324,7 +328,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         '#description' => $this->t('Selecting a color will enable the border options below.'),
       ];
     }
-    $form['borders']['border_width_option'] = [
+    $form['border']['border_width_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Width'),
       '#options' => $this->getBorderWidthOptions(),
@@ -335,7 +339,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         ],
       ],
     ];
-    $form['borders']['border_style_option'] = [
+    $form['border']['border_style_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Style'),
       '#options' => $this->getBorderStyleOptions(),
@@ -346,7 +350,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
         ],
       ],
     ];
-    $form['borders']['border_radius_option'] = [
+    $form['border']['border_radius_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Radius'),
       '#options' => $this->getBorderRadiusOptions(),
@@ -612,6 +616,28 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Filter'),
       '#options' => $this->getFilterOptions(),
       '#default_value' => $this->configuration['filter_option'],
+    ];
+    // New fields for Shadows & Effects.
+    $form['shadows_effects']['opacity_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Opacity'),
+      '#options' => $this->getOpacityOptions(),
+      '#default_value' => $this->configuration['opacity_option'],
+      '#description' => $this->t('Adjust the overall transparency of the layout section.'),
+    ];
+    $form['shadows_effects']['transform_scale_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Scale'),
+      '#options' => $this->getTransformScaleOptions(),
+      '#default_value' => $this->configuration['transform_scale_option'],
+      '#description' => $this->t('Scale the size of the layout section.'),
+    ];
+    $form['shadows_effects']['transform_rotate_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Rotate'),
+      '#options' => $this->getTransformRotateOptions(),
+      '#default_value' => $this->configuration['transform_rotate_option'],
+      '#description' => $this->t('Rotate the layout section.'),
     ];
 
     // Responsiveness.
@@ -1018,6 +1044,60 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
+   * Returns the available opacity options for the element itself.
+   *
+   * @return array
+   *   An associative array of opacity options.
+   */
+  protected function getOpacityOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('100% (Default)'),
+      '0.9' => $this->t('90%'),
+      '0.75' => $this->t('75%'),
+      '0.5' => $this->t('50%'),
+      '0.25' => $this->t('25%'),
+      '0' => $this->t('0% (Transparent)'),
+    ];
+  }
+
+  /**
+   * Returns the available transform scale options.
+   *
+   * @return array
+   *   An associative array of scale options.
+   */
+  protected function getTransformScaleOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None (100%)'),
+      '0.9' => $this->t('90%'),
+      '0.95' => $this->t('95%'),
+      '1.05' => $this->t('105%'),
+      '1.1' => $this->t('110%'),
+      '1.25' => $this->t('125%'),
+    ];
+  }
+
+  /**
+   * Returns the available transform rotate options.
+   *
+   * @return array
+   *   An associative array of rotate options.
+   */
+  protected function getTransformRotateOptions(): array {
+    return [
+      self::NONE_OPTION_KEY => $this->t('None (0deg)'),
+      '1' => $this->t('1 degree'),
+      '2' => $this->t('2 degrees'),
+      '3' => $this->t('3 degrees'),
+      '5' => $this->t('5 degrees'),
+      '-1' => $this->t('-1 degree'),
+      '-2' => $this->t('-2 degrees'),
+      '-3' => $this->t('-3 degrees'),
+      '-5' => $this->t('-5 degrees'),
+    ];
+  }
+
+  /**
    * Returns the available breakpoint visibility options.
    *
    * @return array
@@ -1050,10 +1130,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['background_color'] = $values['colors']['background_color'] ?? self::NONE_OPTION_KEY;
     $this->configuration['background_opacity'] = $values['colors']['background_opacity'] ?? self::NONE_OPTION_KEY;
     $this->configuration['foreground_color'] = $values['colors']['foreground_color'] ?? self::NONE_OPTION_KEY;
-    $this->configuration['border_color'] = $values['borders']['border_color'] ?? self::NONE_OPTION_KEY;
-    $this->configuration['border_width_option'] = $values['borders']['border_width_option'];
-    $this->configuration['border_style_option'] = $values['borders']['border_style_option'];
-    $this->configuration['border_radius_option'] = $values['borders']['border_radius_option'];
+    $this->configuration['border_color'] = $values['border']['border_color'] ?? self::NONE_OPTION_KEY;
+    $this->configuration['border_width_option'] = $values['border']['border_width_option'];
+    $this->configuration['border_style_option'] = $values['border']['border_style_option'];
+    $this->configuration['border_radius_option'] = $values['border']['border_radius_option'];
 
     $this->configuration['vertical_alignment'] = $values['alignment']['vertical_alignment'];
 
@@ -1090,6 +1170,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Shadows & Effects.
     $this->configuration['box_shadow_option'] = $values['shadows_effects']['box_shadow_option'];
     $this->configuration['filter_option'] = $values['shadows_effects']['filter_option'];
+    $this->configuration['opacity_option'] = $values['shadows_effects']['opacity_option'];
+    $this->configuration['transform_scale_option'] = $values['shadows_effects']['transform_scale_option'];
+    $this->configuration['transform_rotate_option'] = $values['shadows_effects']['transform_rotate_option'];
 
     // Responsiveness.
     $this->configuration['hide_on_breakpoint'] = array_filter($values['responsiveness']['hide_on_breakpoint']);
@@ -1167,6 +1250,23 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Apply shadows & effects classes.
     $this->applyClassFromConfig($build, 'kingly-layout-shadow-', 'box_shadow_option');
     $this->applyClassFromConfig($build, 'kingly-layout-filter-', 'filter_option');
+
+    // Apply new effects: Opacity, Scale, Rotate.
+    $this->applyInlineStyleFromOption($build, 'opacity', 'opacity_option');
+
+    // Handle combined transforms.
+    $transforms = [];
+    $scale_value = $this->configuration['transform_scale_option'];
+    if ($scale_value !== self::NONE_OPTION_KEY) {
+      $transforms[] = 'scale(' . $scale_value . ')';
+    }
+    $rotate_value = $this->configuration['transform_rotate_option'];
+    if ($rotate_value !== self::NONE_OPTION_KEY) {
+      $transforms[] = 'rotate(' . $rotate_value . 'deg)';
+    }
+    if (!empty($transforms)) {
+      $build['#attributes']['style'][] = 'transform: ' . implode(' ', $transforms) . ';';
+    }
 
     // Apply responsiveness classes.
     if (!empty($this->configuration['hide_on_breakpoint'])) {
@@ -1343,7 +1443,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    */
   private function applyInlineStyleFromOption(array &$build, string $style_property, string $config_key): void {
     $value = $this->configuration[$config_key];
-    if (!empty($value) && $value !== self::NONE_OPTION_KEY) {
+    // Check if the value is explicitly not the NONE_OPTION_KEY.
+    // This allows '0' or other falsy but valid values to be applied.
+    if ($value !== self::NONE_OPTION_KEY) {
       $build['#attributes']['style'][] = $style_property . ': ' . $value . ';';
     }
   }
