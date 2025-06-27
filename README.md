@@ -3,6 +3,30 @@
 A Drupal module that provides highly configurable layouts with a rich set of
 display options.
 
+## Permissions
+
+Kingly Layouts provides a set of granular permissions to control which user
+roles can configure the different aspects of a layout section. This is useful
+for preventing accidental changes and restricting complex features to trusted
+users.
+
+All permissions can be managed from the standard Drupal permissions page
+at `/admin/people/permissions` under the "Kingly Layouts" section.
+
+The available permissions correspond to the setting groups in the UI:
+
+* **Administer Kingly Layouts: Column Sizing**
+* **Administer Kingly Layouts: Container Type**
+* **Administer Kingly Layouts: Spacing**
+* **Administer Kingly Layouts: Colors**
+* **Administer Kingly Layouts: Border**
+* **Administer Kingly Layouts: Alignment**
+* **Administer Kingly Layouts: Animation**
+* **Administer Kingly Layouts: Background**
+* **Administer Kingly Layouts: Shadows & Effects**
+* **Administer Kingly Layouts: Responsiveness**
+* **Administer Kingly Layouts: Custom Attributes**
+
 ## Layout Options
 
 Each layout section comes with a comprehensive set of options to control its
@@ -52,19 +76,19 @@ from `None` to `Extra Large`.
 
 ### Background
 
-* **Background Type**: Choose between a solid color, an image, or a video
-  background.
+* **Background Type**: Choose between a solid color, an image, a video, or a
+  gradient background.
 * **Background Color & Opacity**: When 'Color' is selected as the background
-  type,
-  choose a background color and apply a transparency level (from 100% down to
-  0%)
-  without affecting the content. This color also serves as a fallback if a
-  background image or video is not set.
+  type, choose a background color and apply a transparency level (from 100% down
+  to
+  0%) without affecting the content.
 * **Media URL & Min Height**: Provide a URL for your background image or video
   and set a minimum height for the section.
 * **Image Options**: Control position, repeat, size, and attachment (for
   parallax effects).
 * **Video Options**: Control looping, autoplay, and mute settings.
+* **Gradient Options**: Configure linear or radial gradients with custom colors
+  and directions.
 * **Overlay**: Add a color overlay on top of your background media with
   adjustable opacity to improve text readability.
 
