@@ -31,10 +31,8 @@ from `None` to `Extra Large`.
 
 ### Colors
 
-* **Background & Foreground Color**: Select from a predefined list of colors
-  managed in the `Kingly CSS Color` taxonomy.
-* **Background Opacity**: Apply a transparency level (from 100% down to 0%) to
-  the background color, without affecting the content.
+* **Foreground Color**: Select from a predefined list of colors managed in the
+  `Kingly CSS Color` taxonomy.
 
 ### Border
 
@@ -48,12 +46,18 @@ from `None` to `Extra Large`.
 * **Vertical Alignment**: Align the content of all columns vertically (Top,
   Middle, Bottom). Especially useful for columns of different heights.
 
-### Background Media
+### Background
 
 * **Background Type**: Choose between a solid color, an image, or a video
   background.
-* **Media URL & Min Height**: Provide a URL for your media and set a minimum
-  height for the section.
+* **Background Color & Opacity**: When 'Color' is selected as the background
+  type,
+  choose a background color and apply a transparency level (from 100% down to
+  0%)
+  without affecting the content. This color also serves as a fallback if a
+  background image or video is not set.
+* **Media URL & Min Height**: Provide a URL for your background image or video
+  and set a minimum height for the section.
 * **Image Options**: Control position, repeat, size, and attachment (for
   parallax effects).
 * **Video Options**: Control looping, autoplay, and mute settings.

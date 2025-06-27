@@ -204,6 +204,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form = parent::buildConfigurationForm($form, $form_state);
 
+    // Get color options once, as it's used in multiple places.
+    $color_options = $this->getColorOptions();
+
     // Column Sizing (now at the top level).
     $form['sizing_option'] = [
       '#type' => 'select',
@@ -272,28 +275,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Colors'),
       '#open' => FALSE,
     ];
-    $color_options = $this->getColorOptions();
     if (count($color_options) > 1) {
-      $form['colors']['background_color'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Background Color'),
-        '#options' => $color_options,
-        '#default_value' => $this->configuration['background_color'],
-        '#description' => $this->t('This color is used as a fallback if a background image or video is not set.'),
-      ];
-      // Added new background opacity field.
-      $form['colors']['background_opacity'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Background Opacity'),
-        '#options' => $this->getBackgroundOpacityOptions(),
-        '#default_value' => $this->configuration['background_opacity'],
-        '#description' => $this->t('Set the opacity for the background color. This requires a background color to be selected.'),
-        '#states' => [
-          'visible' => [
-            ':input[name="layout_settings[colors][background_color]"]' => ['!value' => self::NONE_OPTION_KEY],
-          ],
-        ],
-      ];
+      // Background color and opacity moved to 'background' group.
       $form['colors']['foreground_color'] = [
         '#type' => 'select',
         '#title' => $this->t('Foreground Color'),
@@ -445,13 +428,41 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       ],
     ];
 
-    // Background Media.
-    $form['background_media'] = [
+    // Background.
+    // Renamed from background_media.
+    $form['background'] = [
       '#type' => 'details',
-      '#title' => $this->t('Background Media'),
+    // Renamed title.
+      '#title' => $this->t('Background'),
       '#open' => FALSE,
     ];
-    $form['background_media']['background_type'] = [
+
+    // Background Color and Opacity (moved here).
+    if (count($color_options) > 1) {
+      $form['background']['background_color'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Background Color'),
+        '#options' => $color_options,
+        '#default_value' => $this->configuration['background_color'],
+        '#description' => $this->t('This color is used as a fallback if a background image or video is not set.'),
+        '#weight' => -5,
+      ];
+      $form['background']['background_opacity'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Background Opacity'),
+        '#options' => $this->getBackgroundOpacityOptions(),
+        '#default_value' => $this->configuration['background_opacity'],
+        '#description' => $this->t('Set the opacity for the background color. This requires a background color to be selected.'),
+        '#states' => [
+          'visible' => [
+            ':input[name="layout_settings[background][background_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+          ],
+        ],
+        '#weight' => -4,
+      ];
+    }
+
+    $form['background']['background_type'] = [
       '#type' => 'radios',
       '#title' => $this->t('Background Type'),
       '#options' => $this->getBackgroundTypeOptions(),
@@ -460,31 +471,31 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     ];
 
     // URL field for background media.
-    $form['background_media']['background_media_url'] = [
+    $form['background']['background_media_url'] = [
       '#type' => 'url',
       '#title' => $this->t('Background Media URL'),
       '#default_value' => $this->configuration['background_media_url'],
       '#description' => $this->t('Enter the full, absolute URL for the background image or video (e.g., https://example.com/image.jpg or https://example.com/video.mp4). YouTube or Vimeo URLs are not supported; please use direct links to video files.'),
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'image']],
+          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'image']],
           'or',
-          [':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'video']],
+          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'video']],
         ],
       ],
     ];
 
     // Media min height field.
-    $form['background_media']['background_media_min_height'] = [
+    $form['background']['background_media_min_height'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Media Minimum Height'),
       '#default_value' => $this->configuration['background_media_min_height'],
       '#description' => $this->t('Set a minimum height for the background media container. Include the unit (e.g., 400px, 50vh, 20rem). Leave blank for default height.'),
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'image']],
+          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'image']],
           'or',
-          [':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'video']],
+          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'video']],
         ],
         // Add this new state to hide/disable when container_type is 'hero'.
         'disabled' => [
@@ -494,36 +505,36 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     ];
 
     // Image settings.
-    $form['background_media']['image_settings'] = [
+    $form['background']['image_settings'] = [
       '#type' => 'container',
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'image'],
+          ':input[name="layout_settings[background][background_type]"]' => ['value' => 'image'],
         ],
       ],
     ];
-    $form['background_media']['image_settings']['background_image_position'] = [
+    $form['background']['image_settings']['background_image_position'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Position'),
       '#options' => $this->getBackgroundImagePositionOptions(),
       '#default_value' => $this->configuration['background_image_position'],
       '#description' => $this->t("Select the starting position of the background image. This is most noticeable when the image is not set to 'cover' or 'contain'."),
     ];
-    $form['background_media']['image_settings']['background_image_repeat'] = [
+    $form['background']['image_settings']['background_image_repeat'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Repeat'),
       '#options' => $this->getBackgroundImageRepeatOptions(),
       '#default_value' => $this->configuration['background_image_repeat'],
       '#description' => $this->t('Define if and how the background image should repeat.'),
     ];
-    $form['background_media']['image_settings']['background_image_size'] = [
+    $form['background']['image_settings']['background_image_size'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Size'),
       '#options' => $this->getBackgroundImageSizeOptions(),
       '#default_value' => $this->configuration['background_image_size'],
       '#description' => $this->t("'Cover' will fill the entire area, potentially cropping the image. 'Contain' will show the entire image, potentially leaving empty space."),
     ];
-    $form['background_media']['image_settings']['background_image_attachment'] = [
+    $form['background']['image_settings']['background_image_attachment'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Attachment'),
       '#options' => $this->getBackgroundImageAttachmentOptions(),
@@ -531,33 +542,33 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t("Define how the background image behaves when scrolling. 'Fixed' creates a parallax-like effect."),
     ];
     // Video settings.
-    $form['background_media']['video_settings'] = [
+    $form['background']['video_settings'] = [
       '#type' => 'container',
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'video'],
+          ':input[name="layout_settings[background][background_type]"]' => ['value' => 'video'],
         ],
       ],
     ];
-    $form['background_media']['video_settings']['background_video_loop'] = [
+    $form['background']['video_settings']['background_video_loop'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Loop video'),
       '#default_value' => $this->configuration['background_video_loop'],
       '#description' => $this->t('If checked, the video will automatically restart from the beginning after it ends.'),
     ];
-    $form['background_media']['video_settings']['background_video_autoplay'] = [
+    $form['background']['video_settings']['background_video_autoplay'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Autoplay video'),
       '#default_value' => $this->configuration['background_video_autoplay'],
       '#description' => $this->t('If checked, the video will attempt to play automatically. For this to work reliably across browsers, the video must also be muted.'),
     ];
-    $form['background_media']['video_settings']['background_video_muted'] = [
+    $form['background']['video_settings']['background_video_muted'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Mute video'),
       '#default_value' => $this->configuration['background_video_muted'],
       '#description' => $this->t("If checked, the video's audio will be muted. This is required for autoplay to work in most modern browsers."),
     ];
-    $form['background_media']['video_settings']['background_video_preload'] = [
+    $form['background']['video_settings']['background_video_preload'] = [
       '#type' => 'select',
       '#title' => $this->t('Preload video'),
       '#options' => [
@@ -569,24 +580,24 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Specifies if and how the video should be loaded when the page loads. The "preload" attribute is often ignored if "Autoplay" is enabled, but setting it to "Auto" is still best practice.'),
     ];
     // Overlay settings.
-    $form['background_media']['overlay_settings'] = [
+    $form['background']['overlay_settings'] = [
       '#type' => 'container',
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'image']],
+          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'image']],
           'or',
-          [':input[name="layout_settings[background_media][background_type]"]' => ['value' => 'video']],
+          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'video']],
         ],
       ],
     ];
-    $form['background_media']['overlay_settings']['background_overlay_color'] = [
+    $form['background']['overlay_settings']['background_overlay_color'] = [
       '#type' => 'select',
       '#title' => $this->t('Background Overlay Color'),
-      '#options' => $this->getColorOptions(),
+      '#options' => $color_options,
       '#default_value' => $this->configuration['background_overlay_color'],
       '#description' => $this->t('Select a color for the overlay. The overlay sits on top of the background image or video, but behind the content.'),
     ];
-    $form['background_media']['overlay_settings']['background_overlay_opacity'] = [
+    $form['background']['overlay_settings']['background_overlay_opacity'] = [
       '#type' => 'select',
       '#title' => $this->t('Background Overlay Opacity'),
       '#options' => $this->getBackgroundOverlayOpacityOptions(),
@@ -594,7 +605,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#description' => $this->t('Set the opacity for the overlay color. This requires an overlay color to be selected.'),
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background_media][overlay_settings][background_overlay_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+          ':input[name="layout_settings[background][overlay_settings][background_overlay_color]"]' => ['!value' => self::NONE_OPTION_KEY],
         ],
       ],
     ];
@@ -1127,8 +1138,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['horizontal_margin_option'] = $values['spacing']['horizontal_margin_option'];
     $this->configuration['vertical_margin_option'] = $values['spacing']['vertical_margin_option'];
 
-    $this->configuration['background_color'] = $values['colors']['background_color'] ?? self::NONE_OPTION_KEY;
-    $this->configuration['background_opacity'] = $values['colors']['background_opacity'] ?? self::NONE_OPTION_KEY;
+    // Background color and opacity are now under the 'background' key.
+    $this->configuration['background_color'] = $values['background']['background_color'] ?? self::NONE_OPTION_KEY;
+    $this->configuration['background_opacity'] = $values['background']['background_opacity'] ?? self::NONE_OPTION_KEY;
     $this->configuration['foreground_color'] = $values['colors']['foreground_color'] ?? self::NONE_OPTION_KEY;
     $this->configuration['border_color'] = $values['border']['border_color'] ?? self::NONE_OPTION_KEY;
     $this->configuration['border_width_option'] = $values['border']['border_width_option'];
@@ -1144,28 +1156,28 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $this->configuration['transition_timing_function'] = $values['animation']['transition_timing_function'];
     $this->configuration['transition_delay'] = $values['animation']['transition_delay'];
 
-    // Background Media.
-    $this->configuration['background_type'] = $values['background_media']['background_type'];
-    $this->configuration['background_media_url'] = $values['background_media']['background_media_url'] ?? '';
+    // Background Media (now under 'background' key).
+    $this->configuration['background_type'] = $values['background']['background_type'];
+    $this->configuration['background_media_url'] = $values['background']['background_media_url'] ?? '';
 
     // Clear background_media_min_height if container type is 'hero'.
     if ($values['container_type'] === 'hero') {
       $this->configuration['background_media_min_height'] = '';
     }
     else {
-      $this->configuration['background_media_min_height'] = $values['background_media']['background_media_min_height'] ?? '';
+      $this->configuration['background_media_min_height'] = $values['background']['background_media_min_height'] ?? '';
     }
 
-    $this->configuration['background_image_position'] = $values['background_media']['image_settings']['background_image_position'];
-    $this->configuration['background_image_repeat'] = $values['background_media']['image_settings']['background_image_repeat'];
-    $this->configuration['background_image_size'] = $values['background_media']['image_settings']['background_image_size'];
-    $this->configuration['background_image_attachment'] = $values['background_media']['image_settings']['background_image_attachment'];
-    $this->configuration['background_video_loop'] = $values['background_media']['video_settings']['background_video_loop'];
-    $this->configuration['background_video_autoplay'] = $values['background_media']['video_settings']['background_video_autoplay'];
-    $this->configuration['background_video_muted'] = $values['background_media']['video_settings']['background_video_muted'];
-    $this->configuration['background_video_preload'] = $values['background_media']['video_settings']['background_video_preload'];
-    $this->configuration['background_overlay_color'] = $values['background_media']['overlay_settings']['background_overlay_color'];
-    $this->configuration['background_overlay_opacity'] = $values['background_media']['overlay_settings']['background_overlay_opacity'];
+    $this->configuration['background_image_position'] = $values['background']['image_settings']['background_image_position'];
+    $this->configuration['background_image_repeat'] = $values['background']['image_settings']['background_image_repeat'];
+    $this->configuration['background_image_size'] = $values['background']['image_settings']['background_image_size'];
+    $this->configuration['background_image_attachment'] = $values['background']['image_settings']['background_image_attachment'];
+    $this->configuration['background_video_loop'] = $values['background']['video_settings']['background_video_loop'];
+    $this->configuration['background_video_autoplay'] = $values['background']['video_settings']['background_video_autoplay'];
+    $this->configuration['background_video_muted'] = $values['background']['video_settings']['background_video_muted'];
+    $this->configuration['background_video_preload'] = $values['background']['video_settings']['background_video_preload'];
+    $this->configuration['background_overlay_color'] = $values['background']['overlay_settings']['background_overlay_color'];
+    $this->configuration['background_overlay_opacity'] = $values['background']['overlay_settings']['background_overlay_opacity'];
 
     // Shadows & Effects.
     $this->configuration['box_shadow_option'] = $values['shadows_effects']['box_shadow_option'];
