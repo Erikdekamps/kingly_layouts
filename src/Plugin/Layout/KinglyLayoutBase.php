@@ -124,7 +124,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['border_style_option'] = self::NONE_OPTION_KEY;
 
     // Add default for vertical alignment.
-    $configuration['vertical_alignment'] = 'stretch';
+    $configuration['vertical_alignment'] = 'middle';
 
     // Add defaults for animation options.
     $configuration['animation_type'] = self::NONE_OPTION_KEY;
@@ -804,9 +804,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    */
   protected function getVerticalAlignmentOptions(): array {
     return [
-      'stretch' => $this->t('Stretch (Default)'),
+      'stretch' => $this->t('Stretch'),
       'flex-start' => $this->t('Top'),
-      'center' => $this->t('Middle'),
+      'center' => $this->t('Middle (Default)'),
       'flex-end' => $this->t('Bottom'),
       'baseline' => $this->t('Baseline'),
     ];
