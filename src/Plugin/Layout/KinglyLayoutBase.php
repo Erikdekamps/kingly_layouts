@@ -107,12 +107,25 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Get color options once, as it's used in multiple places.
     $color_options = $this->getColorOptions();
 
+    // Get sizing options for this layout.
+    $sizing_options = $this->getSizingOptions();
+    // Get the currently configured sizing option.
+    $default_sizing_option = $this->configuration['sizing_option'];
+
+    // If the configured sizing option isn't valid for the current layout
+    // (e.g., when switching from a one-column to a two-column layout),
+    // fall back to the first available option. This prevents form validation
+    // errors.
+    if (!isset($sizing_options[$default_sizing_option])) {
+      $default_sizing_option = key($sizing_options);
+    }
+
     // Column Sizing (now at the top level).
     $form['sizing_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Column sizing'),
-      '#options' => $this->getSizingOptions(),
-      '#default_value' => $this->configuration['sizing_option'],
+      '#options' => $sizing_options,
+      '#default_value' => $default_sizing_option,
       '#description' => $this->t('Select the desired column width distribution.'),
       '#weight' => -10,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts sizing'),
