@@ -10,6 +10,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
+use Drupal\kingly_layouts\Service\AlignmentServiceInterface;
 use Drupal\kingly_layouts\Service\SpacingServiceInterface;
 use Drupal\taxonomy\TermInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -38,8 +39,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
   /**
    * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected EntityTypeManagerInterface $entityTypeManager;
 
@@ -52,24 +51,23 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
   /**
    * The cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
   protected CacheBackendInterface $cache;
 
   /**
    * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
   protected AccountInterface $currentUser;
 
   /**
    * The Kingly Layouts spacing service.
-   *
-   * @var \Drupal\kingly_layouts\Service\SpacingServiceInterface
    */
   protected SpacingServiceInterface $spacingService;
+
+  /**
+   * The Kingly Layouts alignment service.
+   */
+  protected AlignmentServiceInterface $alignmentService;
 
   /**
    * Constructs a new KinglyLayoutBase object.
@@ -88,14 +86,17 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   The current user.
    * @param \Drupal\kingly_layouts\Service\SpacingServiceInterface $spacing_service
    *   The Kingly Layouts spacing service.
+   * @param \Drupal\kingly_layouts\Service\AlignmentServiceInterface $alignment_service
+   *   The Kingly Layouts alignment service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache_backend, AccountInterface $current_user, SpacingServiceInterface $spacing_service) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache_backend, AccountInterface $current_user, SpacingServiceInterface $spacing_service, AlignmentServiceInterface $alignment_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
     $this->termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
     $this->cache = $cache_backend;
     $this->currentUser = $current_user;
     $this->spacingService = $spacing_service;
+    $this->alignmentService = $alignment_service;
   }
 
   /**
@@ -109,7 +110,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $container->get('entity_type.manager'),
       $container->get('cache.default'),
       $container->get('current_user'),
-      $container->get('kingly_layouts.spacing')
+      $container->get('kingly_layouts.spacing'),
+      $container->get('kingly_layouts.alignment')
     );
   }
 
@@ -154,8 +156,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#access' => $this->currentUser->hasPermission('administer kingly layouts container type'),
     ];
 
-    // Delegate Spacing form elements to the SpacingService.
+    // Delegate form elements to services.
     $form = $this->spacingService->buildConfigurationForm($form, $form_state, $this->configuration);
+    $form = $this->alignmentService->buildConfigurationForm($form, $form_state, $this->configuration);
 
     // Colors.
     $form['colors'] = [
@@ -228,28 +231,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#title' => $this->t('Border Radius'),
       '#options' => $this->getOptions('border_radius'),
       '#default_value' => $this->configuration['border_radius_option'],
-    ];
-
-    // Alignment.
-    $form['alignment'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Alignment'),
-      '#open' => FALSE,
-      '#access' => $this->currentUser->hasPermission('administer kingly layouts alignment'),
-    ];
-    $form['alignment']['vertical_alignment'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Vertical Alignment'),
-      '#options' => $this->getOptions('vertical_alignment'),
-      '#default_value' => $this->configuration['vertical_alignment'],
-      '#description' => $this->t('Align content vertically within the layout. This assumes the layout uses Flexbox or Grid. "Stretch" makes columns in the same row equal height.'),
-    ];
-    $form['alignment']['horizontal_alignment'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Horizontal Alignment'),
-      '#options' => $this->getOptions('horizontal_alignment'),
-      '#default_value' => $this->configuration['horizontal_alignment'],
-      '#description' => $this->t('Justify content horizontally within the layout. This assumes the layout uses Flexbox or Grid.'),
     ];
 
     // Animation Options.
@@ -959,8 +940,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $this->configuration[$key] = $values[$key];
     }
 
-    // Delegate Spacing form submission to the SpacingService.
+    // Delegate form submission to services.
     $this->spacingService->submitConfigurationForm($form, $form_state, $this->configuration);
+    $this->alignmentService->submitConfigurationForm($form, $form_state, $this->configuration);
 
     // The rest of the submission logic for other setting groups.
     $this->configuration['foreground_color'] = $values['colors']['foreground_color'] ?? self::NONE_OPTION_KEY;
@@ -973,9 +955,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     ] as $key) {
       $this->configuration[$key] = $values['border'][$key] ?? self::NONE_OPTION_KEY;
     }
-
-    $this->configuration['vertical_alignment'] = $values['alignment']['vertical_alignment'];
-    $this->configuration['horizontal_alignment'] = $values['alignment']['horizontal_alignment'];
 
     foreach ([
       'animation_type',
@@ -1085,6 +1064,10 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['horizontal_margin_option'] = self::NONE_OPTION_KEY;
     $configuration['vertical_margin_option'] = self::NONE_OPTION_KEY;
 
+    // Manually set alignment defaults.
+    $configuration['vertical_alignment'] = 'center';
+    $configuration['horizontal_alignment'] = 'start';
+
     // --- Defaults for other setting groups (to be refactored later) ---
     // Colors.
     $configuration['background_color'] = self::NONE_OPTION_KEY;
@@ -1096,10 +1079,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['border_color'] = self::NONE_OPTION_KEY;
     $configuration['border_width_option'] = self::NONE_OPTION_KEY;
     $configuration['border_style_option'] = self::NONE_OPTION_KEY;
-
-    // Alignment.
-    $configuration['vertical_alignment'] = 'center';
-    $configuration['horizontal_alignment'] = 'start';
 
     // Animation.
     $configuration['animation_type'] = self::NONE_OPTION_KEY;
@@ -1165,9 +1144,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $build['#attributes']['class'][] = 'layout--' . $layout_id . '--' . $this->configuration['sizing_option'];
     }
 
-    // Delegate all spacing processing (padding, margin, gap) to the service.
-    // The service correctly handles the logic based on the container type.
+    // Delegate processing to services.
     $this->spacingService->processBuild($build, $this->configuration);
+    $this->alignmentService->processBuild($build, $this->configuration);
 
     // Apply the main class for the container type.
     if (!empty($this->configuration['container_type'])) {
@@ -1176,8 +1155,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
     // Apply classes from a map for other settings.
     $class_map = [
-      'vertical_alignment' => 'kingly-layout-align-content-',
-      'horizontal_alignment' => 'kingly-layout-justify-content-',
       'border_radius_option' => 'kingly-layout-border-radius-',
       'box_shadow_option' => 'kingly-layout-shadow-',
       'filter_option' => 'kingly-layout-filter-',

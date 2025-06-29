@@ -2,3 +2,6 @@ services:
   kingly_layouts.spacing:
     class: Drupal\kingly_layouts\Service\SpacingService
     arguments: [ '@current_user', '@string_translation' ]
+  kingly_layouts.alignment:
+    class: Drupal\kingly_layouts\Service\AlignmentService
+    arguments: [ '@current_user', '@string_translation' ]
