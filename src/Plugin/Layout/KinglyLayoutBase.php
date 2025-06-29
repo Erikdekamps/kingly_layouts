@@ -9,6 +9,8 @@ use Drupal\Core\Layout\LayoutDefault;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
+use Drupal\kingly_layouts\Service\SpacingServiceInterface;
 use Drupal\taxonomy\TermInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -16,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Base class for Kingly layouts with sizing and background options.
  */
 abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInterface, ContainerFactoryPluginInterface {
+
+  use KinglyLayoutsUtilityTrait;
 
   /**
    * The key used for the "None" option in select lists.
@@ -37,7 +41,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The term storage.
@@ -51,14 +55,21 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $cache;
+  protected CacheBackendInterface $cache;
 
   /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $currentUser;
+  protected AccountInterface $currentUser;
+
+  /**
+   * The Kingly Layouts spacing service.
+   *
+   * @var \Drupal\kingly_layouts\Service\SpacingServiceInterface
+   */
+  protected SpacingServiceInterface $spacingService;
 
   /**
    * Constructs a new KinglyLayoutBase object.
@@ -75,13 +86,16 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   The cache backend.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\kingly_layouts\Service\SpacingServiceInterface $spacing_service
+   *   The Kingly Layouts spacing service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache_backend, AccountInterface $current_user) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache_backend, AccountInterface $current_user, SpacingServiceInterface $spacing_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
     $this->termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
     $this->cache = $cache_backend;
     $this->currentUser = $current_user;
+    $this->spacingService = $spacing_service;
   }
 
   /**
@@ -94,7 +108,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('cache.default'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('kingly_layouts.spacing')
     );
   }
 
@@ -112,15 +127,12 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Get the currently configured sizing option.
     $default_sizing_option = $this->configuration['sizing_option'];
 
-    // If the configured sizing option isn't valid for the current layout
-    // (e.g., when switching from a one-column to a two-column layout),
-    // fall back to the first available option. This prevents form validation
-    // errors.
+    // Fallback for invalid sizing option.
     if (!isset($sizing_options[$default_sizing_option])) {
       $default_sizing_option = key($sizing_options);
     }
 
-    // Column Sizing (now at the top level).
+    // Column Sizing.
     $form['sizing_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Column sizing'),
@@ -131,7 +143,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#access' => $this->currentUser->hasPermission('administer kingly layouts sizing'),
     ];
 
-    // Container Type (now at the top level).
+    // Container Type.
     $form['container_type'] = [
       '#type' => 'select',
       '#title' => $this->t('Container Type'),
@@ -142,48 +154,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       '#access' => $this->currentUser->hasPermission('administer kingly layouts container type'),
     ];
 
-    // Spacing.
-    $form['spacing'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Spacing'),
-      '#open' => FALSE,
-      '#access' => $this->currentUser->hasPermission('administer kingly layouts spacing'),
-    ];
-    $form['spacing']['horizontal_padding_option'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Horizontal Padding'),
-      '#options' => $this->getScaleOptions(),
-      '#default_value' => $this->configuration['horizontal_padding_option'],
-      '#description' => $this->t('Select the horizontal padding for the layout. For "Full Width (Background Only)" layouts, this padding is added to the default content alignment. For "Edge to Edge" layouts, this padding is applied from the viewport edge.'),
-    ];
-    $form['spacing']['vertical_padding_option'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Vertical Padding'),
-      '#options' => $this->getScaleOptions(),
-      '#default_value' => $this->configuration['vertical_padding_option'],
-      '#description' => $this->t('Select the desired vertical padding (top and bottom) for the layout container.'),
-    ];
-    $form['spacing']['gap_option'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Gap'),
-      '#options' => $this->getScaleOptions(),
-      '#default_value' => $this->configuration['gap_option'],
-      '#description' => $this->t('Select the desired gap between layout columns/regions.'),
-    ];
-    $form['spacing']['horizontal_margin_option'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Horizontal Margin'),
-      '#options' => $this->getScaleOptions(),
-      '#default_value' => $this->configuration['horizontal_margin_option'],
-      '#description' => $this->t('Select the horizontal margin for the layout. This margin will not be applied if "Full Width" or "Edge to Edge" is selected.'),
-    ];
-    $form['spacing']['vertical_margin_option'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Vertical Margin'),
-      '#options' => $this->getScaleOptions(),
-      '#default_value' => $this->configuration['vertical_margin_option'],
-      '#description' => $this->t('Select the desired vertical margin (top and bottom) for the layout container.'),
-    ];
+    // Delegate Spacing form elements to the SpacingService.
+    $form = $this->spacingService->buildConfigurationForm($form, $form_state, $this->configuration);
 
     // Colors.
     $form['colors'] = [
@@ -982,20 +954,15 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
     $values = $form_state->getValues();
 
+    // Handle settings not managed by a service.
     foreach (['sizing_option', 'container_type'] as $key) {
       $this->configuration[$key] = $values[$key];
     }
 
-    foreach ([
-      'horizontal_padding_option',
-      'vertical_padding_option',
-      'gap_option',
-      'horizontal_margin_option',
-      'vertical_margin_option',
-    ] as $key) {
-      $this->configuration[$key] = $values['spacing'][$key];
-    }
+    // Delegate Spacing form submission to the SpacingService.
+    $this->spacingService->submitConfigurationForm($form, $form_state, $this->configuration);
 
+    // The rest of the submission logic for other setting groups.
     $this->configuration['foreground_color'] = $values['colors']['foreground_color'] ?? self::NONE_OPTION_KEY;
 
     foreach ([
@@ -1027,7 +994,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
     // Consolidate shared fields based on background type.
     $media_url = '';
-    // background_media_min_height is now directly under $background_values.
     $min_height = $background_values['background_media_min_height'] ?? '';
 
     switch ($this->configuration['background_type']) {
@@ -1038,14 +1004,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       case 'video':
         $media_url = $background_values['video_settings']['background_media_url'] ?? '';
         break;
-
-      case 'gradient':
-        // No media URL for gradient.
-        break;
     }
 
     $this->configuration['background_media_url'] = $media_url;
-    // Clear background_media_min_height if container type is 'hero'.
     $this->configuration['background_media_min_height'] = ($values['container_type'] === 'hero') ? '' : $min_height;
 
     // Color settings.
@@ -1109,42 +1070,38 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function defaultConfiguration(): array {
     $configuration = parent::defaultConfiguration();
 
-    $sizing_options = $this->getSizingOptions();
-    $configuration['sizing_option'] = key($sizing_options);
+    // Set a safe, generic default for sizing.
+    $configuration['sizing_option'] = 'default';
 
-    // Add defaults for padding options.
-    $padding_options = $this->getScaleOptions();
-    $default_padding = key($padding_options);
-    $configuration['horizontal_padding_option'] = $default_padding;
-    $configuration['vertical_padding_option'] = $default_padding;
+    // Set the default for the container type.
+    $configuration['container_type'] = 'boxed';
 
-    // Add default for gap option.
-    $gap_options = $this->getScaleOptions();
-    $configuration['gap_option'] = key($gap_options);
-
-    // Add defaults for margin options.
+    // Manually set spacing defaults. These values must not come from an
+    // injected service, as this method can be called before the service
+    // is initialized.
+    $configuration['horizontal_padding_option'] = self::NONE_OPTION_KEY;
+    $configuration['vertical_padding_option'] = self::NONE_OPTION_KEY;
+    $configuration['gap_option'] = self::NONE_OPTION_KEY;
     $configuration['horizontal_margin_option'] = self::NONE_OPTION_KEY;
     $configuration['vertical_margin_option'] = self::NONE_OPTION_KEY;
 
-    // Default to no background or foreground color, and no background opacity.
+    // --- Defaults for other setting groups (to be refactored later) ---
+    // Colors.
     $configuration['background_color'] = self::NONE_OPTION_KEY;
     $configuration['background_opacity'] = self::NONE_OPTION_KEY;
     $configuration['foreground_color'] = self::NONE_OPTION_KEY;
 
-    // Add default for container type.
-    $configuration['container_type'] = 'boxed';
-
-    // Add defaults for border options.
+    // Borders.
     $configuration['border_radius_option'] = self::NONE_OPTION_KEY;
     $configuration['border_color'] = self::NONE_OPTION_KEY;
     $configuration['border_width_option'] = self::NONE_OPTION_KEY;
     $configuration['border_style_option'] = self::NONE_OPTION_KEY;
 
-    // Add default for vertical alignment.
+    // Alignment.
     $configuration['vertical_alignment'] = 'center';
     $configuration['horizontal_alignment'] = 'start';
 
-    // Add defaults for animation options.
+    // Animation.
     $configuration['animation_type'] = self::NONE_OPTION_KEY;
     $configuration['slide_direction'] = self::NONE_OPTION_KEY;
     $configuration['transition_property'] = self::NONE_OPTION_KEY;
@@ -1152,7 +1109,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['transition_timing_function'] = self::NONE_OPTION_KEY;
     $configuration['transition_delay'] = self::NONE_OPTION_KEY;
 
-    // Add defaults for background media options.
+    // Background Media.
     $configuration['background_type'] = 'color';
     $configuration['background_media_url'] = '';
     $configuration['background_media_min_height'] = '';
@@ -1167,7 +1124,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['background_overlay_color'] = self::NONE_OPTION_KEY;
     $configuration['background_overlay_opacity'] = self::NONE_OPTION_KEY;
 
-    // Add defaults for background gradient options.
+    // Background Gradient.
     $configuration['background_gradient_type'] = 'linear';
     $configuration['background_gradient_start_color'] = self::NONE_OPTION_KEY;
     $configuration['background_gradient_end_color'] = self::NONE_OPTION_KEY;
@@ -1175,18 +1132,17 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration['background_gradient_radial_shape'] = 'ellipse';
     $configuration['background_gradient_radial_position'] = 'center';
 
-    // Add defaults for shadows & effects.
+    // Shadows & Effects.
     $configuration['box_shadow_option'] = self::NONE_OPTION_KEY;
     $configuration['filter_option'] = self::NONE_OPTION_KEY;
-    // New: Opacity, Scale, Rotate.
     $configuration['opacity_option'] = self::NONE_OPTION_KEY;
     $configuration['transform_scale_option'] = self::NONE_OPTION_KEY;
     $configuration['transform_rotate_option'] = self::NONE_OPTION_KEY;
 
-    // Add defaults for responsiveness.
+    // Responsiveness.
     $configuration['hide_on_breakpoint'] = [];
 
-    // Add defaults for custom CSS attributes.
+    // Custom Attributes.
     $configuration['custom_css_id'] = '';
     $configuration['custom_css_class'] = '';
 
@@ -1205,45 +1161,20 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $layout_id = $plugin_definition->id();
 
     // Add layout-specific sizing class.
-    if (!empty($this->configuration['sizing_option'])) {
+    if (!empty($this->configuration['sizing_option']) && $this->configuration['sizing_option'] !== 'default') {
       $build['#attributes']['class'][] = 'layout--' . $layout_id . '--' . $this->configuration['sizing_option'];
     }
 
-    // Apply container type classes and adjust padding/margin behavior.
-    $container_type = $this->configuration['container_type'];
-    $h_padding_effective = $this->configuration['horizontal_padding_option'];
-    $apply_horizontal_margin = TRUE;
+    // Delegate all spacing processing (padding, margin, gap) to the service.
+    // The service correctly handles the logic based on the container type.
+    $this->spacingService->processBuild($build, $this->configuration);
 
-    switch ($container_type) {
-      case 'full':
-        $build['#attributes']['class'][] = 'kingly-layout--full-width';
-        $apply_horizontal_margin = FALSE;
-        break;
-
-      case 'edge-to-edge':
-        $build['#attributes']['class'][] = 'kingly-layout--edge-to-edge';
-        $h_padding_effective = self::NONE_OPTION_KEY;
-        $apply_horizontal_margin = FALSE;
-        break;
-
-      case 'hero':
-        $build['#attributes']['class'][] = 'kingly-layout--hero';
-        $h_padding_effective = self::NONE_OPTION_KEY;
-        $apply_horizontal_margin = FALSE;
-        break;
+    // Apply the main class for the container type.
+    if (!empty($this->configuration['container_type'])) {
+      $build['#attributes']['class'][] = 'kingly-layout--' . $this->configuration['container_type'];
     }
 
-    // Apply spacing utility classes.
-    $this->applyClassFromConfig($build, 'kingly-layout-padding-x-', $h_padding_effective);
-    $this->applyClassFromConfig($build, 'kingly-layout-padding-y-', 'vertical_padding_option');
-    $this->applyClassFromConfig($build, 'kingly-layout-gap-', 'gap_option');
-    $this->applyClassFromConfig($build, 'kingly-layout-margin-y-', 'vertical_margin_option');
-
-    if ($apply_horizontal_margin) {
-      $this->applyClassFromConfig($build, 'kingly-layout-margin-x-', 'horizontal_margin_option');
-    }
-
-    // Apply classes from a map.
+    // Apply classes from a map for other settings.
     $class_map = [
       'vertical_alignment' => 'kingly-layout-align-content-',
       'horizontal_alignment' => 'kingly-layout-justify-content-',
@@ -1252,7 +1183,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       'filter_option' => 'kingly-layout-filter-',
     ];
     foreach ($class_map as $config_key => $prefix) {
-      $this->applyClassFromConfig($build, $prefix, $config_key);
+      // Pass the configuration array to use the method from the trait.
+      $this->applyClassFromConfig($build, $prefix, $config_key, $this->configuration);
     }
 
     // Apply background media (image, video, or gradient).
@@ -1307,18 +1239,18 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       $build['#attributes']['style'][] = 'border-color: ' . $border_color_hex . ';';
       $border_width = $this->configuration['border_width_option'] !== self::NONE_OPTION_KEY ? $this->configuration['border_width_option'] : 'sm';
       $border_style = $this->configuration['border_style_option'] !== self::NONE_OPTION_KEY ? $this->configuration['border_style_option'] : 'solid';
-      $this->applyClassFromConfig($build, 'kingly-layout-border-width-', $border_width);
-      $this->applyClassFromConfig($build, 'kingly-layout-border-style-', $border_style);
+      $this->applyClassFromConfig($build, 'kingly-layout-border-width-', $border_width, $this->configuration);
+      $this->applyClassFromConfig($build, 'kingly-layout-border-style-', $border_style, $this->configuration);
     }
 
     // Apply animation.
     if ($this->configuration['animation_type'] !== self::NONE_OPTION_KEY) {
       $build['#attached']['library'][] = 'kingly_layouts/kingly_animations';
       $build['#attributes']['class'][] = 'kingly-animate';
-      $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_type');
+      $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_type', $this->configuration);
 
       if ($this->configuration['animation_type'] === 'slide-in' && $this->configuration['slide_direction'] !== self::NONE_OPTION_KEY) {
-        $this->applyClassFromConfig($build, 'kingly-animate--direction-', 'slide_direction');
+        $this->applyClassFromConfig($build, 'kingly-animate--direction-', 'slide_direction', $this->configuration);
       }
 
       $animation_style_map = [
