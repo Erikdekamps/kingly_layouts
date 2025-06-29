@@ -9,9 +9,8 @@ use Drupal\Core\Layout\LayoutDefault;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
 use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
-use Drupal\kingly_layouts\Service\AlignmentServiceInterface;
-use Drupal\kingly_layouts\Service\SpacingServiceInterface;
 use Drupal\taxonomy\TermInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -62,12 +61,12 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   /**
    * The Kingly Layouts spacing service.
    */
-  protected SpacingServiceInterface $spacingService;
+  protected KinglyLayoutsDisplayOptionInterface $spacingService;
 
   /**
    * The Kingly Layouts alignment service.
    */
-  protected AlignmentServiceInterface $alignmentService;
+  protected KinglyLayoutsDisplayOptionInterface $alignmentService;
 
   /**
    * Constructs a new KinglyLayoutBase object.
@@ -84,12 +83,12 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    *   The cache backend.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\kingly_layouts\Service\SpacingServiceInterface $spacing_service
+   * @param \Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface $spacing_service
    *   The Kingly Layouts spacing service.
-   * @param \Drupal\kingly_layouts\Service\AlignmentServiceInterface $alignment_service
+   * @param \Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface $alignment_service
    *   The Kingly Layouts alignment service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache_backend, AccountInterface $current_user, SpacingServiceInterface $spacing_service, AlignmentServiceInterface $alignment_service) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache_backend, AccountInterface $current_user, KinglyLayoutsDisplayOptionInterface $spacing_service, KinglyLayoutsDisplayOptionInterface $alignment_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
     $this->termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
