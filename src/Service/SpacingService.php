@@ -6,12 +6,13 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
 use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
 
 /**
  * Service to manage spacing options for Kingly Layouts.
  */
-class SpacingService implements SpacingServiceInterface {
+class SpacingService implements KinglyLayoutsDisplayOptionInterface {
 
   use StringTranslationTrait;
   use KinglyLayoutsUtilityTrait;
