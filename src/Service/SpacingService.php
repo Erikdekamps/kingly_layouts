@@ -141,6 +141,27 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function processBuild(array &$build, array $configuration): void {
+    $has_spacing = FALSE;
+    $defaults = self::defaultConfiguration();
+    $spacing_options = [
+      'horizontal_padding_option',
+      'vertical_padding_option',
+      'gap_option',
+      'horizontal_margin_option',
+      'vertical_margin_option',
+    ];
+
+    foreach ($spacing_options as $option) {
+      if (($configuration[$option] ?? $defaults[$option]) !== $defaults[$option]) {
+        $has_spacing = TRUE;
+        break;
+      }
+    }
+
+    if ($has_spacing) {
+      $build['#attached']['library'][] = 'kingly_layouts/spacing';
+    }
+
     // Determine effective padding and margin based on container type.
     $container_type = $configuration['container_type'];
     $h_padding_effective = $configuration['horizontal_padding_option'];

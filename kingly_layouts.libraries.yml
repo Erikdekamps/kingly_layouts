@@ -52,7 +52,7 @@ responsiveness:
   dependencies:
     - kingly_layouts/variables
 
-kingly_animations:
+animations:
   version: 1.x
   js:
     js/kingly-animations.js: {}

@@ -76,6 +76,7 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function processBuild(array &$build, array $configuration): void {
     if (!empty($configuration['hide_on_breakpoint'])) {
+      $build['#attached']['library'][] = 'kingly_layouts/responsiveness';
       foreach ($configuration['hide_on_breakpoint'] as $breakpoint) {
         if ($breakpoint) {
           $build['#attributes']['class'][] = 'kingly-layout-hide-on-' . $breakpoint;

@@ -386,12 +386,14 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $background_type = $configuration['background_type'];
     $media_url = $configuration['background_media_url'];
     $min_height = $configuration['background_media_min_height'];
+    $has_background = FALSE;
 
     if (!empty($min_height) && in_array($background_type, ['image', 'video', 'gradient'])) {
       $build['#attributes']['style'][] = 'min-height: ' . $min_height . ';';
     }
 
     if ($background_type === 'color' && ($background_color_hex = $this->colorService->getTermColorHex($configuration['background_color']))) {
+      $has_background = TRUE;
       $opacity_value = $configuration['background_opacity'];
       if ($opacity_value !== self::NONE_OPTION_KEY && ($rgb = $this->hexToRgb($background_color_hex))) {
         $alpha = (float) $opacity_value / 100;
@@ -403,6 +405,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     }
 
     if (!empty($media_url)) {
+      $has_background = TRUE;
       if ($background_type === 'image') {
         $build['#attributes']['style'][] = 'background-image: url("' . $media_url . '");';
         $this->applyInlineStyleFromOption($build, 'background-position', 'background_image_position', $configuration);
@@ -428,6 +431,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       $end_hex = $this->colorService->getTermColorHex($configuration['background_gradient_end_color']);
 
       if ($start_hex && $end_hex) {
+        $has_background = TRUE;
         if ($configuration['background_gradient_type'] === 'linear') {
           $direction = $configuration['background_gradient_linear_direction'];
           $gradient = "linear-gradient({$direction}, {$start_hex}, {$end_hex})";
@@ -442,10 +446,11 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     }
 
     // Handle overlay.
-    if (in_array($background_type, ['image', 'video', 'gradient'])) {
-      $overlay_hex = $this->colorService->getTermColorHex($configuration['background_overlay_color']);
+    $overlay_hex = $this->colorService->getTermColorHex($configuration['background_overlay_color']);
+    if (in_array($background_type, ['image', 'video', 'gradient']) && $overlay_hex) {
+      $has_background = TRUE;
       $overlay_opacity = $configuration['background_overlay_opacity'];
-      if ($overlay_hex && $overlay_opacity !== self::NONE_OPTION_KEY) {
+      if ($overlay_opacity !== self::NONE_OPTION_KEY) {
         $build['#attributes']['class'][] = 'kingly-layout--has-bg-overlay';
         $build['overlay'] = [
           '#type' => 'container',
@@ -459,6 +464,10 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
           '#weight' => -99,
         ];
       }
+    }
+
+    if ($has_background) {
+      $build['#attached']['library'][] = 'kingly_layouts/backgrounds';
     }
   }
 
