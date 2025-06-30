@@ -173,25 +173,6 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
   }
 
   /**
-   * Helper to apply a generic inline style from a configuration option.
-   *
-   * @param array &$build
-   *   The render array.
-   * @param string $style_property
-   *   The CSS property to set (e.g., 'transition-duration').
-   * @param string $config_key
-   *   The configuration key whose value will be used.
-   * @param array $configuration
-   *   The layout's current configuration.
-   */
-  private function applyInlineStyleFromOption(array &$build, string $style_property, string $config_key, array $configuration): void {
-    $value = $configuration[$config_key];
-    if ($value !== self::NONE_OPTION_KEY) {
-      $build['#attributes']['style'][] = $style_property . ': ' . $value . ';';
-    }
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function defaultConfiguration(): array {
