@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
 
 /**
  * Provides centralized option lists for layout configuration forms.
@@ -13,11 +14,6 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 class OptionsService {
 
   use StringTranslationTrait;
-
-  /**
-   * The key used for the "None" option in select lists.
-   */
-  public const NONE_OPTION_KEY = '_none';
 
   /**
    * The ID of the taxonomy vocabulary used for CSS colors.
@@ -68,7 +64,8 @@ class OptionsService {
    *   An associative array of options.
    */
   public function getOptions(string $key): array {
-    $none = [self::NONE_OPTION_KEY => $this->t('None')];
+    // Use the constant from the interface where it is defined.
+    $none = [KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY => $this->t('None')];
 
     // Special case for border_radius which combines scale options with another.
     if ($key === 'border_radius') {
@@ -118,14 +115,14 @@ class OptionsService {
         'right' => $this->t('Left to Right'),
       ],
       'transition_property' => [
-        self::NONE_OPTION_KEY => $this->t('Default (opacity, transform)'),
+        KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY => $this->t('Default (opacity, transform)'),
         'opacity' => $this->t('Opacity only'),
         'transform' => $this->t('Transform only'),
         'all' => $this->t('All properties'),
         'opacity, transform' => $this->t('Opacity and Transform'),
       ],
       'transition_duration' => [
-        self::NONE_OPTION_KEY => $this->t('Default (600ms)'),
+        KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY => $this->t('Default (600ms)'),
         '150ms' => $this->t('150ms'),
         '300ms' => $this->t('300ms'),
         '500ms' => $this->t('500ms'),
@@ -133,7 +130,7 @@ class OptionsService {
         '1s' => $this->t('1s'),
       ],
       'transition_timing_function' => [
-        self::NONE_OPTION_KEY => $this->t('Default (ease-out)'),
+        KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY => $this->t('Default (ease-out)'),
         'ease' => $this->t('ease'),
         'ease-in' => $this->t('ease-in'),
         'ease-in-out' => $this->t('ease-in-out'),
@@ -153,7 +150,7 @@ class OptionsService {
         'gradient' => $this->t('Gradient'),
       ],
       'background_opacity' => [
-        self::NONE_OPTION_KEY => $this->t('100% (Default)'),
+        KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY => $this->t('100% (Default)'),
         '90' => $this->t('90%'),
         '75' => $this->t('75%'),
         '50' => $this->t('50%'),
@@ -241,7 +238,7 @@ class OptionsService {
         'brightness' => $this->t('Brightness'),
       ],
       'opacity' => [
-        self::NONE_OPTION_KEY => $this->t('100% (Default)'),
+        KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY => $this->t('100% (Default)'),
         '0.9' => $this->t('90%'),
         '0.75' => $this->t('75%'),
         '0.5' => $this->t('50%'),
@@ -249,7 +246,7 @@ class OptionsService {
         '0' => $this->t('0% (Transparent)'),
       ],
       'transform_scale' => [
-        self::NONE_OPTION_KEY => $this->t('None (100%)'),
+        KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY => $this->t('None (100%)'),
         '0.9' => $this->t('90%'),
         '0.95' => $this->t('95%'),
         '1.05' => $this->t('105%'),
@@ -289,7 +286,7 @@ class OptionsService {
     }
 
     $options = [
-      self::NONE_OPTION_KEY => $this->t('None'),
+      KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY => $this->t('None'),
     ];
 
     // The vocabulary config entity itself is a cache dependency.
@@ -318,7 +315,7 @@ class OptionsService {
    */
   public function getScaleOptions(): array {
     return [
-      self::NONE_OPTION_KEY => $this->t('None'),
+      KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY => $this->t('None'),
       'xs' => $this->t('Extra Small (0.25rem)'),
       'sm' => $this->t('Small (0.5rem)'),
       'md' => $this->t('Medium (1rem)'),

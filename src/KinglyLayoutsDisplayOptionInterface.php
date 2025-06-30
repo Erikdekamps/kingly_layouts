@@ -15,6 +15,11 @@ use Drupal\Core\Form\FormStateInterface;
 interface KinglyLayoutsDisplayOptionInterface {
 
   /**
+   * The key used for the "None" option in select lists.
+   */
+  public const NONE_OPTION_KEY = '_none';
+
+  /**
    * Builds the form elements for this display option category.
    *
    * @param array $form

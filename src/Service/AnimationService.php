@@ -18,11 +18,6 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
   use KinglyLayoutsUtilityTrait;
 
   /**
-   * The key used for the "None" option in select lists.
-   */
-  protected const NONE_OPTION_KEY = '_none';
-
-  /**
    * The current user.
    */
   protected AccountInterface $currentUser;

@@ -18,11 +18,6 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
   use StringTranslationTrait;
 
   /**
-   * The key used for the "None" option in select lists.
-   */
-  protected const NONE_OPTION_KEY = '_none';
-
-  /**
    * The ID of the taxonomy vocabulary used for CSS colors.
    */
   protected const KINGLY_CSS_COLOR_VOCABULARY = 'kingly_css_color';
@@ -48,6 +43,13 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
    * @var \Drupal\taxonomy\TermStorageInterface
    */
   protected $termStorage;
+
+  /**
+   * A static cache for hex values to avoid redundant loads within a request.
+   *
+   * @var array
+   */
+  private static array $hexCache = [];
 
   /**
    * Constructs a new ColorService object.
@@ -135,17 +137,25 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
       return NULL;
     }
 
+    // Return from static cache if available.
+    if (isset(self::$hexCache[$term_id])) {
+      return self::$hexCache[$term_id];
+    }
+
     /** @var \Drupal\taxonomy\TermInterface $term */
     $term = $this->termStorage->load($term_id);
+    $hex_value = NULL;
 
     if ($term instanceof TermInterface &&
       $term->bundle() === self::KINGLY_CSS_COLOR_VOCABULARY &&
       $term->hasField(self::KINGLY_CSS_COLOR_FIELD) &&
       !$term->get(self::KINGLY_CSS_COLOR_FIELD)->isEmpty()) {
-      return $term->get(self::KINGLY_CSS_COLOR_FIELD)->value;
+      $hex_value = $term->get(self::KINGLY_CSS_COLOR_FIELD)->value;
     }
 
-    return NULL;
+    // Store the result (even if null) in the static cache and return it.
+    self::$hexCache[$term_id] = $hex_value;
+    return $hex_value;
   }
 
   /**

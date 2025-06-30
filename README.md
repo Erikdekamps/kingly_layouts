@@ -1,19 +1,137 @@
 # Kingly Layouts
 
-A Drupal module that provides highly configurable layouts with a rich set of
-display options.
+Kingly Layouts provides a suite of highly configurable, modern layouts for Drupal's Layout Builder. Built with a flexible plugin system, it empowers site builders to create visually rich page sections with fine-grained control over spacing, colors, backgrounds, animations, and more, all through an intuitive user interface.
+
+## Features
+
+* **Multi-Column Layouts
+  **: Includes 1, 2, 3, and 4-column layouts with responsive sizing options (e.g., 50/50, 25/75, 33/34/33).
+* **Modern Frontend
+  **: Utilizes CSS Grid for robust, efficient, and predictable layout rendering across all modern browsers.
+* **Rich Display Options**: A comprehensive set of controls to customize every aspect of a layout section.
+* **Dynamic Backgrounds**: Supports solid colors, gradients, images (with parallax), and self-hosted background videos.
+* **On-Scroll Animations**: Animate sections as they enter the viewport using the performant Intersection Observer API.
+* **Plugin Architecture**: Fully extensible system allowing developers to easily add new display option groups.
+* **Granular Permissions
+  **: Control which user roles can access each group of settings (e.g., allow editors to change colors but not spacing).
+
+## Requirements
+
+* Drupal Core Layout Discovery module (`drupal:layout_discovery`)
+* Drupal Core Taxonomy module (`drupal:taxonomy`)
+
+## Installation
+
+1. Install the module as you would any other Drupal module. The recommended way is via Composer:
+   ```bash
+   composer require erikdekamps/kingly_layouts
+   ```
+2. Enable the module on the Extend page (`/admin/modules`).
+
+## Configuration
+
+For the module's color-related options to function correctly, you must first configure the color palette.
+
+### Step 1: Configure Color Palette
+
+The module uses a Taxonomy vocabulary to manage a centralized list of colors that will be available in the layout configuration UI.
+
+1. Navigate to the vocabulary at **Structure > Taxonomy > Kingly CSS Color
+   ** (`/admin/structure/taxonomy/manage/kingly_css_color/overview`).
+2. Click **Add term** to create a new color option.
+3. Fill in the fields:
+
+* **Name
+  **: The human-readable name for the color (e.g., "Brand Blue", "Light Gray"). This is what users will see in the dropdown menus.
+* **CSS Color**: The exact CSS hex code for the color. **It must be a 6-digit hex code starting with `#`
+  ** (e.g., `#0D6EFD`, `#F8F9FA`).
+
+4. Save the term.
+5. Repeat this process for all the colors you want in your site's palette.
+
+### Step 2: Using Kingly Layouts in Layout Builder
+
+1. When managing the layout for a content type or a custom page, click **Add section**.
+2. In the right-hand sidebar, select one of the layouts prefixed with "Kingly" (e.g., "Kingly: Two column").
+3. After adding the section, click **Configure section** on the section you just added.
+4. The sidebar will now display all the available Kingly Layouts options, grouped into categories.
+
+## Layout Options
+
+The following configuration options are available for every Kingly layout section.
+
+### General
+
+* **Column Sizing
+  **: Controls the width distribution of the layout's columns (e.g., 50/50, 33/67). The specific options depend on the chosen layout.
+* **Container Type**:
+* **Boxed**: Standard container with a maximum width.
+* **Full Width (Background Only)
+  **: The background spans the full viewport width, but the content remains aligned with the site's main content area.
+* **Edge to Edge (Full Bleed)**: Both the background and content span the full viewport width.
+* **Full Screen Hero**: The section fills the entire viewport height and width.
+
+### Spacing
+
+Control the space inside and around the layout using a consistent scale.
+
+* **Horizontal & Vertical Padding**: Space *inside* the layout container.
+* **Gap**: Space *between* columns within the layout.
+* **Horizontal & Vertical Margin**: Space *outside* the layout container.
+
+### Colors
+
+* **Foreground Color**: Sets the text color for the entire section. The available options are populated from the *
+  *Kingly CSS Color** vocabulary you configured.
+
+### Border
+
+* **Border Color, Width, & Style
+  **: Apply a border using a color from your palette and a pre-defined thickness and style (solid, dashed, dotted).
+* **Border Radius**: Round the corners of the layout, with options from `Small` to `Full (Pill/Circle)`.
+
+### Alignment
+
+* **Vertical Alignment
+  **: Align the content of all columns vertically (Top, Middle, Bottom, Stretch). Especially useful for columns of different heights.
+* **Horizontal Alignment
+  **: Justify the content within the layout horizontally (e.g., Start/Left, Center, Space Between).
+
+### Background
+
+* **Background Type**: Choose between a solid color, an image, a video, or a gradient.
+* **Color Options**: When 'Color' is selected, choose a background color from your palette and set its opacity.
+* **Media Options
+  **: Provide a URL for a background image or video. For images, control position, repeat, size, and attachment (for parallax effects). For videos, control loop, autoplay, and mute settings.
+* **Gradient Options**: Configure linear or radial gradients using two colors from your palette.
+* **Overlay**: Add a semi-transparent color overlay on top of any background media to improve text readability.
+
+### Shadows & Effects
+
+* **Box Shadow**: Apply a pre-configured drop shadow to the layout container.
+* **Filter**: Apply a CSS filter like `Grayscale`, `Blur`, or `Sepia`.
+* **Opacity, Scale, Rotate**: Adjust the section's overall transparency and apply CSS transforms.
+
+### Animation
+
+* **Animation Type**: Animate the section as it scrolls into view (e.g., `Fade In`, `Slide In`).
+* **Transition Options**: Fine-tune the animation's direction, duration, speed curve, and delay.
+
+### Responsiveness
+
+* **Hide on Breakpoint
+  **: Choose to hide the entire layout section on specific screen sizes (Mobile, Tablet, or Desktop).
+
+### Custom Attributes
+
+* **Custom ID**: Assign a unique HTML `id` attribute for CSS/JS targeting or anchor links.
+* **Custom CSS Classes**: Add one or more custom classes for advanced styling.
 
 ## Permissions
 
-Kingly Layouts provides a set of granular permissions to control which user
-roles can configure the different aspects of a layout section. This is useful
-for preventing accidental changes and restricting complex features to trusted
-users.
+Kingly Layouts provides a granular permission for each option group, allowing you to control which roles can access which settings. This is useful for preventing accidental changes and restricting complex features to trusted users.
 
-All permissions can be managed from the standard Drupal permissions page
-at `/admin/people/permissions` under the "Kingly Layouts" section.
-
-The available permissions correspond to the setting groups in the UI:
+All permissions can be found on the main permissions page (`/admin/people/permissions`) under the "Kingly Layouts" section.
 
 * **Administer Kingly Layouts: Column Sizing**
 * **Administer Kingly Layouts: Container Type**
@@ -26,104 +144,3 @@ The available permissions correspond to the setting groups in the UI:
 * **Administer Kingly Layouts: Shadows & Effects**
 * **Administer Kingly Layouts: Responsiveness**
 * **Administer Kingly Layouts: Custom Attributes**
-
-## Layout Options
-
-Each layout section comes with a comprehensive set of options to control its
-appearance and behavior, grouped into the following categories.
-
-### General
-
-* **Column Sizing**: Controls the width distribution of the layout's columns (
-  e.g., 50%/50%, 33%/67%). The specific options depend on the chosen layout.
-* **Container Type**:
-* **Boxed**: Standard container with a maximum width.
-* **Full Width (Background Only)**: The background spans the full viewport
-  width, but the content remains aligned with the site's main content area.
-* **Edge to Edge (Full Bleed)**: Both the background and content span the full
-  viewport width.
-* **Full Screen Hero**: The section fills the entire viewport height and width.
-
-### Spacing
-
-Control the space inside and around the layout. Options generally range
-from `None` to `Extra Large`.
-
-* **Horizontal & Vertical Padding**: Space inside the layout container.
-* For **Full Width (Background Only)** layouts, horizontal padding is added
-  *inside* the main content alignment, providing extra space around the content.
-* For **Edge to Edge** layouts, horizontal padding is applied from the viewport
-  edge.
-* **Gap**: Space between columns within the layout.
-* **Horizontal & Vertical Margin**: Space outside the layout container.
-
-### Colors
-
-* **Foreground Color**: Select from a predefined list of colors managed in the
-  `Kingly CSS Color` taxonomy.
-
-### Border
-
-* **Border Color, Width, & Style**: Apply a border with a specific color,
-  thickness, and style (solid, dashed, dotted).
-* **Border Radius**: Round the corners of the layout, with options from `Small`
-  to `Full (Pill/Circle)`.
-
-### Alignment
-
-* **Vertical Alignment**: Align the content of all columns vertically (Top,
-  Middle, Bottom). Especially useful for columns of different heights.
-* **Horizontal Content Alignment**: Justify the content within the layout
-  section horizontally (e.g., Start/Left, Center, End/Right, or space between
-  items). This is most effective on layouts that behave as flex containers.
-
-### Background
-
-* **Background Type**: Choose between a solid color, an image, a video, or a
-  gradient background.
-* **Background Color & Opacity**: When 'Color' is selected as the background
-  type, choose a background color and apply a transparency level (from 100% down
-  to
-  0%) without affecting the content.
-* **Media URL & Min Height**: Provide a URL for your background image or video
-  and set a minimum height for the section.
-* **Image Options**: Control position, repeat, size, and attachment (for
-  parallax effects).
-* **Video Options**: Control looping, autoplay, and mute settings.
-* **Gradient Options**: Configure linear or radial gradients with custom colors
-  and directions.
-* **Overlay**: Add a color overlay on top of your background media with
-  adjustable opacity to improve text readability.
-
-### Shadows & Effects
-
-* **Box Shadow**: Apply a pre-configured drop shadow to the layout container for
-  a sense of depth.
-* **Filter**: Apply a CSS filter to the layout, such as `Grayscale`, `Blur`,
-  or `Sepia`.
-* **Opacity**: Adjust the overall transparency of the layout section.
-* **Scale**: Scale the size of the layout section.
-* **Rotate**: Rotate the layout section.
-
-### Animation
-
-* **Animation Type**: Animate the section as it scrolls into view (
-  e.g., `Fade In`, `Slide In`).
-* **Transition Options**: Fine-tune the animation's direction, duration, speed,
-  and delay.
-
-### Responsiveness
-
-* **Hide on Breakpoint**: Choose to hide the entire layout section on specific
-  screen sizes (Mobile, Tablet, or Desktop).
-
-### Custom Attributes
-
-* **Custom ID**: Assign a unique HTML `id` attribute to the layout section
-  (e.g., `my-unique-section`). This allows for specific targeting with CSS,
-  JavaScript, or anchor links. Must be unique on the page and contain only
-  letters, numbers, hyphens, and underscores.
-* **Custom CSS Classes**: Add one or more custom CSS classes to the layout
-  section, separated by spaces (e.g., `my-custom-class another-class`). This
-  provides a powerful way to apply highly specific styling or integrate with
-  external CSS frameworks.
