@@ -1,7 +1,7 @@
 /*
- * @file
- * Provides utility styles for Kingly Layouts.
- */
+* @file
+* Provides utility styles for Kingly Layouts.
+  */
 
 /* --- CSS Variables --- */
 :root {
@@ -12,10 +12,10 @@
   --kingly-spacing-lg: 2rem;
   --kingly-spacing-xl: 4rem;
   /*
-   * Additional horizontal padding.
-   * This variable is set by the padding-x utilities and consumed by the
-   * container type rules to prevent style clashes.
-   */
+  * Additional horizontal padding.
+  * This variable is set by the padding-x utilities and consumed by the
+  * container type rules to prevent style clashes.
+    */
   --kingly-padding-x-additional: 0rem;
   /* Border Radius Scale */
   --kingly-border-radius-xs: 0.25rem;
@@ -42,8 +42,19 @@
 
 /* --- Container Types --- */
 
+/*
+* Apply horizontal padding to "Boxed" and "Edge to Edge" containers.
+* The variable is 0rem by default, so no padding is added unless a
+* padding utility class is also present on the element.
+*/
+.kingly-layout--boxed,
+.kingly-layout--edge-to-edge {
+  padding-left: var(--kingly-padding-x-additional);
+  padding-right: var(--kingly-padding-x-additional);
+}
+
 /* Common full-bleed styles for both container types */
-.kingly-layout--full-width,
+.kingly-layout--full,
 .kingly-layout--edge-to-edge {
   /* 1. Pull the container out to the viewport edges. */
   margin-left: calc(50% - 50vw);
@@ -52,16 +63,14 @@
 }
 
 /*
- * For "Full Width (Background Only)", we calculate the base padding to
- * align content with the site's container. We then add any user-selected
- * horizontal padding (via --kingly-padding-x-additional) on top of that base.
- * This prevents the padding utility classes from overriding the full-width
- * alignment.
- */
-.kingly-layout--full-width {
-  /* 2. Push the inner content back, including any additional padding. */
-  padding-left: calc((50vw - 50%) + var(--kingly-padding-x-additional));
-  padding-right: calc((50vw - 50%) + var(--kingly-padding-x-additional));
+* For "Full Width (Background Only)", we override the default padding
+* with a special calculation that aligns content to the site's container
+* while also including any user-selected additional padding.
+*/
+.kingly-layout--full {
+  /* 2. Push inner content back. `max()` prevents negative padding. */
+  padding-left: calc(max(0px, 50vw - 50%) + var(--kingly-padding-x-additional));
+  padding-right: calc(max(0px, 50vw - 50%) + var(--kingly-padding-x-additional));
 }
 
 .kingly-layout--hero {
@@ -86,12 +95,11 @@
 /* --- Spacing Utilities (Padding & Margin) --- */
 
 /*
- * Padding X
- * These utilities now only set the --kingly-padding-x-additional variable.
- * This variable is then used by the container rules (e.g., for "Boxed" or
- * "Full Width") to apply the final padding value correctly, making the
- * padding additive and avoiding conflicts.
- */
+* Padding X
+* These utilities now ONLY set the --kingly-padding-x-additional variable.
+* This variable is then consumed by the container type rules above to apply
+* the final padding value correctly, avoiding specificity conflicts.
+*/
 .kingly-layout-padding-x-xs {
   --kingly-padding-x-additional: var(--kingly-spacing-xs);
 }
@@ -106,17 +114,6 @@
 }
 .kingly-layout-padding-x-xl {
   --kingly-padding-x-additional: var(--kingly-spacing-xl);
-}
-
-/*
- * Apply the additional horizontal padding for any layout that is NOT
- * full-width. The .kingly-layout--full-width rule handles its own padding
- * calculation. This ensures that for "Boxed" layouts, the padding is applied
- * as expected without interfering with the full-width logic.
- */
-.layout[class*="kingly-layout-padding-x-"]:not(.kingly-layout--full-width) {
-  padding-left: var(--kingly-padding-x-additional);
-  padding-right: var(--kingly-padding-x-additional);
 }
 
 /* Padding Y */
@@ -249,8 +246,8 @@
 /* --- Alignment Utilities --- */
 
 /*
- * These utilities require the layout container to be a flex or grid container.
- */
+* These utilities require the layout container to be a flex or grid container.
+  */
 
 /* Vertical Alignment (align-content) */
 .kingly-layout-align-content-flex-start {
