@@ -1,0 +1,36 @@
+/**
+ * @file
+ * Provides general typography styles for Kingly Layouts.
+ *
+ * This file is included when any typography options are applied via the
+ * layout configuration. Individual styles are primarily set via inline
+ * CSS to allow for granular control without generating an excessive
+ * number of utility classes.
+ *
+ * It ensures that the base structure is ready for dynamic styles.
+ */
+
+/* No specific CSS rules are defined here for the new feature. */
+/* Styles for typography are applied directly as inline styles */
+/* or via @import rules generated dynamically based on user input. */
+/* This file exists to register a library for typography and to ensure */
+/* CSS variables for typography (if added in _variables.css) are available. */
+
+/*
+ * Example if you wanted base classes for some typography elements,
+ * but for this feature, inline styles are preferred for flexibility.
+ *
+.kingly-layout--font-serif {
+  font-family: var(--kingly-font-serif);
+}
+.kingly-layout--font-size-lg {
+  font-size: var(--kingly-font-size-lg);
+}
+ */
+
+/*
+ * Note: If custom font imports were to be handled entirely via CSS,
+ * this file might contain @import rules or CSS variables. However,
+ * for dynamic URLs, PHP-level library attachment with data for
+ * `hook_css_alter` is a more robust approach.
+ */

@@ -1,3 +1,4 @@
+# Filename: kingly_layouts/kingly_layouts.services.yml
 services:
   kingly_layouts.display_option_collector:
     class: Drupal\kingly_layouts\Service\DisplayOptionCollector
@@ -7,6 +8,10 @@ services:
     arguments: ['@entity_type.manager', '@cache.default', '@string_translation']
   kingly_layouts.hook.form_alter:
     class: Drupal\kingly_layouts\Hook\FormAlterHooks
+    tags:
+      - { name: hook_subscriber }
+  kingly_layouts.hook.css_alter:
+    class: Drupal\kingly_layouts\Hook\CssAlterHooks
     tags:
       - { name: hook_subscriber }
   kingly_layouts.container_type:
@@ -24,6 +29,11 @@ services:
     arguments: ['@current_user', '@string_translation', '@kingly_layouts.options', '@entity_type.manager']
     tags:
       - { name: kingly_layouts.display_option, priority: 80 }
+  kingly_layouts.typography:
+    class: Drupal\kingly_layouts\Service\TypographyService
+    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options']
+    tags:
+      - { name: kingly_layouts.display_option, priority: 75 }
   kingly_layouts.border:
     class: Drupal\kingly_layouts\Service\BorderService
     arguments: ['@current_user', '@string_translation', '@kingly_layouts.options', '@kingly_layouts.color']
