@@ -10,10 +10,7 @@ services:
     class: Drupal\kingly_layouts\Hook\FormAlterHooks
     tags:
       - { name: hook_subscriber }
-  kingly_layouts.hook.css_alter:
-    class: Drupal\kingly_layouts\Hook\CssAlterHooks
-    tags:
-      - { name: hook_subscriber }
+  # Removed kingly_layouts.hook.css_alter service as it's no longer needed.
   kingly_layouts.container_type:
     class: Drupal\kingly_layouts\Service\ContainerTypeService
     arguments: ['@current_user', '@string_translation', '@kingly_layouts.options']

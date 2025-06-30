@@ -71,17 +71,6 @@ typography:
   dependencies:
     - kingly_layouts/variables
 
-custom_font:
-  # This library does not directly contain CSS files.
-  # Its purpose is to act as a flag for hook_css_alter to inject @import rules.
-  # The 'data' property holds the dynamic URL.
-  # It has no CSS, so it won't be listed in a standard libraries include.
-  # The processing logic is in hook_css_alter.
-  js: {} # Must have at least one asset type.
-  css: {}
-  dependencies:
-    - core/drupal
-
 kingly_layout_one_column:
   css:
     theme:

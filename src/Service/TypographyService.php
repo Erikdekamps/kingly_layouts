@@ -46,21 +46,6 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
-  public static function defaultConfiguration(): array {
-    return [
-      'font_family_option' => self::NONE_OPTION_KEY,
-      'custom_font_url' => '',
-      'font_size_option' => self::NONE_OPTION_KEY,
-      'font_weight_option' => self::NONE_OPTION_KEY,
-      'line_height_option' => self::NONE_OPTION_KEY,
-      'letter_spacing_option' => self::NONE_OPTION_KEY,
-      'text_transform_option' => self::NONE_OPTION_KEY,
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
     $form['typography'] = [
       '#type' => 'details',
@@ -137,18 +122,24 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
     $values = $form_state->getValue('typography', []);
-    foreach ([
-      'font_family_option',
-      'font_size_option',
-      'font_weight_option',
-      'line_height_option',
-      'letter_spacing_option',
-      'text_transform_option',
-    ] as $key) {
-      $configuration[$key] = $values[$key] ?? self::NONE_OPTION_KEY;
+
+    // Explicitly set each configuration value from the submitted form values.
+    $configuration['font_family_option'] = $values['font_family_option'] ?? self::NONE_OPTION_KEY;
+    $configuration['font_size_option'] = $values['font_size_option'] ?? self::NONE_OPTION_KEY;
+    $configuration['font_weight_option'] = $values['font_weight_option'] ?? self::NONE_OPTION_KEY;
+    $configuration['line_height_option'] = $values['line_height_option'] ?? self::NONE_OPTION_KEY;
+    $configuration['letter_spacing_option'] = $values['letter_spacing_option'] ?? self::NONE_OPTION_KEY;
+    $configuration['text_transform_option'] = $values['text_transform_option'] ?? self::NONE_OPTION_KEY;
+
+    // Handle custom_font_url conditionally based on the chosen
+    // font_family_option. If 'custom-import' is selected, store the submitted
+    // URL; otherwise, clear it.
+    if ($configuration['font_family_option'] === 'custom-import') {
+      $configuration['custom_font_url'] = trim($values['custom_font_url'] ?? '');
     }
-    // Custom font URL is only stored if the custom-import option is selected.
-    $configuration['custom_font_url'] = ($configuration['font_family_option'] === 'custom-import') ? trim($values['custom_font_url'] ?? '') : '';
+    else {
+      $configuration['custom_font_url'] = '';
+    }
   }
 
   /**
@@ -158,20 +149,33 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     $has_typography_styles = FALSE;
 
     // Apply inline styles for various typography properties.
-    if ($configuration['font_family_option'] !== self::NONE_OPTION_KEY && $configuration['font_family_option'] !== 'custom-import') {
-      $this->applyInlineStyleFromOption($build, 'font-family', 'font_family_option', $configuration);
-      $has_typography_styles = TRUE;
-    }
-    elseif ($configuration['font_family_option'] === 'custom-import' && !empty($configuration['custom_font_url'])) {
-      // For custom font imports, we add the URL to the attached libraries.
-      // This will be processed by a hook_css_alter or similar mechanism
-      // if not directly handled by Drupal's CSS aggregation.
-      $build['#attached']['library'][] = [
-        'kingly_layouts/custom_font',
-        ['data' => ['url' => $configuration['custom_font_url']]],
-      ];
-      $build['#attributes']['style'][] = 'font-family: ' . $this->optionsService->getCustomFontImportCssValue($configuration['custom_font_url']) . ';';
-      $has_typography_styles = TRUE;
+    if ($configuration['font_family_option'] !== self::NONE_OPTION_KEY) {
+      if ($configuration['font_family_option'] === 'custom-import' && !empty($configuration['custom_font_url'])) {
+        // For custom font imports, add the @import rule directly to the HTML
+        // head.
+        // This ensures the font is loaded.
+        $build['#attached']['html_head'][] = [
+          [
+            '#tag' => 'style',
+            '#attributes' => [
+              'type' => 'text/css',
+            ],
+            // Ensure the @import URL is properly quoted.
+            '#value' => '@import url("' . $configuration['custom_font_url'] . '");',
+          ],
+          // Use a unique key based on the URL to prevent duplicates if the same
+          // font is used in multiple sections.
+          'kingly_layouts_custom_font_' . hash('sha256', $configuration['custom_font_url']),
+        ];
+        // Apply the font family using the helper to infer a CSS-safe value.
+        $build['#attributes']['style'][] = 'font-family: ' . $this->optionsService->getCustomFontImportCssValue($configuration['custom_font_url']) . ';';
+        $has_typography_styles = TRUE;
+      }
+      else {
+        // Apply the pre-defined font family as an inline style.
+        $this->applyInlineStyleFromOption($build, 'font-family', 'font_family_option', $configuration);
+        $has_typography_styles = TRUE;
+      }
     }
 
     $inline_style_map = [
@@ -193,6 +197,21 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     if ($has_typography_styles) {
       $build['#attached']['library'][] = 'kingly_layouts/typography';
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultConfiguration(): array {
+    return [
+      'font_family_option' => self::NONE_OPTION_KEY,
+      'custom_font_url' => '',
+      'font_size_option' => self::NONE_OPTION_KEY,
+      'font_weight_option' => self::NONE_OPTION_KEY,
+      'line_height_option' => self::NONE_OPTION_KEY,
+      'letter_spacing_option' => self::NONE_OPTION_KEY,
+      'text_transform_option' => self::NONE_OPTION_KEY,
+    ];
   }
 
 }
