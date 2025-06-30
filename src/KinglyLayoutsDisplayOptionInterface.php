@@ -54,9 +54,12 @@ interface KinglyLayoutsDisplayOptionInterface {
   /**
    * Provides the default configuration values for this display option.
    *
+   * This method must be static as it can be called before the plugin or
+   * service is fully instantiated.
+   *
    * @return array
    *   An associative array of default configuration values.
    */
-  public function defaultConfiguration(): array;
+  public static function defaultConfiguration(): array;
 
 }
