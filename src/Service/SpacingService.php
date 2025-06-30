@@ -141,9 +141,32 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function processBuild(array &$build, array $configuration): void {
-    $has_spacing = FALSE;
+    $has_spacing = $this->determineLibraryAttachment($configuration);
+
+    // Apply spacing utility classes.
+    $this->applyPaddingClasses($build, $configuration);
+    $this->applyGapClass($build, $configuration);
+    $this->applyMarginClasses($build, $configuration);
+
+    if ($has_spacing) {
+      $build['#attached']['library'][] = 'kingly_layouts/spacing';
+    }
+  }
+
+  /**
+   * Determines if the spacing library should be attached.
+   *
+   * Checks if any non-default spacing options are set.
+   *
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if the spacing library should be attached, FALSE otherwise.
+   */
+  private function determineLibraryAttachment(array $configuration): bool {
     $defaults = self::defaultConfiguration();
-    $spacing_options = [
+    $spacing_options_keys = [
       'horizontal_padding_option',
       'vertical_padding_option',
       'gap_option',
@@ -151,44 +174,73 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
       'vertical_margin_option',
     ];
 
-    foreach ($spacing_options as $option) {
-      if (($configuration[$option] ?? $defaults[$option]) !== $defaults[$option]) {
-        $has_spacing = TRUE;
-        break;
+    foreach ($spacing_options_keys as $option_key) {
+      if (($configuration[$option_key] ?? $defaults[$option_key]) !== $defaults[$option_key]) {
+        return TRUE;
       }
     }
+    return FALSE;
+  }
 
-    if ($has_spacing) {
-      $build['#attached']['library'][] = 'kingly_layouts/spacing';
-    }
-
-    // Determine effective padding and margin based on container type.
+  /**
+   * Applies padding-related CSS classes to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   */
+  private function applyPaddingClasses(array &$build, array $configuration): void {
+    // Determine effective horizontal padding based on container type.
     $container_type = $configuration['container_type'];
     $h_padding_effective = $configuration['horizontal_padding_option'];
+
+    // For 'full' and 'edge-to-edge' container types, the horizontal padding
+    // is handled differently by CSS. The `kingly-layout-padding-x-` class
+    // sets a CSS variable, which the container CSS then consumes.
+    // 'hero' also handles horizontal padding differently.
+    $this->applyClassFromConfig($build, 'kingly-layout-padding-x-', $h_padding_effective, $configuration);
+    $this->applyClassFromConfig($build, 'kingly-layout-padding-y-', 'vertical_padding_option', $configuration);
+  }
+
+  /**
+   * Applies gap-related CSS classes to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   */
+  private function applyGapClass(array &$build, array $configuration): void {
+    $this->applyClassFromConfig($build, 'kingly-layout-gap-', 'gap_option', $configuration);
+  }
+
+  /**
+   * Applies margin-related CSS classes to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   */
+  private function applyMarginClasses(array &$build, array $configuration): void {
+    $container_type = $configuration['container_type'];
     $apply_horizontal_margin = TRUE;
 
+    // Horizontal margins are typically not applied to full-width or hero
+    // layouts.
     switch ($container_type) {
       case 'full':
-        $apply_horizontal_margin = FALSE;
-        break;
-
       case 'edge-to-edge':
       case 'hero':
-        // The CSS for these container types handles padding differently.
-        // We only apply the class, and CSS variables do the rest.
         $apply_horizontal_margin = FALSE;
         break;
     }
-
-    // Apply spacing utility classes.
-    $this->applyClassFromConfig($build, 'kingly-layout-padding-x-', $h_padding_effective, $configuration);
-    $this->applyClassFromConfig($build, 'kingly-layout-padding-y-', 'vertical_padding_option', $configuration);
-    $this->applyClassFromConfig($build, 'kingly-layout-gap-', 'gap_option', $configuration);
-    $this->applyClassFromConfig($build, 'kingly-layout-margin-y-', 'vertical_margin_option', $configuration);
 
     if ($apply_horizontal_margin) {
       $this->applyClassFromConfig($build, 'kingly-layout-margin-x-', 'horizontal_margin_option', $configuration);
     }
+    $this->applyClassFromConfig($build, 'kingly-layout-margin-y-', 'vertical_margin_option', $configuration);
   }
 
 }

@@ -91,20 +91,65 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
     $h_align = $configuration['horizontal_alignment'];
     $defaults = self::defaultConfiguration();
 
-    // Check if a non-default alignment option is used.
+    // Determine if any non-default alignment is set to attach the library.
     $is_v_align_set = $v_align !== $defaults['vertical_alignment'];
     $is_h_align_set = $h_align !== $defaults['horizontal_alignment'];
 
-    if ($is_v_align_set || $is_h_align_set) {
-      // Conditionally attach the library only if needed.
-      $build['#attached']['library'][] = 'kingly_layouts/alignment';
-    }
+    // Apply vertical alignment class if set.
+    $this->applyVerticalAlignmentClass($build, $configuration, $is_v_align_set);
 
+    // Apply horizontal alignment class if set.
+    $this->applyHorizontalAlignmentClass($build, $configuration, $is_h_align_set);
+
+    // Attach the library only if alignment options are used.
+    $this->attachAlignmentLibrary($build, $is_v_align_set, $is_h_align_set);
+  }
+
+  /**
+   * Applies the vertical alignment CSS class to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   * @param bool $is_v_align_set
+   *   TRUE if a non-default vertical alignment is set, FALSE otherwise.
+   */
+  private function applyVerticalAlignmentClass(array &$build, array $configuration, bool $is_v_align_set): void {
     if ($is_v_align_set) {
       $this->applyClassFromConfig($build, 'kingly-layout-align-content-', 'vertical_alignment', $configuration);
     }
+  }
+
+  /**
+   * Applies the horizontal alignment CSS class to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   * @param bool $is_h_align_set
+   *   TRUE if a non-default horizontal alignment is set, FALSE otherwise.
+   */
+  private function applyHorizontalAlignmentClass(array &$build, array $configuration, bool $is_h_align_set): void {
     if ($is_h_align_set) {
       $this->applyClassFromConfig($build, 'kingly-layout-justify-content-', 'horizontal_alignment', $configuration);
+    }
+  }
+
+  /**
+   * Attaches the alignment library if any alignment option is active.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param bool $is_v_align_set
+   *   TRUE if vertical alignment is set.
+   * @param bool $is_h_align_set
+   *   TRUE if horizontal alignment is set.
+   */
+  private function attachAlignmentLibrary(array &$build, bool $is_v_align_set, bool $is_h_align_set): void {
+    if ($is_v_align_set || $is_h_align_set) {
+      $build['#attached']['library'][] = 'kingly_layouts/alignment';
     }
   }
 

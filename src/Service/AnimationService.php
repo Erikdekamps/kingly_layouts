@@ -152,23 +152,70 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function processBuild(array &$build, array $configuration): void {
     if ($configuration['animation_type'] !== self::NONE_OPTION_KEY) {
-      $build['#attached']['library'][] = 'kingly_layouts/animations';
-      $build['#attributes']['class'][] = 'kingly-animate';
-      $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_type', $configuration);
+      // Attach the necessary library.
+      $this->attachAnimationLibrary($build);
+      // Apply base animation classes.
+      $this->applyBaseAnimationClasses($build);
+      // Apply specific animation type and direction classes.
+      $this->applySpecificAnimationClasses($build, $configuration);
+      // Apply inline transition styles.
+      $this->applyAnimationTransitionStyles($build, $configuration);
+    }
+  }
 
-      if ($configuration['animation_type'] === 'slide-in' && $configuration['slide_direction'] !== self::NONE_OPTION_KEY) {
-        $this->applyClassFromConfig($build, 'kingly-animate--direction-', 'slide_direction', $configuration);
-      }
+  /**
+   * Attaches the animation library.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   */
+  private function attachAnimationLibrary(array &$build): void {
+    $build['#attached']['library'][] = 'kingly_layouts/animations';
+  }
 
-      $animation_style_map = [
-        'transition_property' => 'transition-property',
-        'transition_duration' => 'transition-duration',
-        'transition_timing_function' => 'transition-timing-function',
-        'transition_delay' => 'transition-delay',
-      ];
-      foreach ($animation_style_map as $config_key => $property) {
-        $this->applyInlineStyleFromOption($build, $property, $config_key, $configuration);
-      }
+  /**
+   * Applies base animation classes.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   */
+  private function applyBaseAnimationClasses(array &$build): void {
+    $build['#attributes']['class'][] = 'kingly-animate';
+  }
+
+  /**
+   * Applies specific animation type and direction classes.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   */
+  private function applySpecificAnimationClasses(array &$build, array $configuration): void {
+    $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_type', $configuration);
+
+    if ($configuration['animation_type'] === 'slide-in' && $configuration['slide_direction'] !== self::NONE_OPTION_KEY) {
+      $this->applyClassFromConfig($build, 'kingly-animate--direction-', 'slide_direction', $configuration);
+    }
+  }
+
+  /**
+   * Applies inline transition styles.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   */
+  private function applyAnimationTransitionStyles(array &$build, array $configuration): void {
+    $animation_style_map = [
+      'transition_property' => 'transition-property',
+      'transition_duration' => 'transition-duration',
+      'transition_timing_function' => 'transition-timing-function',
+      'transition_delay' => 'transition-delay',
+    ];
+    foreach ($animation_style_map as $config_key => $property) {
+      $this->applyInlineStyleFromOption($build, $property, $config_key, $configuration);
     }
   }
 
