@@ -118,6 +118,14 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       '#default_value' => $configuration['hover_filter_option'],
       '#description' => $this->t('Apply a visual filter to the layout section on hover.'),
     ];
+    // New: Hover Font Size option.
+    $form['shadows_effects']['hover_effects']['hover_font_size_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Hover Font Size'),
+      '#options' => $this->optionsService->getOptions('hover_font_size'),
+      '#default_value' => $configuration['hover_font_size_option'],
+      '#description' => $this->t('Adjust the font size of text within the layout section on hover.'),
+    ];
 
     return $form;
   }
@@ -144,6 +152,7 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       'hover_transform_scale_option',
       'hover_box_shadow_option',
       'hover_filter_option',
+      'hover_font_size_option',
     ] as $key) {
       $configuration[$key] = $values['hover_effects'][$key] ?? self::NONE_OPTION_KEY;
     }
@@ -161,13 +170,17 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
     // Apply static opacity and transform inline styles.
     $has_effects = $this->applyStaticInlineStyles($build, $configuration) || $has_effects;
 
-    // Apply hover transform scale, box shadow, and filter classes.
+    // Apply hover transform scale, box shadow, filter, and font size classes.
     $has_effects = $this->applyHoverEffects($build, $configuration) || $has_effects;
 
-    // If any effect (static or hover) was applied, attach the effects library
-    // and the base animation class for transitions.
+    // If any effect (static or hover) was applied, attach the necessary
+    // libraries and the base animation class for transitions.
     if ($has_effects) {
       $build['#attached']['library'][] = 'kingly_layouts/effects';
+      // The 'animations' library contains the base 'kingly-animate' class
+      // and its transition properties, which are essential for smooth
+      // hover effects.
+      $build['#attached']['library'][] = 'kingly_layouts/animations';
       $build['#attributes']['class'][] = 'kingly-animate';
     }
   }
@@ -238,7 +251,7 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
   }
 
   /**
-   * Applies hover effects (transform, box shadow, filter) to the build array.
+   * Applies hover effects (transform, box shadow, filter, font size) to the build array.
    *
    * @param array &$build
    *   The render array, passed by reference.
@@ -254,16 +267,15 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       'hover_transform_scale_option' => 'kingly-layout--hover-scale-',
       'hover_box_shadow_option' => 'kingly-layout--hover-shadow-',
       'hover_filter_option' => 'kingly-layout--hover-filter-',
+      'hover_font_size_option' => 'kingly-layout--hover-font-size-',
     ];
 
     foreach ($hover_class_map as $config_key => $prefix) {
       if ($configuration[$config_key] !== self::NONE_OPTION_KEY) {
-        // Special handling for scale values that are decimals.
-        $value_for_class = $configuration[$config_key];
-        if (str_contains($value_for_class, '.')) {
-          $value_for_class = str_replace('.', '\.', $value_for_class);
-        }
-        $this->applyClassFromConfig($build, $prefix, $value_for_class, ['_value' => $configuration[$config_key]]);
+        // The applyClassFromConfig helper will automatically fetch the correct
+        // class suffix (e.g., 'scale-110' or 'size-110') from the configuration
+        // based on the $config_key provided.
+        $this->applyClassFromConfig($build, $prefix, $config_key, $configuration);
         $applied = TRUE;
       }
     }
@@ -283,6 +295,7 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       'hover_transform_scale_option' => self::NONE_OPTION_KEY,
       'hover_box_shadow_option' => self::NONE_OPTION_KEY,
       'hover_filter_option' => self::NONE_OPTION_KEY,
+      'hover_font_size_option' => self::NONE_OPTION_KEY,
     ];
   }
 

@@ -21,7 +21,7 @@ user interface.
 * **On-Scroll Animations**: Animate sections as they enter the viewport using
   the performant Intersection Observer API.
 * **Hover Effects**: Apply subtle visual transformations (scale, box-shadow,
-  filters) to layout sections on user hover.
+  filters, **font size**) to layout sections on user hover.
 * **Plugin Architecture**: Fully extensible system allowing developers to easily
   add new display option groups.
 * **Granular Permissions**: Control which user roles can access each group of
@@ -85,7 +85,8 @@ section.
 ### General
 
 * **Column Sizing**: Controls the width distribution of the layout's columns (
-  e.g., 50/50, 33/67). The specific options depend on the chosen layout.
+  e.g., 50/50, 25/75, 33/34/33). The specific options depend on the chosen
+  layout.
 * **Container Type**:
 * **Boxed**: Standard container with a maximum width.
 * **Full Width (Background Only)**: The background spans the full viewport
@@ -152,6 +153,7 @@ Control the space inside and around the layout using a consistent scale.
 * **Hover Box Shadow**: Change the box shadow on hover.
 * **Hover Filter**: Apply a filter change on hover (e.g., Grayscale to Color,
   Brightness adjustment).
+* **Hover Font Size**: Change the font size of text within the section on hover.
 
 ### Animation
 

@@ -39,19 +39,19 @@
 /* --- Hover Effects --- */
 
 /* Hover Transform Scale */
-.kingly-layout--hover-scale-0\.9:hover {
+.kingly-layout--hover-scale-90:hover {
   transform: scale(0.9);
 }
-.kingly-layout--hover-scale-0\.95:hover {
+.kingly-layout--hover-scale-95:hover {
   transform: scale(0.95);
 }
-.kingly-layout--hover-scale-1\.05:hover {
+.kingly-layout--hover-scale-105:hover {
   transform: scale(1.05);
 }
-.kingly-layout--hover-scale-1\.1:hover {
+.kingly-layout--hover-scale-110:hover {
   transform: scale(1.1);
 }
-.kingly-layout--hover-scale-1\.25:hover {
+.kingly-layout--hover-scale-125:hover {
   transform: scale(1.25);
 }
 
@@ -94,4 +94,31 @@
 }
 .kingly-layout--hover-filter-brightness-up:hover {
   filter: brightness(1.25);
+}
+
+/* New: Hover Font Size */
+/* We define variables for these font sizes, making them easily adjustable
+   and allowing for more granular control if needed in the future. */
+:root {
+  --kingly-font-size-90: 0.9em;
+  --kingly-font-size-95: 0.95em;
+  --kingly-font-size-105: 1.05em;
+  --kingly-font-size-110: 1.1em;
+  --kingly-font-size-125: 1.25em;
+}
+
+.kingly-layout--hover-font-size-size-90:hover {
+  font-size: var(--kingly-font-size-90);
+}
+.kingly-layout--hover-font-size-size-95:hover {
+  font-size: var(--kingly-font-size-95);
+}
+.kingly-layout--hover-font-size-size-105:hover {
+  font-size: var(--kingly-font-size-105);
+}
+.kingly-layout--hover-font-size-size-110:hover {
+  font-size: var(--kingly-font-size-110);
+}
+.kingly-layout--hover-font-size-size-125:hover {
+  font-size: var(--kingly-font-size-125);
 }

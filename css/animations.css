@@ -6,7 +6,7 @@
 /* Base class for all animated elements. Defines the transition. */
 .kingly-animate {
   /* Default transition properties, can be overridden by inline styles from PHP. */
-  transition-property: opacity, transform, filter, box-shadow;
+  transition-property: opacity, transform, filter, box-shadow, font-size;
   transition-duration: 0.6s;
   transition-timing-function: ease-out;
 }

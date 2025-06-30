@@ -264,11 +264,11 @@ class OptionsService {
         '-5' => $this->t('-5 degrees'),
       ],
       'hover_transform_scale' => $none + [
-        '0.9' => $this->t('Scale Down (90%)'),
-        '0.95' => $this->t('Slightly Scale Down (95%)'),
-        '1.05' => $this->t('Slightly Scale Up (105%)'),
-        '1.1' => $this->t('Scale Up (110%)'),
-        '1.25' => $this->t('Enlarge (125%)'),
+        'scale-90' => $this->t('Scale Down (90%)'),
+        'scale-95' => $this->t('Slightly Scale Down (95%)'),
+        'scale-105' => $this->t('Slightly Scale Up (105%)'),
+        'scale-110' => $this->t('Scale Up (110%)'),
+        'scale-125' => $this->t('Enlarge (125%)'),
       ],
       'hover_box_shadow' => $none + [
         'sm' => $this->t('Small Shadow'),
@@ -281,6 +281,14 @@ class OptionsService {
         'grayscale-to-color' => $this->t('Grayscale to Color'),
         'brightness-down' => $this->t('Brightness Down'),
         'brightness-up' => $this->t('Brightness Up'),
+      ],
+      // New: Hover Font Size.
+      'hover_font_size' => $none + [
+        'size-90' => $this->t('Smaller (90%)'),
+        'size-95' => $this->t('Slightly Smaller (95%)'),
+        'size-105' => $this->t('Slightly Larger (105%)'),
+        'size-110' => $this->t('Larger (110%)'),
+        'size-125' => $this->t('Much Larger (125%)'),
       ],
       'hide_on_breakpoint' => [
         'mobile' => $this->t('Mobile'),
