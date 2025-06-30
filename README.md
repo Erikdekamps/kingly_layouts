@@ -8,11 +8,11 @@ user interface.
 
 ## Features
 
-* **Multi-Column Layouts
-  **: Includes 1, 2, 3, and 4-column layouts with responsive sizing options (
+* **Multi-Column Layouts**: Includes 1, 2, 3, and 4-column layouts with
+  responsive sizing options (
   e.g., 50/50, 25/75, 33/34/33).
-* **Modern Frontend
-  **: Utilizes CSS Grid for robust, efficient, and predictable layout rendering
+* **Modern Frontend**: Utilizes CSS Grid for robust, efficient, and predictable
+  layout rendering
   across all modern browsers.
 * **Rich Display Options**: A comprehensive set of controls to customize every
   aspect of a layout section.
@@ -20,11 +20,13 @@ user interface.
   parallax), and self-hosted background videos.
 * **On-Scroll Animations**: Animate sections as they enter the viewport using
   the performant Intersection Observer API.
+* **Hover Effects**: Apply subtle visual transformations (scale, box-shadow,
+  filters) to layout sections on user hover.
 * **Plugin Architecture**: Fully extensible system allowing developers to easily
   add new display option groups.
-* **Granular Permissions
-  **: Control which user roles can access each group of settings (e.g., allow
-  editors to change colors but not spacing).
+* **Granular Permissions**: Control which user roles can access each group of
+  settings (
+  e.g., allow editors to change colors but not spacing).
 
 ## Requirements
 
@@ -55,12 +57,11 @@ that will be available in the layout configuration UI.
 2. Click **Add term** to create a new color option.
 3. Fill in the fields:
 
-* **Name
-  **: The human-readable name for the color (e.g., "Brand Blue", "Light Gray").
+* **Name**: The human-readable name for the color (e.g., "Brand Blue", "Light
+  Gray").
   This is what users will see in the dropdown menus.
 * **CSS Color**: The exact CSS hex code for the color. **It must be a 6-digit
-  hex code starting with `#`
-  ** (e.g., `#0D6EFD`, `#F8F9FA`).
+  hex code starting with `#`** (e.g., `#0D6EFD`, `#F8F9FA`).
 
 4. Save the term.
 5. Repeat this process for all the colors you want in your site's palette.
@@ -83,13 +84,12 @@ section.
 
 ### General
 
-* **Column Sizing
-  **: Controls the width distribution of the layout's columns (e.g., 50/50,
-  33/67). The specific options depend on the chosen layout.
+* **Column Sizing**: Controls the width distribution of the layout's columns (
+  e.g., 50/50, 33/67). The specific options depend on the chosen layout.
 * **Container Type**:
 * **Boxed**: Standard container with a maximum width.
-* **Full Width (Background Only)
-  **: The background spans the full viewport width, but the content remains
+* **Full Width (Background Only)**: The background spans the full viewport
+  width, but the content remains
   aligned with the site's main content area.
 * **Edge to Edge (Full Bleed)**: Both the background and content span the full
   viewport width.
@@ -106,25 +106,24 @@ Control the space inside and around the layout using a consistent scale.
 ### Colors
 
 * **Foreground Color**: Sets the text color for the entire section. The
-  available options are populated from the *
-  *Kingly CSS Color** vocabulary you configured.
+  available options are populated from the **Kingly CSS Color** vocabulary you
+  configured.
 
 ### Border
 
-* **Border Color, Width, & Style
-  **: Apply a border using a color from your palette and a pre-defined thickness
+* **Border Color, Width, & Style**: Apply a border using a color from your
+  palette and a pre-defined thickness
   and style (solid, dashed, dotted).
 * **Border Radius**: Round the corners of the layout, with options from `Small`
   to `Full (Pill/Circle)`.
 
 ### Alignment
 
-* **Vertical Alignment
-  **: Align the content of all columns vertically (Top, Middle, Bottom,
+* **Vertical Alignment**: Align the content of all columns vertically (Top,
+  Middle, Bottom,
   Stretch). Especially useful for columns of different heights.
-* **Horizontal Alignment
-  **: Justify the content within the layout horizontally (e.g., Start/Left,
-  Center, Space Between).
+* **Horizontal Alignment**: Justify the content within the layout horizontally (
+  e.g., Start/Left, Center, Space Between).
 
 ### Background
 
@@ -132,8 +131,8 @@ Control the space inside and around the layout using a consistent scale.
   gradient.
 * **Color Options**: When 'Color' is selected, choose a background color from
   your palette and set its opacity.
-* **Media Options
-  **: Provide a URL for a background image or video. For images, control
+* **Media Options**: Provide a URL for a background image or video. For images,
+  control
   position, repeat, size, and attachment (for parallax effects). For videos,
   control loop, autoplay, and mute settings.
 * **Gradient Options**: Configure linear or radial gradients using two colors
@@ -143,10 +142,16 @@ Control the space inside and around the layout using a consistent scale.
 
 ### Shadows & Effects
 
+* **Static Effects**:
 * **Box Shadow**: Apply a pre-configured drop shadow to the layout container.
 * **Filter**: Apply a CSS filter like `Grayscale`, `Blur`, or `Sepia`.
 * **Opacity, Scale, Rotate**: Adjust the section's overall transparency and
   apply CSS transforms.
+* **Hover Effects**:
+* **Hover Scale**: Apply a scale transformation to the section on hover.
+* **Hover Box Shadow**: Change the box shadow on hover.
+* **Hover Filter**: Apply a filter change on hover (e.g., Grayscale to Color,
+  Brightness adjustment).
 
 ### Animation
 
@@ -157,8 +162,8 @@ Control the space inside and around the layout using a consistent scale.
 
 ### Responsiveness
 
-* **Hide on Breakpoint
-  **: Choose to hide the entire layout section on specific screen sizes (Mobile,
+* **Hide on Breakpoint**: Choose to hide the entire layout section on specific
+  screen sizes (Mobile,
   Tablet, or Desktop).
 
 ### Custom Attributes
@@ -180,6 +185,7 @@ page (`/admin/people/permissions`) under the "Kingly Layouts" section.
 * **Administer Kingly Layouts: Container Type**
 * **Administer Kingly Layouts: Spacing**
 * **Administer Kingly Layouts: Colors**
+* **Administer Kingly Layouts: Typography**
 * **Administer Kingly Layouts: Border**
 * **Administer Kingly Layouts: Alignment**
 * **Administer Kingly Layouts: Animation**

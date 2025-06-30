@@ -263,6 +263,25 @@ class OptionsService {
         '-3' => $this->t('-3 degrees'),
         '-5' => $this->t('-5 degrees'),
       ],
+      'hover_transform_scale' => $none + [
+        '0.9' => $this->t('Scale Down (90%)'),
+        '0.95' => $this->t('Slightly Scale Down (95%)'),
+        '1.05' => $this->t('Slightly Scale Up (105%)'),
+        '1.1' => $this->t('Scale Up (110%)'),
+        '1.25' => $this->t('Enlarge (125%)'),
+      ],
+      'hover_box_shadow' => $none + [
+        'sm' => $this->t('Small Shadow'),
+        'md' => $this->t('Medium Shadow'),
+        'lg' => $this->t('Large Shadow'),
+        'xl' => $this->t('Extra Large Shadow'),
+        'inner' => $this->t('Inner Shadow'),
+      ],
+      'hover_filter' => $none + [
+        'grayscale-to-color' => $this->t('Grayscale to Color'),
+        'brightness-down' => $this->t('Brightness Down'),
+        'brightness-up' => $this->t('Brightness Up'),
+      ],
       'hide_on_breakpoint' => [
         'mobile' => $this->t('Mobile'),
         'tablet' => $this->t('Tablet'),
