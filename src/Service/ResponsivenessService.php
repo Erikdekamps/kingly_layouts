@@ -75,12 +75,49 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function processBuild(array &$build, array $configuration): void {
-    if (!empty($configuration['hide_on_breakpoint'])) {
-      $build['#attached']['library'][] = 'kingly_layouts/responsiveness';
-      foreach ($configuration['hide_on_breakpoint'] as $breakpoint) {
-        if ($breakpoint) {
-          $build['#attributes']['class'][] = 'kingly-layout-hide-on-' . $breakpoint;
-        }
+    if ($this->shouldApplyResponsiveness($configuration)) {
+      // Attach the necessary library for responsiveness.
+      $this->attachResponsivenessLibrary($build);
+      // Apply the CSS classes to hide the element on specified breakpoints.
+      $this->applyHideOnBreakpointClasses($build, $configuration);
+    }
+  }
+
+  /**
+   * Determines if responsiveness features should be applied.
+   *
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if any responsiveness option is configured, FALSE otherwise.
+   */
+  private function shouldApplyResponsiveness(array $configuration): bool {
+    return !empty($configuration['hide_on_breakpoint']);
+  }
+
+  /**
+   * Attaches the responsiveness library to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   */
+  private function attachResponsivenessLibrary(array &$build): void {
+    $build['#attached']['library'][] = 'kingly_layouts/responsiveness';
+  }
+
+  /**
+   * Applies CSS classes to hide the element on specific breakpoints.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   */
+  private function applyHideOnBreakpointClasses(array &$build, array $configuration): void {
+    foreach ($configuration['hide_on_breakpoint'] as $breakpoint) {
+      if ($breakpoint) {
+        $build['#attributes']['class'][] = 'kingly-layout-hide-on-' . $breakpoint;
       }
     }
   }

@@ -111,39 +111,82 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function processBuild(array &$build, array $configuration): void {
     $has_effects = FALSE;
+
+    // Apply box shadow and filter classes.
+    $has_effects = $this->applyClassBasedEffects($build, $configuration) || $has_effects;
+
+    // Apply opacity and transform inline styles.
+    $has_effects = $this->applyInlineStyles($build, $configuration) || $has_effects;
+
+    // Attach the effects library if any effect was applied.
+    if ($has_effects) {
+      $build['#attached']['library'][] = 'kingly_layouts/effects';
+    }
+  }
+
+  /**
+   * Applies CSS class-based effects (box shadow, filter).
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if any class-based effect was applied, FALSE otherwise.
+   */
+  private function applyClassBasedEffects(array &$build, array $configuration): bool {
+    $applied = FALSE;
     $class_map = [
       'box_shadow_option' => 'kingly-layout-shadow-',
       'filter_option' => 'kingly-layout-filter-',
     ];
     foreach ($class_map as $config_key => $prefix) {
       if ($configuration[$config_key] !== self::NONE_OPTION_KEY) {
-        $has_effects = TRUE;
         $this->applyClassFromConfig($build, $prefix, $config_key, $configuration);
+        $applied = TRUE;
       }
     }
+    return $applied;
+  }
 
-    if ($has_effects) {
-      $build['#attached']['library'][] = 'kingly_layouts/effects';
-    }
-
+  /**
+   * Applies inline CSS styles (opacity, transform).
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if any inline style effect was applied, FALSE otherwise.
+   */
+  private function applyInlineStyles(array &$build, array $configuration): bool {
+    $applied = FALSE;
     $style_map = [
       'opacity_option' => 'opacity',
     ];
     foreach ($style_map as $config_key => $property) {
-      $this->applyInlineStyleFromOption($build, $property, $config_key, $configuration);
+      if ($configuration[$config_key] !== self::NONE_OPTION_KEY) {
+        $this->applyInlineStyleFromOption($build, $property, $config_key, $configuration);
+        $applied = TRUE;
+      }
     }
 
-    // Handle combined transforms.
+    // Handle combined transforms for scale and rotate.
     $transforms = [];
     if (($scale_value = $configuration['transform_scale_option']) !== self::NONE_OPTION_KEY) {
       $transforms[] = 'scale(' . $scale_value . ')';
+      $applied = TRUE;
     }
     if (($rotate_value = $configuration['transform_rotate_option']) !== self::NONE_OPTION_KEY) {
       $transforms[] = 'rotate(' . $rotate_value . 'deg)';
+      $applied = TRUE;
     }
     if (!empty($transforms)) {
       $build['#attributes']['style'][] = 'transform: ' . implode(' ', $transforms) . ';';
     }
+    return $applied;
   }
 
   /**

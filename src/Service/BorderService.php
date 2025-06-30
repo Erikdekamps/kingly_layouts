@@ -126,23 +126,62 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
   public function processBuild(array &$build, array $configuration): void {
     $has_border = FALSE;
 
-    if ($configuration['border_radius_option'] !== self::NONE_OPTION_KEY) {
-      $has_border = TRUE;
-      $this->applyClassFromConfig($build, 'kingly-layout-border-radius-', 'border_radius_option', $configuration);
-    }
+    // Apply border radius classes.
+    $has_border = $this->applyBorderRadius($build, $configuration) || $has_border;
 
-    if ($border_color_hex = $this->colorService->getTermColorHex($configuration['border_color'])) {
-      $has_border = TRUE;
-      $build['#attributes']['style'][] = 'border-color: ' . $border_color_hex . ';';
-      $border_width = $configuration['border_width_option'] !== self::NONE_OPTION_KEY ? $configuration['border_width_option'] : 'sm';
-      $border_style = $configuration['border_style_option'] !== self::NONE_OPTION_KEY ? $configuration['border_style_option'] : 'solid';
-      $this->applyClassFromConfig($build, 'kingly-layout-border-width-', $border_width, $configuration);
-      $this->applyClassFromConfig($build, 'kingly-layout-border-style-', $border_style, $configuration);
-    }
+    // Apply border color, width, and style.
+    $has_border = $this->applyBorderProperties($build, $configuration) || $has_border;
 
+    // Attach the library if any border options are active.
     if ($has_border) {
       $build['#attached']['library'][] = 'kingly_layouts/borders';
     }
+  }
+
+  /**
+   * Applies border-radius CSS class to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if a border-radius class was applied, FALSE otherwise.
+   */
+  private function applyBorderRadius(array &$build, array $configuration): bool {
+    if ($configuration['border_radius_option'] !== self::NONE_OPTION_KEY) {
+      $this->applyClassFromConfig($build, 'kingly-layout-border-radius-', 'border_radius_option', $configuration);
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Applies border color, width, and style to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if border properties were applied, FALSE otherwise.
+   */
+  private function applyBorderProperties(array &$build, array $configuration): bool {
+    if ($border_color_hex = $this->colorService->getTermColorHex($configuration['border_color'])) {
+      $build['#attributes']['style'][] = 'border-color: ' . $border_color_hex . ';';
+
+      // Set default width and style if 'None' is selected for them, but color
+      // is.
+      $border_width = $configuration['border_width_option'] !== self::NONE_OPTION_KEY ? $configuration['border_width_option'] : 'sm';
+      $border_style = $configuration['border_style_option'] !== self::NONE_OPTION_KEY ? $configuration['border_style_option'] : 'solid';
+
+      $this->applyClassFromConfig($build, 'kingly-layout-border-width-', $border_width, $configuration);
+      $this->applyClassFromConfig($build, 'kingly-layout-border-style-', $border_style, $configuration);
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
