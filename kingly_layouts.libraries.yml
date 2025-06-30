@@ -63,22 +63,22 @@ animations:
     - core/drupal
     - core/once
 
-kingly_onecol:
+kingly_layout_one_column:
   css:
     theme:
-      css/kingly-onecol.css: {}
+      css/layout--one-column.css: {}
 
-kingly_twocol:
+kingly_layout_two_column:
   css:
     theme:
-      css/kingly-twocol.css: {}
+      css/layout--two-column.css: {}
 
-kingly_threecol:
+kingly_layout_three_column:
   css:
     theme:
-      css/kingly-threecol.css: {}
+      css/layout--three-column.css: {}
 
-kingly_fourcol:
+kingly_layout_four_column:
   css:
     theme:
-      css/kingly-fourcol.css: {}
+      css/layout--four-column.css: {}
