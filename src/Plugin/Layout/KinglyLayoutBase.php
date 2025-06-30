@@ -18,6 +18,7 @@ use Drupal\kingly_layouts\Service\DisplayOptionCollector;
 use Drupal\kingly_layouts\Service\ResponsivenessService;
 use Drupal\kingly_layouts\Service\ShadowsEffectsService;
 use Drupal\kingly_layouts\Service\SpacingService;
+use Drupal\kingly_layouts\Service\TypographyService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -123,6 +124,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
       ContainerTypeService::class,
       SpacingService::class,
       ColorService::class,
+      TypographyService::class,
       BorderService::class,
       AlignmentService::class,
       AnimationService::class,

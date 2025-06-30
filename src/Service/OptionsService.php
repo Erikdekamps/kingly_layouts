@@ -268,6 +268,62 @@ class OptionsService {
         'tablet' => $this->t('Tablet'),
         'desktop' => $this->t('Desktop'),
       ],
+      'font_family' => $none + [
+        'sans-serif' => $this->t('Sans-serif (Generic)'),
+        'serif' => $this->t('Serif (Generic)'),
+        'monospace' => $this->t('Monospace (Generic)'),
+        'custom-import' => $this->t('Custom Font (via URL)'),
+          // Add specific web-safe fonts or common system fonts here.
+        'Arial, sans-serif' => $this->t('Arial'),
+        'Verdana, sans-serif' => $this->t('Verdana'),
+        'Helvetica, sans-serif' => $this->t('Helvetica'),
+        'Times New Roman, serif' => $this->t('Times New Roman'),
+        'Georgia, serif' => $this->t('Georgia'),
+        'Courier New, monospace' => $this->t('Courier New'),
+      ],
+      'font_size' => $none + [
+        '0.75rem' => $this->t('Extra Small (0.75rem)'),
+        '0.875rem' => $this->t('Small (0.875rem)'),
+        '1rem' => $this->t('Base (1rem)'),
+        '1.125rem' => $this->t('Large (1.125rem)'),
+        '1.25rem' => $this->t('Extra Large (1.25rem)'),
+        '1.5rem' => $this->t('2XL (1.5rem)'),
+        '1.875rem' => $this->t('3XL (1.875rem)'),
+        '2.25rem' => $this->t('4XL (2.25rem)'),
+        '3rem' => $this->t('5XL (3rem)'),
+      ],
+      'font_weight' => $none + [
+        '100' => $this->t('Thin (100)'),
+        '200' => $this->t('Extra Light (200)'),
+        '300' => $this->t('Light (300)'),
+        '400' => $this->t('Normal (400)'),
+        '500' => $this->t('Medium (500)'),
+        '600' => $this->t('Semi Bold (600)'),
+        '700' => $this->t('Bold (700)'),
+        '800' => $this->t('Extra Bold (800)'),
+        '900' => $this->t('Black (900)'),
+      ],
+      'line_height' => $none + [
+        '1' => $this->t('1 (Tight)'),
+        '1.25' => $this->t('1.25'),
+        '1.5' => $this->t('1.5 (Normal)'),
+        '1.75' => $this->t('1.75'),
+        '2' => $this->t('2 (Loose)'),
+      ],
+      'letter_spacing' => $none + [
+        '-0.05em' => $this->t('-0.05em (Tight)'),
+        '-0.025em' => $this->t('-0.025em'),
+        '0em' => $this->t('0em (Normal)'),
+        '0.025em' => $this->t('0.025em'),
+        '0.05em' => $this->t('0.05em (Loose)'),
+        '0.1em' => $this->t('0.1em (Extra Loose)'),
+      ],
+      'text_transform' => $none + [
+        'none' => $this->t('None'),
+        'uppercase' => $this->t('Uppercase'),
+        'lowercase' => $this->t('Lowercase'),
+        'capitalize' => $this->t('Capitalize'),
+      ],
     ];
 
     return $options[$key] ?? [];
@@ -322,6 +378,29 @@ class OptionsService {
       'lg' => $this->t('Large (2rem)'),
       'xl' => $this->t('Extra Large (4rem)'),
     ];
+  }
+
+  /**
+   * Generates a CSS font-family value suitable for a custom font import.
+   *
+   * This extracts the font family name from the Google Fonts URL structure
+   * or provides a generic fallback.
+   *
+   * @param string $url
+   *   The custom font URL.
+   *
+   * @return string
+   *   The CSS font-family value, including a fallback.
+   */
+  public function getCustomFontImportCssValue(string $url): string {
+    // Attempt to parse font family from Google Fonts URL.
+    if (preg_match('/family=([^&:]+)/', $url, $matches)) {
+      $font_name = str_replace('+', ' ', $matches[1]);
+      // Add a generic fallback.
+      return "'" . $font_name . "', sans-serif";
+    }
+    // Generic fallback if URL doesn't match a known pattern.
+    return 'sans-serif';
   }
 
 }

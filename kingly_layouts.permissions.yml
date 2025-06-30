@@ -1,3 +1,4 @@
+# Filename: kingly_layouts/kingly_layouts.permissions.yml
 administer kingly layouts sizing:
   title: 'Administer Kingly Layouts: Column Sizing'
   description: 'Allow users to configure the column sizing option for Kingly layouts.'
@@ -16,6 +17,11 @@ administer kingly layouts spacing:
 administer kingly layouts colors:
   title: 'Administer Kingly Layouts: Colors'
   description: 'Allow users to configure foreground and background colors for Kingly layouts.'
+  restrict access: true
+
+administer kingly layouts typography:
+  title: 'Administer Kingly Layouts: Typography'
+  description: 'Allow users to configure typography options (font family, size, weight, line height, letter spacing, text transform, custom font URL) for Kingly layouts.'
   restrict access: true
 
 administer kingly layouts border:

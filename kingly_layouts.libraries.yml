@@ -1,3 +1,4 @@
+# Filename: kingly_layouts/kingly_layouts.libraries.yml
 variables:
   css:
     base:
@@ -62,6 +63,13 @@ animations:
     - core/jquery
     - core/drupal
     - core/once
+
+typography:
+  css:
+    theme:
+      css/typography.css: {}
+  dependencies:
+    - kingly_layouts/variables
 
 kingly_layout_one_column:
   css:
