@@ -1,0 +1,111 @@
+/*
+* @file
+* Provides spacing utility styles for Kingly Layouts.
+*/
+
+/* --- Spacing Utilities (Padding & Margin) --- */
+
+/*
+* Padding X
+* These utilities now ONLY set the --kingly-padding-x-additional variable.
+* This variable is then consumed by the container type rules above to apply
+* the final padding value correctly, avoiding specificity conflicts.
+*/
+.kingly-layout-padding-x-xs {
+  --kingly-padding-x-additional: var(--kingly-spacing-xs);
+}
+.kingly-layout-padding-x-sm {
+  --kingly-padding-x-additional: var(--kingly-spacing-sm);
+}
+.kingly-layout-padding-x-md {
+  --kingly-padding-x-additional: var(--kingly-spacing-md);
+}
+.kingly-layout-padding-x-lg {
+  --kingly-padding-x-additional: var(--kingly-spacing-lg);
+}
+.kingly-layout-padding-x-xl {
+  --kingly-padding-x-additional: var(--kingly-spacing-xl);
+}
+
+/* Padding Y */
+.kingly-layout-padding-y-xs {
+  padding-top: var(--kingly-spacing-xs);
+  padding-bottom: var(--kingly-spacing-xs);
+}
+.kingly-layout-padding-y-sm {
+  padding-top: var(--kingly-spacing-sm);
+  padding-bottom: var(--kingly-spacing-sm);
+}
+.kingly-layout-padding-y-md {
+  padding-top: var(--kingly-spacing-md);
+  padding-bottom: var(--kingly-spacing-md);
+}
+.kingly-layout-padding-y-lg {
+  padding-top: var(--kingly-spacing-lg);
+  padding-bottom: var(--kingly-spacing-lg);
+}
+.kingly-layout-padding-y-xl {
+  padding-top: var(--kingly-spacing-xl);
+  padding-bottom: var(--kingly-spacing-xl);
+}
+
+/* Gap (for flex/grid containers) */
+.kingly-layout-gap-xs {
+  gap: var(--kingly-spacing-xs);
+}
+.kingly-layout-gap-sm {
+  gap: var(--kingly-spacing-sm);
+}
+.kingly-layout-gap-md {
+  gap: var(--kingly-spacing-md);
+}
+.kingly-layout-gap-lg {
+  gap: var(--kingly-spacing-lg);
+}
+.kingly-layout-gap-xl {
+  gap: var(--kingly-spacing-xl);
+}
+
+/* Margin X */
+.kingly-layout-margin-x-xs {
+  margin-left: var(--kingly-spacing-xs);
+  margin-right: var(--kingly-spacing-xs);
+}
+.kingly-layout-margin-x-sm {
+  margin-left: var(--kingly-spacing-sm);
+  margin-right: var(--kingly-spacing-sm);
+}
+.kingly-layout-margin-x-md {
+  margin-left: var(--kingly-spacing-md);
+  margin-right: var(--kingly-spacing-md);
+}
+.kingly-layout-margin-x-lg {
+  margin-left: var(--kingly-spacing-lg);
+  margin-right: var(--kingly-spacing-lg);
+}
+.kingly-layout-margin-x-xl {
+  margin-left: var(--kingly-spacing-xl);
+  margin-right: var(--kingly-spacing-xl);
+}
+
+/* Margin Y */
+.kingly-layout-margin-y-xs {
+  margin-top: var(--kingly-spacing-xs);
+  margin-bottom: var(--kingly-spacing-xs);
+}
+.kingly-layout-margin-y-sm {
+  margin-top: var(--kingly-spacing-sm);
+  margin-bottom: var(--kingly-spacing-sm);
+}
+.kingly-layout-margin-y-md {
+  margin-top: var(--kingly-spacing-md);
+  margin-bottom: var(--kingly-spacing-md);
+}
+.kingly-layout-margin-y-lg {
+  margin-top: var(--kingly-spacing-lg);
+  margin-bottom: var(--kingly-spacing-lg);
+}
+.kingly-layout-margin-y-xl {
+  margin-top: var(--kingly-spacing-xl);
+  margin-bottom: var(--kingly-spacing-xl);
+}

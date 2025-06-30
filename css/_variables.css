@@ -1,0 +1,40 @@
+/*
+* @file
+* Provides CSS variables for Kingly Layouts.
+*/
+
+:root {
+  /* Spacing Scale */
+  --kingly-spacing-xs: 0.25rem;
+  --kingly-spacing-sm: 0.5rem;
+  --kingly-spacing-md: 1rem;
+  --kingly-spacing-lg: 2rem;
+  --kingly-spacing-xl: 4rem;
+  /*
+  * Additional horizontal padding.
+  * This variable is set by the padding-x utilities and consumed by the
+  * container type rules to prevent style clashes.
+  */
+  --kingly-padding-x-additional: 0rem;
+  /* Border Radius Scale */
+  --kingly-border-radius-xs: 0.25rem;
+  --kingly-border-radius-sm: 0.5rem;
+  --kingly-border-radius-md: 1rem;
+  --kingly-border-radius-lg: 2rem;
+  --kingly-border-radius-xl: 4rem;
+  --kingly-border-radius-full: 9999px; /* Large value for pill/circle effect */
+  /* Border Width Scale */
+  --kingly-border-width-sm: 1px;
+  --kingly-border-width-md: 2px;
+  --kingly-border-width-lg: 4px;
+  /* Breakpoints (adjust to match your theme's actual breakpoints) */
+  --kingly-breakpoint-mobile-max: 767px;
+  --kingly-breakpoint-tablet-min: 768px;
+  --kingly-breakpoint-tablet-max: 1023px;
+  --kingly-breakpoint-desktop-min: 1024px;
+  /* Shadow Colors (example, could be more granular if needed) */
+  --kingly-shadow-color-light: rgba(0, 0, 0, 0.05);
+  --kingly-shadow-color-medium: rgba(0, 0, 0, 0.1);
+  --kingly-shadow-color-dark: rgba(0, 0, 0, 0.06);
+  --kingly-shadow-color-xl-dark: rgba(0, 0, 0, 0.04);
+}

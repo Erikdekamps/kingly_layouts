@@ -1,0 +1,29 @@
+/*
+* @file
+* Provides responsiveness utility styles for Kingly Layouts.
+*/
+
+/* --- Responsiveness Utilities --- */
+
+/* Hide on Breakpoint */
+/* Using common breakpoints, adjust as per theme's actual breakpoints */
+@media (max-width: var(--kingly-breakpoint-mobile-max)) {
+  /* Mobile */
+  .kingly-layout-hide-on-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: var(--kingly-breakpoint-tablet-min)) and (max-width: var(--kingly-breakpoint-tablet-max)) {
+  /* Tablet */
+  .kingly-layout-hide-on-tablet {
+    display: none !important;
+  }
+}
+
+@media (min-width: var(--kingly-breakpoint-desktop-min)) {
+  /* Desktop */
+  .kingly-layout-hide-on-desktop {
+    display: none !important;
+  }
+}

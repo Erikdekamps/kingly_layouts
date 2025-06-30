@@ -1,0 +1,56 @@
+/*
+* @file
+* Provides container type styles for Kingly Layouts.
+*/
+
+/* --- Container Types --- */
+
+/*
+* Apply horizontal padding to "Boxed" and "Edge to Edge" containers.
+* The variable is 0rem by default, so no padding is added unless a
+* padding utility class is also present on the element.
+*/
+.kingly-layout--boxed,
+.kingly-layout--edge-to-edge {
+  padding-left: var(--kingly-padding-x-additional);
+  padding-right: var(--kingly-padding-x-additional);
+}
+
+/* Common full-bleed styles for both container types */
+.kingly-layout--full,
+.kingly-layout--edge-to-edge {
+  /* 1. Pull the container out to the viewport edges. */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  box-sizing: border-box; /* Crucial for padding calculations */
+}
+
+/*
+* For "Full Width (Background Only)", we override the default padding
+* with a special calculation that aligns content to the site's container
+* while also including any user-selected additional padding.
+*/
+.kingly-layout--full {
+  /* 2. Push inner content back. `max()` prevents negative padding. */
+  padding-left: calc(max(0px, 50vw - 50%) + var(--kingly-padding-x-additional));
+  padding-right: calc(max(0px, 50vw - 50%) + var(--kingly-padding-x-additional));
+}
+
+.kingly-layout--hero {
+  /* Basic full-screen styles.  You'll likely want to customize this further. */
+  min-height: 100vh; /* This will now be the default from CSS */
+  width: 100vw; /* This will now be the default from CSS */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--kingly-spacing-md);
+}
+
+/* If you want to ensure content within the hero doesn't get too wide */
+.kingly-layout--hero > .layout__region {
+  max-width: 1200px; /* Example max width, adjust as needed */
+  width: 100%;
+}
