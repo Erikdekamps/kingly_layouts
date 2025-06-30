@@ -386,16 +386,68 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function processBuild(array &$build, array $configuration): void {
     $background_type = $configuration['background_type'];
-    $media_url = $configuration['background_media_url'];
-    $min_height = $configuration['background_media_min_height'];
     $has_background = FALSE;
 
-    if (!empty($min_height) && in_array($background_type, ['image', 'video', 'gradient'])) {
-      $build['#attributes']['style'][] = 'min-height: ' . $min_height . ';';
+    // Apply minimum height if configured.
+    $has_background = $this->applyMinHeight($build, $configuration) || $has_background;
+
+    // Apply background based on type.
+    if ($background_type === 'color') {
+      $has_background = $this->applyBackgroundColor($build, $configuration) || $has_background;
+    }
+    elseif ($background_type === 'image') {
+      $has_background = $this->applyBackgroundImage($build, $configuration) || $has_background;
+    }
+    elseif ($background_type === 'video') {
+      $has_background = $this->applyBackgroundVideo($build, $configuration) || $has_background;
+    }
+    elseif ($background_type === 'gradient') {
+      $has_background = $this->applyBackgroundGradient($build, $configuration) || $has_background;
     }
 
-    if ($background_type === 'color' && ($background_color_hex = $this->colorService->getTermColorHex($configuration['background_color']))) {
-      $has_background = TRUE;
+    // Apply overlay for media/gradient backgrounds.
+    $has_background = $this->applyBackgroundOverlay($build, $configuration, $background_type) || $has_background;
+
+    // Attach the library only if a background feature is actually used.
+    if ($has_background) {
+      $build['#attached']['library'][] = 'kingly_layouts/backgrounds';
+    }
+  }
+
+  /**
+   * Applies the minimum height style to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if min-height was applied, FALSE otherwise.
+   */
+  private function applyMinHeight(array &$build, array $configuration): bool {
+    $min_height = $configuration['background_media_min_height'];
+    $background_type = $configuration['background_type'];
+    if (!empty($min_height) && in_array($background_type, ['image', 'video', 'gradient'])) {
+      $build['#attributes']['style'][] = 'min-height: ' . $min_height . ';';
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Applies background color styles to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if a background color was applied, FALSE otherwise.
+   */
+  private function applyBackgroundColor(array &$build, array $configuration): bool {
+    if (($background_color_hex = $this->colorService->getTermColorHex($configuration['background_color']))) {
       $opacity_value = $configuration['background_opacity'];
       if ($opacity_value !== self::NONE_OPTION_KEY && ($rgb = $this->hexToRgb($background_color_hex))) {
         $alpha = (float) $opacity_value / 100;
@@ -404,53 +456,113 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       else {
         $build['#attributes']['style'][] = 'background-color: ' . $background_color_hex . ';';
       }
+      return TRUE;
     }
+    return FALSE;
+  }
 
+  /**
+   * Applies background image styles to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if a background image was applied, FALSE otherwise.
+   */
+  private function applyBackgroundImage(array &$build, array $configuration): bool {
+    $media_url = $configuration['background_media_url'];
     if (!empty($media_url)) {
-      $has_background = TRUE;
-      if ($background_type === 'image') {
-        $build['#attributes']['style'][] = 'background-image: url("' . $media_url . '");';
-        $this->applyInlineStyleFromOption($build, 'background-position', 'background_image_position', $configuration);
-        $this->applyInlineStyleFromOption($build, 'background-repeat', 'background_image_repeat', $configuration);
-        $this->applyInlineStyleFromOption($build, 'background-size', 'background_image_size', $configuration);
-        $this->applyInlineStyleFromOption($build, 'background-attachment', 'background_image_attachment', $configuration);
-      }
-      elseif ($background_type === 'video') {
-        $build['#attributes']['class'][] = 'kingly-layout--has-bg-video';
-        $build['video_background'] = [
-          '#theme' => 'kingly_background_video',
-          '#video_url' => $media_url,
-          '#loop' => $configuration['background_video_loop'],
-          '#autoplay' => $configuration['background_video_autoplay'],
-          '#muted' => $configuration['background_video_muted'],
-          '#preload' => $configuration['background_video_preload'],
-          '#weight' => -100,
-        ];
-      }
+      $build['#attributes']['style'][] = 'background-image: url("' . $media_url . '");';
+      $this->applyInlineStyleFromOption($build, 'background-position', 'background_image_position', $configuration);
+      $this->applyInlineStyleFromOption($build, 'background-repeat', 'background_image_repeat', $configuration);
+      $this->applyInlineStyleFromOption($build, 'background-size', 'background_image_size', $configuration);
+      $this->applyInlineStyleFromOption($build, 'background-attachment', 'background_image_attachment', $configuration);
+      return TRUE;
     }
-    elseif ($background_type === 'gradient') {
-      $start_hex = $this->colorService->getTermColorHex($configuration['background_gradient_start_color']);
-      $end_hex = $this->colorService->getTermColorHex($configuration['background_gradient_end_color']);
+    return FALSE;
+  }
 
-      if ($start_hex && $end_hex) {
-        $has_background = TRUE;
-        if ($configuration['background_gradient_type'] === 'linear') {
-          $direction = $configuration['background_gradient_linear_direction'];
-          $gradient = "linear-gradient({$direction}, {$start_hex}, {$end_hex})";
-        }
-        else {
-          $shape = $configuration['background_gradient_radial_shape'];
-          $position = $configuration['background_gradient_radial_position'];
-          $gradient = "radial-gradient({$shape} at {$position}, {$start_hex}, {$end_hex})";
-        }
-        $build['#attributes']['style'][] = 'background-image: ' . $gradient . ';';
-      }
+  /**
+   * Adds background video render array to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if a background video was applied, FALSE otherwise.
+   */
+  private function applyBackgroundVideo(array &$build, array $configuration): bool {
+    $media_url = $configuration['background_media_url'];
+    if (!empty($media_url)) {
+      $build['#attributes']['class'][] = 'kingly-layout--has-bg-video';
+      $build['video_background'] = [
+        '#theme' => 'kingly_background_video',
+        '#video_url' => $media_url,
+        '#loop' => $configuration['background_video_loop'],
+        '#autoplay' => $configuration['background_video_autoplay'],
+        '#muted' => $configuration['background_video_muted'],
+        '#preload' => $configuration['background_video_preload'],
+        '#weight' => -100,
+      ];
+      return TRUE;
     }
+    return FALSE;
+  }
 
-    // Handle overlay.
+  /**
+   * Applies background gradient styles to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if a background gradient was applied, FALSE otherwise.
+   */
+  private function applyBackgroundGradient(array &$build, array $configuration): bool {
+    $start_hex = $this->colorService->getTermColorHex($configuration['background_gradient_start_color']);
+    $end_hex = $this->colorService->getTermColorHex($configuration['background_gradient_end_color']);
+
+    if ($start_hex && $end_hex) {
+      if ($configuration['background_gradient_type'] === 'linear') {
+        $direction = $configuration['background_gradient_linear_direction'];
+        $gradient = "linear-gradient({$direction}, {$start_hex}, {$end_hex})";
+      }
+      else {
+        $shape = $configuration['background_gradient_radial_shape'];
+        $position = $configuration['background_gradient_radial_position'];
+        $gradient = "radial-gradient({$shape} at {$position}, {$start_hex}, {$end_hex})";
+      }
+      $build['#attributes']['style'][] = 'background-image: ' . $gradient . ';';
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Applies background overlay to the build array.
+   *
+   * This applies to image, video, and gradient background types.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   * @param string $background_type
+   *   The current background type (e.g., 'image', 'video').
+   *
+   * @return bool
+   *   TRUE if an overlay was applied, FALSE otherwise.
+   */
+  private function applyBackgroundOverlay(array &$build, array $configuration, string $background_type): bool {
     $overlay_hex = $this->colorService->getTermColorHex($configuration['background_overlay_color']);
     if (in_array($background_type, ['image', 'video', 'gradient']) && $overlay_hex) {
-      $has_background = TRUE;
       $overlay_opacity = $configuration['background_overlay_opacity'];
       if ($overlay_opacity !== self::NONE_OPTION_KEY) {
         $build['#attributes']['class'][] = 'kingly-layout--has-bg-overlay';
@@ -465,12 +577,10 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
           ],
           '#weight' => -99,
         ];
+        return TRUE;
       }
     }
-
-    if ($has_background) {
-      $build['#attached']['library'][] = 'kingly_layouts/backgrounds';
-    }
+    return FALSE;
   }
 
   /**
