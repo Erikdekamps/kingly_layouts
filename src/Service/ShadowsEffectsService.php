@@ -53,38 +53,78 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       '#open' => FALSE,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts shadows effects'),
     ];
-    $form['shadows_effects']['box_shadow_option'] = [
+    $form['shadows_effects']['static_effects'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Static Effects'),
+      '#description' => $this->t('These effects are applied to the layout section by default.'),
+    ];
+    $form['shadows_effects']['static_effects']['box_shadow_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Box Shadow'),
       '#options' => $this->optionsService->getOptions('box_shadow'),
       '#default_value' => $configuration['box_shadow_option'],
     ];
-    $form['shadows_effects']['filter_option'] = [
+    $form['shadows_effects']['static_effects']['filter_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Filter'),
       '#options' => $this->optionsService->getOptions('filter'),
       '#default_value' => $configuration['filter_option'],
     ];
-    $form['shadows_effects']['opacity_option'] = [
+    $form['shadows_effects']['static_effects']['opacity_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Opacity'),
       '#options' => $this->optionsService->getOptions('opacity'),
       '#default_value' => $configuration['opacity_option'],
       '#description' => $this->t('Adjust the overall transparency of the layout section.'),
     ];
-    $form['shadows_effects']['transform_scale_option'] = [
+    $form['shadows_effects']['static_effects']['transform_scale_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Scale'),
       '#options' => $this->optionsService->getOptions('transform_scale'),
       '#default_value' => $configuration['transform_scale_option'],
       '#description' => $this->t('Scale the size of the layout section.'),
     ];
-    $form['shadows_effects']['transform_rotate_option'] = [
+    $form['shadows_effects']['static_effects']['transform_rotate_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Rotate'),
       '#options' => $this->optionsService->getOptions('transform_rotate'),
       '#default_value' => $configuration['transform_rotate_option'],
       '#description' => $this->t('Rotate the layout section.'),
+    ];
+
+    $form['shadows_effects']['hover_effects'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Hover Effects'),
+      '#description' => $this->t('These effects are applied to the layout section when a user hovers over it.'),
+    ];
+    $form['shadows_effects']['hover_effects']['hover_transform_scale_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Hover Scale'),
+      '#options' => $this->optionsService->getOptions('hover_transform_scale'),
+      '#default_value' => $configuration['hover_transform_scale_option'],
+      '#description' => $this->t('Adjust the scale of the layout section on hover.'),
+    ];
+    $form['shadows_effects']['hover_effects']['hover_box_shadow_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Hover Box Shadow'),
+      '#options' => $this->optionsService->getOptions('hover_box_shadow'),
+      '#default_value' => $configuration['hover_box_shadow_option'],
+      '#description' => $this->t('Apply a box shadow to the layout section on hover.'),
+    ];
+    $form['shadows_effects']['hover_effects']['hover_filter_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Hover Filter'),
+      '#options' => $this->optionsService->getOptions('hover_filter'),
+      '#default_value' => $configuration['hover_filter_option'],
+      '#description' => $this->t('Apply a visual filter to the layout section on hover.'),
+    ];
+    // New: Hover Font Size option.
+    $form['shadows_effects']['hover_effects']['hover_font_size_option'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Hover Font Size'),
+      '#options' => $this->optionsService->getOptions('hover_font_size'),
+      '#default_value' => $configuration['hover_font_size_option'],
+      '#description' => $this->t('Adjust the font size of text within the layout section on hover.'),
     ];
 
     return $form;
@@ -95,6 +135,8 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
     $values = $form_state->getValue('shadows_effects', []);
+
+    // Static effects.
     foreach ([
       'box_shadow_option',
       'filter_option',
@@ -102,7 +144,17 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       'transform_scale_option',
       'transform_rotate_option',
     ] as $key) {
-      $configuration[$key] = $values[$key] ?? self::NONE_OPTION_KEY;
+      $configuration[$key] = $values['static_effects'][$key] ?? self::NONE_OPTION_KEY;
+    }
+
+    // Hover effects.
+    foreach ([
+      'hover_transform_scale_option',
+      'hover_box_shadow_option',
+      'hover_filter_option',
+      'hover_font_size_option',
+    ] as $key) {
+      $configuration[$key] = $values['hover_effects'][$key] ?? self::NONE_OPTION_KEY;
     }
   }
 
@@ -112,20 +164,29 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
   public function processBuild(array &$build, array $configuration): void {
     $has_effects = FALSE;
 
-    // Apply box shadow and filter classes.
-    $has_effects = $this->applyClassBasedEffects($build, $configuration) || $has_effects;
+    // Apply static box shadow and filter classes.
+    $has_effects = $this->applyStaticClassBasedEffects($build, $configuration) || $has_effects;
 
-    // Apply opacity and transform inline styles.
-    $has_effects = $this->applyInlineStyles($build, $configuration) || $has_effects;
+    // Apply static opacity and transform inline styles.
+    $has_effects = $this->applyStaticInlineStyles($build, $configuration) || $has_effects;
 
-    // Attach the effects library if any effect was applied.
+    // Apply hover transform scale, box shadow, filter, and font size classes.
+    $has_effects = $this->applyHoverEffects($build, $configuration) || $has_effects;
+
+    // If any effect (static or hover) was applied, attach the necessary
+    // libraries and the base animation class for transitions.
     if ($has_effects) {
       $build['#attached']['library'][] = 'kingly_layouts/effects';
+      // The 'animations' library contains the base 'kingly-animate' class
+      // and its transition properties, which are essential for smooth
+      // hover effects.
+      $build['#attached']['library'][] = 'kingly_layouts/animations';
+      $build['#attributes']['class'][] = 'kingly-animate';
     }
   }
 
   /**
-   * Applies CSS class-based effects (box shadow, filter).
+   * Applies static CSS class-based effects (box shadow, filter).
    *
    * @param array &$build
    *   The render array, passed by reference.
@@ -133,9 +194,9 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
    *   The layout's current configuration.
    *
    * @return bool
-   *   TRUE if any class-based effect was applied, FALSE otherwise.
+   *   TRUE if any static class-based effect was applied, FALSE otherwise.
    */
-  private function applyClassBasedEffects(array &$build, array $configuration): bool {
+  private function applyStaticClassBasedEffects(array &$build, array $configuration): bool {
     $applied = FALSE;
     $class_map = [
       'box_shadow_option' => 'kingly-layout-shadow-',
@@ -151,7 +212,7 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
   }
 
   /**
-   * Applies inline CSS styles (opacity, transform).
+   * Applies static inline CSS styles (opacity, transform).
    *
    * @param array &$build
    *   The render array, passed by reference.
@@ -159,9 +220,9 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
    *   The layout's current configuration.
    *
    * @return bool
-   *   TRUE if any inline style effect was applied, FALSE otherwise.
+   *   TRUE if any static inline style effect was applied, FALSE otherwise.
    */
-  private function applyInlineStyles(array &$build, array $configuration): bool {
+  private function applyStaticInlineStyles(array &$build, array $configuration): bool {
     $applied = FALSE;
     $style_map = [
       'opacity_option' => 'opacity',
@@ -190,6 +251,38 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
   }
 
   /**
+   * Applies hover effects (transform, box shadow, filter, font size) to the build array.
+   *
+   * @param array &$build
+   *   The render array, passed by reference.
+   * @param array $configuration
+   *   The layout's current configuration.
+   *
+   * @return bool
+   *   TRUE if any hover effect was applied, FALSE otherwise.
+   */
+  private function applyHoverEffects(array &$build, array $configuration): bool {
+    $applied = FALSE;
+    $hover_class_map = [
+      'hover_transform_scale_option' => 'kingly-layout--hover-scale-',
+      'hover_box_shadow_option' => 'kingly-layout--hover-shadow-',
+      'hover_filter_option' => 'kingly-layout--hover-filter-',
+      'hover_font_size_option' => 'kingly-layout--hover-font-size-',
+    ];
+
+    foreach ($hover_class_map as $config_key => $prefix) {
+      if ($configuration[$config_key] !== self::NONE_OPTION_KEY) {
+        // The applyClassFromConfig helper will automatically fetch the correct
+        // class suffix (e.g., 'scale-110' or 'size-110') from the configuration
+        // based on the $config_key provided.
+        $this->applyClassFromConfig($build, $prefix, $config_key, $configuration);
+        $applied = TRUE;
+      }
+    }
+    return $applied;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function defaultConfiguration(): array {
@@ -199,6 +292,10 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       'opacity_option' => self::NONE_OPTION_KEY,
       'transform_scale_option' => self::NONE_OPTION_KEY,
       'transform_rotate_option' => self::NONE_OPTION_KEY,
+      'hover_transform_scale_option' => self::NONE_OPTION_KEY,
+      'hover_box_shadow_option' => self::NONE_OPTION_KEY,
+      'hover_filter_option' => self::NONE_OPTION_KEY,
+      'hover_font_size_option' => self::NONE_OPTION_KEY,
     ];
   }
 

@@ -1,12 +1,12 @@
 /**
- * @file
- * Provides animation styles for Kingly Layouts.
- */
+* @file
+* Provides animation styles for Kingly Layouts.
+  */
 
 /* Base class for all animated elements. Defines the transition. */
 .kingly-animate {
   /* Default transition properties, can be overridden by inline styles from PHP. */
-  transition-property: opacity, transform;
+  transition-property: opacity, transform, filter, box-shadow, font-size;
   transition-duration: 0.6s;
   transition-timing-function: ease-out;
 }
@@ -55,13 +55,15 @@
 
 
 /*
- * Respect user preference for reduced motion.
- * This disables transitions and ensures elements are visible by default.
- */
+* Respect user preference for reduced motion.
+* This disables transitions and ensures elements are visible by default.
+  */
 @media (prefers-reduced-motion: reduce) {
   .kingly-animate {
     transition-property: none;
     transform: none !important;
     opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
   }
 }
