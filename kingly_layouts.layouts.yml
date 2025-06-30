@@ -3,7 +3,7 @@ kingly_onecol:
   category: 'Kingly'
   path: templates
   template: layout--kingly-onecol
-  library: kingly_layouts/kingly_onecol
+  library: kingly_layouts/kingly_layout_one_column
   class: '\Drupal\kingly_layouts\Plugin\Layout\KinglyOneColumnLayout'
   default_region: content
   icon_map:
@@ -17,7 +17,7 @@ kingly_twocol:
   category: 'Kingly'
   path: templates
   template: layout--kingly-twocol
-  library: kingly_layouts/kingly_twocol
+  library: kingly_layouts/kingly_layout_two_column
   class: '\Drupal\kingly_layouts\Plugin\Layout\KinglyTwoColumnLayout'
   default_region: first
   icon_map:
@@ -33,7 +33,7 @@ kingly_threecol:
   category: 'Kingly'
   path: templates
   template: layout--kingly-threecol
-  library: kingly_layouts/kingly_threecol
+  library: kingly_layouts/kingly_layout_three_column
   class: '\Drupal\kingly_layouts\Plugin\Layout\KinglyThreeColumnLayout'
   default_region: second
   icon_map:
@@ -51,7 +51,7 @@ kingly_fourcol:
   category: 'Kingly'
   path: templates
   template: layout--kingly-fourcol
-  library: kingly_layouts/kingly_fourcol
+  library: kingly_layouts/kingly_layout_four_column
   class: '\Drupal\kingly_layouts\Plugin\Layout\KinglyFourColumnLayout'
   default_region: first
   icon_map:
