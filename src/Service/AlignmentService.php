@@ -87,8 +87,25 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function processBuild(array &$build, array $configuration): void {
-    $this->applyClassFromConfig($build, 'kingly-layout-align-content-', 'vertical_alignment', $configuration);
-    $this->applyClassFromConfig($build, 'kingly-layout-justify-content-', 'horizontal_alignment', $configuration);
+    $v_align = $configuration['vertical_alignment'];
+    $h_align = $configuration['horizontal_alignment'];
+    $defaults = self::defaultConfiguration();
+
+    // Check if a non-default alignment option is used.
+    $is_v_align_set = $v_align !== $defaults['vertical_alignment'];
+    $is_h_align_set = $h_align !== $defaults['horizontal_alignment'];
+
+    if ($is_v_align_set || $is_h_align_set) {
+      // Conditionally attach the library only if needed.
+      $build['#attached']['library'][] = 'kingly_layouts/alignment';
+    }
+
+    if ($is_v_align_set) {
+      $this->applyClassFromConfig($build, 'kingly-layout-align-content-', 'vertical_alignment', $configuration);
+    }
+    if ($is_h_align_set) {
+      $this->applyClassFromConfig($build, 'kingly-layout-justify-content-', 'horizontal_alignment', $configuration);
+    }
   }
 
   /**

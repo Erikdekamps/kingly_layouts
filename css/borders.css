@@ -1,0 +1,46 @@
+/*
+* @file
+* Provides border utility styles for Kingly Layouts.
+*/
+
+/* Border Radius */
+.kingly-layout-border-radius-xs {
+  border-radius: var(--kingly-border-radius-xs);
+}
+.kingly-layout-border-radius-sm {
+  border-radius: var(--kingly-border-radius-sm);
+}
+.kingly-layout-border-radius-md {
+  border-radius: var(--kingly-border-radius-md);
+}
+.kingly-layout-border-radius-lg {
+  border-radius: var(--kingly-border-radius-lg);
+}
+.kingly-layout-border-radius-xl {
+  border-radius: var(--kingly-border-radius-xl);
+}
+.kingly-layout-border-radius-full {
+  border-radius: var(--kingly-border-radius-full);
+}
+
+/* Border Width */
+.kingly-layout-border-width-sm {
+  border-width: var(--kingly-border-width-sm);
+}
+.kingly-layout-border-width-md {
+  border-width: var(--kingly-border-width-md);
+}
+.kingly-layout-border-width-lg {
+  border-width: var(--kingly-border-width-lg);
+}
+
+/* Border Style */
+.kingly-layout-border-style-solid {
+  border-style: solid;
+}
+.kingly-layout-border-style-dashed {
+  border-style: dashed;
+}
+.kingly-layout-border-style-dotted {
+  border-style: dotted;
+}

@@ -71,6 +71,8 @@ class ContainerTypeService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function processBuild(array &$build, array $configuration): void {
     if (!empty($configuration['container_type'])) {
+      // The container library is always needed as 'boxed' is the default.
+      $build['#attached']['library'][] = 'kingly_layouts/containers';
       $build['#attributes']['class'][] = 'kingly-layout--' . $configuration['container_type'];
     }
   }

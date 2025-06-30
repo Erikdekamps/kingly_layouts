@@ -152,7 +152,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function processBuild(array &$build, array $configuration): void {
     if ($configuration['animation_type'] !== self::NONE_OPTION_KEY) {
-      $build['#attached']['library'][] = 'kingly_layouts/kingly_animations';
+      $build['#attached']['library'][] = 'kingly_layouts/animations';
       $build['#attributes']['class'][] = 'kingly-animate';
       $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_type', $configuration);
 

@@ -110,12 +110,20 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function processBuild(array &$build, array $configuration): void {
+    $has_effects = FALSE;
     $class_map = [
       'box_shadow_option' => 'kingly-layout-shadow-',
       'filter_option' => 'kingly-layout-filter-',
     ];
     foreach ($class_map as $config_key => $prefix) {
-      $this->applyClassFromConfig($build, $prefix, $config_key, $configuration);
+      if ($configuration[$config_key] !== self::NONE_OPTION_KEY) {
+        $has_effects = TRUE;
+        $this->applyClassFromConfig($build, $prefix, $config_key, $configuration);
+      }
+    }
+
+    if ($has_effects) {
+      $build['#attached']['library'][] = 'kingly_layouts/effects';
     }
 
     $style_map = [

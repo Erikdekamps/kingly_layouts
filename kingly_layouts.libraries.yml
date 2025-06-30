@@ -1,40 +1,84 @@
-kingly_utilities:
+variables:
+  css:
+    base:
+      css/_variables.css: {}
+
+containers:
   css:
     theme:
-      css/kingly-utilities.css: {}
+      css/containers.css: {}
+  dependencies:
+    - kingly_layouts/variables
 
-# New library for animations.
-kingly_animations:
+spacing:
+  css:
+    theme:
+      css/spacing.css: {}
+  dependencies:
+    - kingly_layouts/variables
+
+borders:
+  css:
+    theme:
+      css/borders.css: {}
+  dependencies:
+    - kingly_layouts/variables
+
+alignment:
+  css:
+    theme:
+      css/alignment.css: {}
+  dependencies:
+    - kingly_layouts/variables
+
+backgrounds:
+  css:
+    theme:
+      css/backgrounds.css: {}
+  dependencies:
+    - kingly_layouts/variables
+
+effects:
+  css:
+    theme:
+      css/effects.css: {}
+  dependencies:
+    - kingly_layouts/variables
+
+responsiveness:
+  css:
+    theme:
+      css/responsiveness.css: {}
+  dependencies:
+    - kingly_layouts/variables
+
+animations:
   version: 1.x
   js:
     js/kingly-animations.js: {}
   css:
     theme:
-      css/kingly-animations.css: {}
+      css/animations.css: {}
   dependencies:
     - core/drupal
     - core/once
 
-# Library for the one-column layout.
 kingly_onecol:
   css:
     theme:
-      css/kingly-onecol.css: { }
+      css/kingly-onecol.css: {}
 
-# Library for the two-column layout.
 kingly_twocol:
   css:
     theme:
-      css/kingly-twocol.css: { }
+      css/kingly-twocol.css: {}
 
-# Library for the three-column layout.
 kingly_threecol:
   css:
     theme:
-      css/kingly-threecol.css: { }
+      css/kingly-threecol.css: {}
 
-# Library for the four-column layout.
 kingly_fourcol:
   css:
     theme:
-      css/kingly-fourcol.css: { }
+      css/kingly-fourcol.css: {}

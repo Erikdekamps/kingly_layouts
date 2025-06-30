@@ -146,7 +146,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $build = parent::build($regions);
     $build['#attributes']['class'] = $build['#attributes']['class'] ?? [];
     $build['#attributes']['style'] = $build['#attributes']['style'] ?? [];
-    $build['#attached']['library'][] = 'kingly_layouts/kingly_utilities';
 
     if (!empty($this->configuration['sizing_option']) && $this->configuration['sizing_option'] !== 'default') {
       $layout_id = $this->getPluginDefinition()->id();

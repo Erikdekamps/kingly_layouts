@@ -1,0 +1,48 @@
+/*
+* @file
+* Provides background media utility styles for Kingly Layouts.
+*/
+
+/* Background Video Container */
+.kingly-layout--has-bg-video {
+  position: relative;
+  overflow: hidden; /* Ensure video doesn't overflow */
+  z-index: 0; /* Establish a new stacking context. */
+}
+.kingly-layout--has-bg-video > .kingly-layout__video-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2; /* Place at the very back, behind the overlay. */
+  pointer-events: none; /* Allow clicks to pass through to content */
+  overflow: hidden;
+}
+.kingly-layout--has-bg-video > .kingly-layout__video-wrapper > .kingly-layout__video {
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  object-fit: cover; /* Ensure video covers the area */
+}
+
+/* Background Overlay */
+.kingly-layout--has-bg-overlay {
+  position: relative; /* Ensure overlay is positioned relative to this */
+  z-index: 0; /* Establish a new stacking context. */
+}
+.kingly-layout--has-bg-overlay > .kingly-layout__bg-overlay {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Place above video/image, but still behind content. */
+  pointer-events: none; /* Allow clicks to pass through */
+}
