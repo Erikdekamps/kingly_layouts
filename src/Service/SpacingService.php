@@ -125,21 +125,18 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
       'horizontal_margin_option',
       'vertical_margin_option',
     ] as $key) {
-      $configuration[$key] = $spacing_values[$key] ?? $this->defaultConfiguration()[$key];
+      $configuration[$key] = $spacing_values[$key] ?? self::defaultConfiguration()[$key];
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration(): array {
-    $padding_options = $this->getScaleOptions();
-    $default_padding = key($padding_options);
-
+  public static function defaultConfiguration(): array {
     return [
-      'horizontal_padding_option' => $default_padding,
-      'vertical_padding_option' => $default_padding,
-      'gap_option' => key($this->getScaleOptions()),
+      'horizontal_padding_option' => self::NONE_OPTION_KEY,
+      'vertical_padding_option' => self::NONE_OPTION_KEY,
+      'gap_option' => self::NONE_OPTION_KEY,
       'horizontal_margin_option' => self::NONE_OPTION_KEY,
       'vertical_margin_option' => self::NONE_OPTION_KEY,
     ];
@@ -161,7 +158,8 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
 
       case 'edge-to-edge':
       case 'hero':
-        $h_padding_effective = self::NONE_OPTION_KEY;
+        // The CSS for these container types handles padding differently.
+        // We only apply the class, and CSS variables do the rest.
         $apply_horizontal_margin = FALSE;
         break;
     }

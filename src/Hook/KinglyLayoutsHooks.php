@@ -10,7 +10,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 class KinglyLayoutsHooks {
 
   /**
-   * {@inheritdoc}
+   * Implements hook_theme().
    */
   #[Hook('theme')]
   public function theme(): array {
