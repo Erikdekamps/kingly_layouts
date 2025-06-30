@@ -53,13 +53,13 @@ responsiveness:
     - kingly_layouts/variables
 
 animations:
-  version: 1.x
   js:
-    js/kingly-animations.js: {}
+    js/animations.js: {}
   css:
     theme:
       css/animations.css: {}
   dependencies:
+    - core/jquery
     - core/drupal
     - core/once
 
