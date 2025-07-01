@@ -2,6 +2,7 @@
 
 namespace Drupal\kingly_layouts\Service;
 
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -33,16 +34,21 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The options service.
-   */
-  protected OptionsService $optionsService;
-
-  /**
    * The term storage.
    *
    * @var \Drupal\taxonomy\TermStorageInterface
    */
   protected $termStorage;
+
+  /**
+   * The cache backend.
+   */
+  protected CacheBackendInterface $cache;
+
+  /**
+   * The entity type manager.
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * A static cache for hex values to avoid redundant loads within a request.
@@ -58,23 +64,24 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\OptionsService $options_service
-   *   The options service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   *   The cache backend.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, OptionsService $options_service, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->optionsService = $options_service;
+    $this->entityTypeManager = $entity_type_manager;
     $this->termStorage = $entity_type_manager->getStorage('taxonomy_term');
+    $this->cache = $cache;
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $color_options = $this->optionsService->getColorOptions();
+    $color_options = $this->getColorOptions();
 
     $form['colors'] = [
       '#type' => 'details',
@@ -124,6 +131,49 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function defaultConfiguration(): array {
+    return [
+      'foreground_color' => self::NONE_OPTION_KEY,
+    ];
+  }
+
+  /**
+   * Returns color options from the 'kingly_css_color' vocabulary.
+   *
+   * @return array
+   *   An associative array of color options.
+   */
+  public function getColorOptions(): array {
+    $cid = 'kingly_layouts:color_options';
+    if ($cache = $this->cache->get($cid)) {
+      return $cache->data;
+    }
+
+    $options = [
+      self::NONE_OPTION_KEY => $this->t('None'),
+    ];
+
+    // The vocabulary config entity itself is a cache dependency.
+    $cache_tags = ['config:taxonomy.vocabulary.' . self::KINGLY_CSS_COLOR_VOCABULARY];
+
+    if ($this->entityTypeManager->getStorage('taxonomy_vocabulary')
+      ->load(self::KINGLY_CSS_COLOR_VOCABULARY)) {
+      // The list of terms in the vocabulary is also a cache dependency.
+      $cache_tags[] = 'taxonomy_term_list:' . self::KINGLY_CSS_COLOR_VOCABULARY;
+      $terms = $this->termStorage->loadTree(self::KINGLY_CSS_COLOR_VOCABULARY, 0, NULL, TRUE);
+      foreach ($terms as $term) {
+        $options[$term->id()] = $term->getName();
+      }
+    }
+
+    $this->cache->set($cid, $options, CacheBackendInterface::CACHE_PERMANENT, $cache_tags);
+
+    return $options;
+  }
+
+  /**
    * Retrieves the hex color value from a Kingly CSS Color taxonomy term.
    *
    * @param string $term_id
@@ -156,15 +206,6 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
     // Store the result (even if null) in the static cache and return it.
     self::$hexCache[$term_id] = $hex_value;
     return $hex_value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultConfiguration(): array {
-    return [
-      'foreground_color' => self::NONE_OPTION_KEY,
-    ];
   }
 
 }

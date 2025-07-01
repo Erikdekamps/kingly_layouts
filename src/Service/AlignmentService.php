@@ -23,24 +23,16 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The options service.
-   */
-  protected OptionsService $optionsService;
-
-  /**
    * Constructs a new AlignmentService object.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\OptionsService $options_service
-   *   The options service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, OptionsService $options_service) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->optionsService = $options_service;
   }
 
   /**
@@ -57,7 +49,7 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
     $form['alignment']['vertical_alignment'] = [
       '#type' => 'select',
       '#title' => $this->t('Vertical Alignment'),
-      '#options' => $this->optionsService->getOptions('vertical_alignment'),
+      '#options' => $this->getAlignmentOptions('vertical'),
       '#default_value' => $configuration['vertical_alignment'],
       '#description' => $this->t('Align content vertically within the layout. This assumes the layout uses Flexbox or Grid. "Stretch" makes columns in the same row equal height.'),
     ];
@@ -65,7 +57,7 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
     $form['alignment']['horizontal_alignment'] = [
       '#type' => 'select',
       '#title' => $this->t('Horizontal Alignment'),
-      '#options' => $this->optionsService->getOptions('horizontal_alignment'),
+      '#options' => $this->getAlignmentOptions('horizontal'),
       '#default_value' => $configuration['horizontal_alignment'],
       '#description' => $this->t('Justify content horizontally within the layout. This assumes the layout uses Flexbox or Grid.'),
     ];
@@ -103,6 +95,48 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
 
     // Attach the library only if alignment options are used.
     $this->attachAlignmentLibrary($build, $is_v_align_set, $is_h_align_set);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultConfiguration(): array {
+    return [
+      'vertical_alignment' => 'center',
+      'horizontal_alignment' => 'start',
+    ];
+  }
+
+  /**
+   * Returns alignment options.
+   *
+   * @param string $type
+   *   The type of alignment options ('vertical' or 'horizontal').
+   *
+   * @return array
+   *   An array of alignment options.
+   */
+  private function getAlignmentOptions(string $type): array {
+    if ($type === 'vertical') {
+      return [
+        'stretch' => $this->t('Stretch'),
+        'flex-start' => $this->t('Top'),
+        'center' => $this->t('Center (Default)'),
+        'flex-end' => $this->t('Bottom'),
+        'baseline' => $this->t('Baseline'),
+      ];
+    }
+    if ($type === 'horizontal') {
+      return [
+        'start' => $this->t('Start (Left)'),
+        'center' => $this->t('Center'),
+        'end' => $this->t('End (Right)'),
+        'space-between' => $this->t('Space Between'),
+        'space-around' => $this->t('Space Around'),
+        'space-evenly' => $this->t('Space Evenly'),
+      ];
+    }
+    return [];
   }
 
   /**
@@ -151,16 +185,6 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
     if ($is_v_align_set || $is_h_align_set) {
       $build['#attached']['library'][] = 'kingly_layouts/alignment';
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultConfiguration(): array {
-    return [
-      'vertical_alignment' => 'center',
-      'horizontal_alignment' => 'start',
-    ];
   }
 
 }

@@ -23,24 +23,16 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The options service.
-   */
-  protected OptionsService $optionsService;
-
-  /**
    * Constructs a new AnimationService object.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\OptionsService $options_service
-   *   The options service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, OptionsService $options_service) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->optionsService = $options_service;
   }
 
   /**
@@ -57,7 +49,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
     $form['animation']['animation_type'] = [
       '#type' => 'select',
       '#title' => $this->t('Animation Type'),
-      '#options' => $this->optionsService->getOptions('animation_type'),
+      '#options' => $this->getAnimationOptions('type'),
       '#default_value' => $configuration['animation_type'],
       '#description' => $this->t('Select an animation to apply when the layout scrolls into view. This defines the start and end states.'),
     ];
@@ -65,7 +57,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
     $form['animation']['slide_direction'] = [
       '#type' => 'select',
       '#title' => $this->t('Slide Direction'),
-      '#options' => $this->optionsService->getOptions('slide_direction'),
+      '#options' => $this->getAnimationOptions('slide_direction'),
       '#default_value' => $configuration['slide_direction'],
       '#description' => $this->t('Select the direction for slide-in animations.'),
       '#states' => [
@@ -78,7 +70,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
     $form['animation']['transition_property'] = [
       '#type' => 'select',
       '#title' => $this->t('Transition Property'),
-      '#options' => $this->optionsService->getOptions('transition_property'),
+      '#options' => $this->getAnimationOptions('transition_property'),
       '#default_value' => $configuration['transition_property'],
       '#description' => $this->t('The CSS property that the transition will animate.'),
       '#states' => [
@@ -91,7 +83,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
     $form['animation']['transition_duration'] = [
       '#type' => 'select',
       '#title' => $this->t('Transition Duration'),
-      '#options' => $this->optionsService->getOptions('transition_duration'),
+      '#options' => $this->getAnimationOptions('transition_duration'),
       '#default_value' => $configuration['transition_duration'],
       '#description' => $this->t('How long the animation takes to complete.'),
       '#states' => [
@@ -104,7 +96,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
     $form['animation']['transition_timing_function'] = [
       '#type' => 'select',
       '#title' => $this->t('Transition Speed Curve'),
-      '#options' => $this->optionsService->getOptions('transition_timing_function'),
+      '#options' => $this->getAnimationOptions('transition_timing_function'),
       '#default_value' => $configuration['transition_timing_function'],
       '#description' => $this->t('The speed curve of the animation.'),
       '#states' => [
@@ -117,7 +109,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
     $form['animation']['transition_delay'] = [
       '#type' => 'select',
       '#title' => $this->t('Transition Delay'),
-      '#options' => $this->optionsService->getOptions('transition_delay'),
+      '#options' => $this->getAnimationOptions('transition_delay'),
       '#default_value' => $configuration['transition_delay'],
       '#description' => $this->t('The delay before the animation starts.'),
       '#states' => [
@@ -161,6 +153,76 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
       // Apply inline transition styles.
       $this->applyAnimationTransitionStyles($build, $configuration);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultConfiguration(): array {
+    return [
+      'animation_type' => self::NONE_OPTION_KEY,
+      'slide_direction' => self::NONE_OPTION_KEY,
+      'transition_property' => self::NONE_OPTION_KEY,
+      'transition_duration' => self::NONE_OPTION_KEY,
+      'transition_timing_function' => self::NONE_OPTION_KEY,
+      'transition_delay' => self::NONE_OPTION_KEY,
+    ];
+  }
+
+  /**
+   * Gets animation-related options.
+   *
+   * @param string $key
+   *   The key for the specific options to retrieve.
+   *
+   * @return array
+   *   An array of animation options.
+   */
+  private function getAnimationOptions(string $key): array {
+    $none = [self::NONE_OPTION_KEY => $this->t('None')];
+    $options = [
+      'type' => $none + [
+        'fade-in' => $this->t('Fade In'),
+        'slide-in' => $this->t('Slide In'),
+      ],
+      'slide_direction' => $none + [
+        'up' => $this->t('Bottom up'),
+        'down' => $this->t('Top down'),
+        'left' => $this->t('Right to Left'),
+        'right' => $this->t('Left to Right'),
+      ],
+      'transition_property' => [
+        self::NONE_OPTION_KEY => $this->t('Default (opacity, transform)'),
+        'opacity' => $this->t('Opacity only'),
+        'transform' => $this->t('Transform only'),
+        'all' => $this->t('All properties'),
+        'opacity, transform' => $this->t('Opacity and Transform'),
+      ],
+      'transition_duration' => [
+        self::NONE_OPTION_KEY => $this->t('Default (600ms)'),
+        '150ms' => $this->t('150ms'),
+        '300ms' => $this->t('300ms'),
+        '500ms' => $this->t('500ms'),
+        '750ms' => $this->t('750ms'),
+        '1s' => $this->t('1s'),
+      ],
+      'transition_timing_function' => [
+        self::NONE_OPTION_KEY => $this->t('Default (ease-out)'),
+        'ease' => $this->t('ease'),
+        'ease-in' => $this->t('ease-in'),
+        'ease-in-out' => $this->t('ease-in-out'),
+        'linear' => $this->t('linear'),
+      ],
+      'transition_delay' => $none + [
+        '150ms' => $this->t('150ms'),
+        '300ms' => $this->t('300ms'),
+        '500ms' => $this->t('500ms'),
+        '750ms' => $this->t('750ms'),
+        '1s' => $this->t('1s'),
+      ],
+    ];
+
+    return $options[$key] ?? [];
   }
 
   /**
@@ -217,20 +279,6 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
     foreach ($animation_style_map as $config_key => $property) {
       $this->applyInlineStyleFromOption($build, $property, $config_key, $configuration);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultConfiguration(): array {
-    return [
-      'animation_type' => self::NONE_OPTION_KEY,
-      'slide_direction' => self::NONE_OPTION_KEY,
-      'transition_property' => self::NONE_OPTION_KEY,
-      'transition_duration' => self::NONE_OPTION_KEY,
-      'transition_timing_function' => self::NONE_OPTION_KEY,
-      'transition_delay' => self::NONE_OPTION_KEY,
-    ];
   }
 
 }

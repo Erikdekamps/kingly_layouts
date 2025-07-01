@@ -1,19 +1,14 @@
-# Filename: kingly_layouts/kingly_layouts.services.yml
 services:
   kingly_layouts.display_option_collector:
     class: Drupal\kingly_layouts\Service\DisplayOptionCollector
     arguments: [!tagged_iterator kingly_layouts.display_option]
-  kingly_layouts.options:
-    class: Drupal\kingly_layouts\Service\OptionsService
-    arguments: ['@entity_type.manager', '@cache.default', '@string_translation']
   kingly_layouts.hook.form_alter:
     class: Drupal\kingly_layouts\Hook\FormAlterHooks
     tags:
       - { name: hook_subscriber }
-  # Removed kingly_layouts.hook.css_alter service as it's no longer needed.
   kingly_layouts.container_type:
     class: Drupal\kingly_layouts\Service\ContainerTypeService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options']
+    arguments: ['@current_user', '@string_translation']
     tags:
       - { name: kingly_layouts.display_option, priority: 100 }
   kingly_layouts.spacing:
@@ -23,42 +18,42 @@ services:
       - { name: kingly_layouts.display_option, priority: 90 }
   kingly_layouts.color:
     class: Drupal\kingly_layouts\Service\ColorService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options', '@entity_type.manager']
+    arguments: ['@current_user', '@string_translation', '@entity_type.manager', '@cache.default']
     tags:
       - { name: kingly_layouts.display_option, priority: 80 }
   kingly_layouts.typography:
     class: Drupal\kingly_layouts\Service\TypographyService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options']
+    arguments: ['@current_user', '@string_translation']
     tags:
       - { name: kingly_layouts.display_option, priority: 75 }
   kingly_layouts.border:
     class: Drupal\kingly_layouts\Service\BorderService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options', '@kingly_layouts.color']
+    arguments: ['@current_user', '@string_translation', '@kingly_layouts.color']
     tags:
       - { name: kingly_layouts.display_option, priority: 70 }
   kingly_layouts.alignment:
     class: Drupal\kingly_layouts\Service\AlignmentService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options']
+    arguments: ['@current_user', '@string_translation']
     tags:
       - { name: kingly_layouts.display_option, priority: 60 }
   kingly_layouts.animation:
     class: Drupal\kingly_layouts\Service\AnimationService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options']
+    arguments: ['@current_user', '@string_translation']
     tags:
       - { name: kingly_layouts.display_option, priority: 50 }
   kingly_layouts.background:
     class: Drupal\kingly_layouts\Service\BackgroundService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options', '@kingly_layouts.color']
+    arguments: ['@current_user', '@string_translation', '@kingly_layouts.color']
     tags:
       - { name: kingly_layouts.display_option, priority: 40 }
   kingly_layouts.shadows_effects:
     class: Drupal\kingly_layouts\Service\ShadowsEffectsService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options']
+    arguments: ['@current_user', '@string_translation']
     tags:
       - { name: kingly_layouts.display_option, priority: 30 }
   kingly_layouts.responsiveness:
     class: Drupal\kingly_layouts\Service\ResponsivenessService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.options']
+    arguments: ['@current_user', '@string_translation']
     tags:
       - { name: kingly_layouts.display_option, priority: 20 }
   kingly_layouts.custom_attributes:

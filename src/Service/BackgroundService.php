@@ -23,11 +23,6 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The options service.
-   */
-  protected OptionsService $optionsService;
-
-  /**
    * The color service.
    */
   protected ColorService $colorService;
@@ -39,15 +34,12 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\OptionsService $options_service
-   *   The options service.
    * @param \Drupal\kingly_layouts\Service\ColorService $color_service
    *   The color service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, OptionsService $options_service, ColorService $color_service) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, ColorService $color_service) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->optionsService = $options_service;
     $this->colorService = $color_service;
   }
 
@@ -55,7 +47,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $color_options = $this->optionsService->getColorOptions();
+    $color_options = $this->colorService->getColorOptions();
 
     $form['background'] = [
       '#type' => 'details',
@@ -68,7 +60,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $form['background']['background_type'] = [
       '#type' => 'radios',
       '#title' => $this->t('Background Type'),
-      '#options' => $this->optionsService->getOptions('background_type'),
+      '#options' => $this->getBackgroundOptions('type'),
       '#default_value' => $configuration['background_type'],
       '#description' => $this->t('Choose the type of background for this layout section.'),
     ];
@@ -116,7 +108,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       $form['background']['color_settings']['background_opacity'] = [
         '#type' => 'select',
         '#title' => $this->t('Background Opacity'),
-        '#options' => $this->optionsService->getOptions('background_opacity'),
+        '#options' => $this->getBackgroundOptions('opacity'),
         '#default_value' => $configuration['background_opacity'],
         '#description' => $this->t('Set the opacity for the background color. This requires a background color to be selected.'),
         '#states' => [
@@ -152,7 +144,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $form['background']['overlay_settings']['background_overlay_opacity'] = [
       '#type' => 'select',
       '#title' => $this->t('Overlay Opacity'),
-      '#options' => $this->optionsService->getOptions('background_overlay_opacity'),
+      '#options' => $this->getBackgroundOptions('overlay_opacity'),
       '#default_value' => $configuration['background_overlay_opacity'],
       '#description' => $this->t('Set the opacity for the overlay color. This requires an overlay color to be selected.'),
       '#states' => [
@@ -182,28 +174,28 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $form['background']['image_settings']['background_image_position'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Position'),
-      '#options' => $this->optionsService->getOptions('background_image_position'),
+      '#options' => $this->getBackgroundOptions('image_position'),
       '#default_value' => $configuration['background_image_position'],
       '#description' => $this->t("Select the starting position of the background image. This is most noticeable when the image is not set to 'cover' or 'contain'."),
     ];
     $form['background']['image_settings']['background_image_repeat'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Repeat'),
-      '#options' => $this->optionsService->getOptions('background_image_repeat'),
+      '#options' => $this->getBackgroundOptions('image_repeat'),
       '#default_value' => $configuration['background_image_repeat'],
       '#description' => $this->t('Define if and how the background image should repeat.'),
     ];
     $form['background']['image_settings']['background_image_size'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Size'),
-      '#options' => $this->optionsService->getOptions('background_image_size'),
+      '#options' => $this->getBackgroundOptions('image_size'),
       '#default_value' => $configuration['background_image_size'],
       '#description' => $this->t("'Cover' will fill the entire area, potentially cropping the image. 'Contain' will show the entire image, potentially leaving empty space."),
     ];
     $form['background']['image_settings']['background_image_attachment'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Attachment'),
-      '#options' => $this->optionsService->getOptions('background_image_attachment'),
+      '#options' => $this->getBackgroundOptions('image_attachment'),
       '#default_value' => $configuration['background_image_attachment'],
       '#description' => $this->t("Define how the background image behaves when scrolling. 'Fixed' creates a parallax-like effect."),
     ];
@@ -265,7 +257,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $form['background']['gradient_settings']['background_gradient_type'] = [
       '#type' => 'radios',
       '#title' => $this->t('Gradient Type'),
-      '#options' => $this->optionsService->getOptions('background_gradient_type'),
+      '#options' => $this->getBackgroundOptions('gradient_type'),
       '#default_value' => $configuration['background_gradient_type'],
     ];
     $form['background']['gradient_settings']['background_gradient_start_color'] = [
@@ -291,7 +283,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $form['background']['gradient_settings']['linear_gradient_settings']['background_gradient_linear_direction'] = [
       '#type' => 'select',
       '#title' => $this->t('Direction'),
-      '#options' => $this->optionsService->getOptions('background_gradient_linear_direction'),
+      '#options' => $this->getBackgroundOptions('gradient_linear_direction'),
       '#default_value' => $configuration['background_gradient_linear_direction'],
     ];
     $form['background']['gradient_settings']['radial_gradient_settings'] = [
@@ -305,13 +297,13 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $form['background']['gradient_settings']['radial_gradient_settings']['background_gradient_radial_shape'] = [
       '#type' => 'select',
       '#title' => $this->t('Shape'),
-      '#options' => $this->optionsService->getOptions('background_gradient_radial_shape'),
+      '#options' => $this->getBackgroundOptions('gradient_radial_shape'),
       '#default_value' => $configuration['background_gradient_radial_shape'],
     ];
     $form['background']['gradient_settings']['radial_gradient_settings']['background_gradient_radial_position'] = [
       '#type' => 'select',
       '#title' => $this->t('Position'),
-      '#options' => $this->optionsService->getOptions('background_gradient_radial_position'),
+      '#options' => $this->getBackgroundOptions('gradient_radial_position'),
       '#default_value' => $configuration['background_gradient_radial_position'],
     ];
 
@@ -412,6 +404,133 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     if ($has_background) {
       $build['#attached']['library'][] = 'kingly_layouts/backgrounds';
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultConfiguration(): array {
+    return [
+      'background_type' => 'color',
+      'background_color' => self::NONE_OPTION_KEY,
+      'background_opacity' => self::NONE_OPTION_KEY,
+      'background_media_url' => '',
+      'background_media_min_height' => '',
+      'background_image_position' => 'center center',
+      'background_image_repeat' => 'no-repeat',
+      'background_image_size' => 'cover',
+      'background_image_attachment' => 'scroll',
+      'background_video_loop' => FALSE,
+      'background_video_autoplay' => TRUE,
+      'background_video_muted' => TRUE,
+      'background_video_preload' => 'auto',
+      'background_overlay_color' => self::NONE_OPTION_KEY,
+      'background_overlay_opacity' => self::NONE_OPTION_KEY,
+      'background_gradient_type' => 'linear',
+      'background_gradient_start_color' => self::NONE_OPTION_KEY,
+      'background_gradient_end_color' => self::NONE_OPTION_KEY,
+      'background_gradient_linear_direction' => 'to bottom',
+      'background_gradient_radial_shape' => 'ellipse',
+      'background_gradient_radial_position' => 'center',
+    ];
+  }
+
+  /**
+   * Gets background-related options.
+   *
+   * @param string $key
+   *   The key for the specific options to retrieve.
+   *
+   * @return array
+   *   An array of background options.
+   */
+  private function getBackgroundOptions(string $key): array {
+    $none = [self::NONE_OPTION_KEY => $this->t('None')];
+    $options = [
+      'type' => [
+        'color' => $this->t('Color'),
+        'image' => $this->t('Image'),
+        'video' => $this->t('Video'),
+        'gradient' => $this->t('Gradient'),
+      ],
+      'opacity' => [
+        self::NONE_OPTION_KEY => $this->t('100% (Default)'),
+        '90' => $this->t('90%'),
+        '75' => $this->t('75%'),
+        '50' => $this->t('50%'),
+        '25' => $this->t('25%'),
+        '0' => $this->t('0% (Transparent)'),
+      ],
+      'overlay_opacity' => $none + [
+        '25' => $this->t('25%'),
+        '50' => $this->t('50%'),
+        '75' => $this->t('75%'),
+        '90' => $this->t('90%'),
+      ],
+      'image_position' => [
+        'center center' => $this->t('Center Center'),
+        'center top' => $this->t('Center Top'),
+        'center bottom' => $this->t('Center Bottom'),
+        'left top' => $this->t('Left Top'),
+        'left center' => $this->t('Left Center'),
+        'left bottom' => $this->t('Left Bottom'),
+        'right top' => $this->t('Right Top'),
+        'right center' => $this->t('Right Center'),
+        'right bottom' => $this->t('Right Bottom'),
+      ],
+      'image_repeat' => [
+        'no-repeat' => $this->t('No Repeat'),
+        'repeat' => $this->t('Repeat'),
+        'repeat-x' => $this->t('Repeat Horizontally'),
+        'repeat-y' => $this->t('Repeat Vertically'),
+      ],
+      'image_size' => [
+        'cover' => $this->t('Cover'),
+        'contain' => $this->t('Contain'),
+        'auto' => $this->t('Auto'),
+      ],
+      'image_attachment' => [
+        'scroll' => $this->t('Scroll'),
+        'fixed' => $this->t('Fixed (Parallax)'),
+        'local' => $this->t('Local'),
+      ],
+      'gradient_type' => [
+        'linear' => $this->t('Linear'),
+        'radial' => $this->t('Radial'),
+      ],
+      'gradient_linear_direction' => [
+        'to bottom' => $this->t('To Bottom (Default)'),
+        'to top' => $this->t('To Top'),
+        'to right' => $this->t('To Right'),
+        'to left' => $this->t('To Left'),
+        'to bottom right' => $this->t('To Bottom Right'),
+        'to top left' => $this->t('To Top Left'),
+        '45deg' => $this->t('45 Degrees'),
+        '90deg' => $this->t('90 Degrees (To Right)'),
+        '135deg' => $this->t('135 Degrees'),
+        '180deg' => $this->t('180 Degrees (To Top)'),
+        '225deg' => $this->t('225 Degrees'),
+        '270deg' => $this->t('270 Degrees (To Left)'),
+        '315deg' => $this->t('315 Degrees'),
+      ],
+      'gradient_radial_shape' => [
+        'ellipse' => $this->t('Ellipse (Default)'),
+        'circle' => $this->t('Circle'),
+      ],
+      'gradient_radial_position' => [
+        'center' => $this->t('Center (Default)'),
+        'top' => $this->t('Top'),
+        'bottom' => $this->t('Bottom'),
+        'left' => $this->t('Left'),
+        'right' => $this->t('Right'),
+        'top left' => $this->t('Top Left'),
+        'top right' => $this->t('Top Right'),
+        'bottom left' => $this->t('Bottom Left'),
+        'bottom right' => $this->t('Bottom Right'),
+      ],
+    ];
+
+    return $options[$key] ?? [];
   }
 
   /**
@@ -581,35 +700,6 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       }
     }
     return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultConfiguration(): array {
-    return [
-      'background_type' => 'color',
-      'background_color' => self::NONE_OPTION_KEY,
-      'background_opacity' => self::NONE_OPTION_KEY,
-      'background_media_url' => '',
-      'background_media_min_height' => '',
-      'background_image_position' => 'center center',
-      'background_image_repeat' => 'no-repeat',
-      'background_image_size' => 'cover',
-      'background_image_attachment' => 'scroll',
-      'background_video_loop' => FALSE,
-      'background_video_autoplay' => TRUE,
-      'background_video_muted' => TRUE,
-      'background_video_preload' => 'auto',
-      'background_overlay_color' => self::NONE_OPTION_KEY,
-      'background_overlay_opacity' => self::NONE_OPTION_KEY,
-      'background_gradient_type' => 'linear',
-      'background_gradient_start_color' => self::NONE_OPTION_KEY,
-      'background_gradient_end_color' => self::NONE_OPTION_KEY,
-      'background_gradient_linear_direction' => 'to bottom',
-      'background_gradient_radial_shape' => 'ellipse',
-      'background_gradient_radial_position' => 'center',
-    ];
   }
 
   /**
