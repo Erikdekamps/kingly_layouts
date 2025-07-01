@@ -14,15 +14,15 @@
 {% if video_url %}
   <div class="kingly-layout__video-wrapper">
     <video class="kingly-layout__video"
-           src="{{ video_url }}"
-           preload="{{ preload }}"
-           {% if autoplay %}autoplay{% endif %}
+      src="{{ video_url }}"
+      preload="{{ preload }}"
+      {% if autoplay %}autoplay{% endif %}
       {% if loop %}loop{% endif %}
       {% if muted %}muted{% endif %}
-           playsinline
-           aria-hidden="true">
-      {# Provide a fallback for browsers that don't support the video tag. #}
-      Your browser does not support the video tag.
+      playsinline
+      aria-hidden="true">
+      {# Provide a translatable fallback for browsers that do not support it. #}
+      {{ 'Your browser does not support the video tag.'|t }}
     </video>
   </div>
 {% endif %}
