@@ -23,24 +23,16 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The options service.
-   */
-  protected OptionsService $optionsService;
-
-  /**
    * Constructs a new ShadowsEffectsService object.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\OptionsService $options_service
-   *   The options service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, OptionsService $options_service) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->optionsService = $options_service;
   }
 
   /**
@@ -61,33 +53,33 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
     $form['shadows_effects']['static_effects']['box_shadow_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Box Shadow'),
-      '#options' => $this->optionsService->getOptions('box_shadow'),
+      '#options' => $this->getEffectsOptions('box_shadow'),
       '#default_value' => $configuration['box_shadow_option'],
     ];
     $form['shadows_effects']['static_effects']['filter_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Filter'),
-      '#options' => $this->optionsService->getOptions('filter'),
+      '#options' => $this->getEffectsOptions('filter'),
       '#default_value' => $configuration['filter_option'],
     ];
     $form['shadows_effects']['static_effects']['opacity_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Opacity'),
-      '#options' => $this->optionsService->getOptions('opacity'),
+      '#options' => $this->getEffectsOptions('opacity'),
       '#default_value' => $configuration['opacity_option'],
       '#description' => $this->t('Adjust the overall transparency of the layout section.'),
     ];
     $form['shadows_effects']['static_effects']['transform_scale_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Scale'),
-      '#options' => $this->optionsService->getOptions('transform_scale'),
+      '#options' => $this->getEffectsOptions('transform_scale'),
       '#default_value' => $configuration['transform_scale_option'],
       '#description' => $this->t('Scale the size of the layout section.'),
     ];
     $form['shadows_effects']['static_effects']['transform_rotate_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Rotate'),
-      '#options' => $this->optionsService->getOptions('transform_rotate'),
+      '#options' => $this->getEffectsOptions('transform_rotate'),
       '#default_value' => $configuration['transform_rotate_option'],
       '#description' => $this->t('Rotate the layout section.'),
     ];
@@ -100,29 +92,28 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
     $form['shadows_effects']['hover_effects']['hover_transform_scale_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Hover Scale'),
-      '#options' => $this->optionsService->getOptions('hover_transform_scale'),
+      '#options' => $this->getEffectsOptions('hover_transform_scale'),
       '#default_value' => $configuration['hover_transform_scale_option'],
       '#description' => $this->t('Adjust the scale of the layout section on hover.'),
     ];
     $form['shadows_effects']['hover_effects']['hover_box_shadow_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Hover Box Shadow'),
-      '#options' => $this->optionsService->getOptions('hover_box_shadow'),
+      '#options' => $this->getEffectsOptions('hover_box_shadow'),
       '#default_value' => $configuration['hover_box_shadow_option'],
       '#description' => $this->t('Apply a box shadow to the layout section on hover.'),
     ];
     $form['shadows_effects']['hover_effects']['hover_filter_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Hover Filter'),
-      '#options' => $this->optionsService->getOptions('hover_filter'),
+      '#options' => $this->getEffectsOptions('hover_filter'),
       '#default_value' => $configuration['hover_filter_option'],
       '#description' => $this->t('Apply a visual filter to the layout section on hover.'),
     ];
-    // New: Hover Font Size option.
     $form['shadows_effects']['hover_effects']['hover_font_size_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Hover Font Size'),
-      '#options' => $this->optionsService->getOptions('hover_font_size'),
+      '#options' => $this->getEffectsOptions('hover_font_size'),
       '#default_value' => $configuration['hover_font_size_option'],
       '#description' => $this->t('Adjust the font size of text within the layout section on hover.'),
     ];
@@ -183,6 +174,105 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       $build['#attached']['library'][] = 'kingly_layouts/animations';
       $build['#attributes']['class'][] = 'kingly-animate';
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultConfiguration(): array {
+    return [
+      'box_shadow_option' => self::NONE_OPTION_KEY,
+      'filter_option' => self::NONE_OPTION_KEY,
+      'opacity_option' => self::NONE_OPTION_KEY,
+      'transform_scale_option' => self::NONE_OPTION_KEY,
+      'transform_rotate_option' => self::NONE_OPTION_KEY,
+      'hover_transform_scale_option' => self::NONE_OPTION_KEY,
+      'hover_box_shadow_option' => self::NONE_OPTION_KEY,
+      'hover_filter_option' => self::NONE_OPTION_KEY,
+      'hover_font_size_option' => self::NONE_OPTION_KEY,
+    ];
+  }
+
+  /**
+   * Gets effects-related options.
+   *
+   * @param string $key
+   *   The key for the specific options to retrieve.
+   *
+   * @return array
+   *   An array of options.
+   */
+  private function getEffectsOptions(string $key): array {
+    $none = [self::NONE_OPTION_KEY => $this->t('None')];
+    $options = [
+      'box_shadow' => $none + [
+        'sm' => $this->t('Small'),
+        'md' => $this->t('Medium'),
+        'lg' => $this->t('Large'),
+        'xl' => $this->t('Extra Large'),
+        'inner' => $this->t('Inner'),
+      ],
+      'filter' => $none + [
+        'grayscale' => $this->t('Grayscale'),
+        'blur' => $this->t('Blur'),
+        'sepia' => $this->t('Sepia'),
+        'brightness' => $this->t('Brightness'),
+      ],
+      'opacity' => [
+        self::NONE_OPTION_KEY => $this->t('100% (Default)'),
+        '0.9' => $this->t('90%'),
+        '0.75' => $this->t('75%'),
+        '0.5' => $this->t('50%'),
+        '0.25' => $this->t('25%'),
+        '0' => $this->t('0% (Transparent)'),
+      ],
+      'transform_scale' => [
+        self::NONE_OPTION_KEY => $this->t('None (100%)'),
+        '0.9' => $this->t('90%'),
+        '0.95' => $this->t('95%'),
+        '1.05' => $this->t('105%'),
+        '1.1' => $this->t('110%'),
+        '1.25' => $this->t('125%'),
+      ],
+      'transform_rotate' => $none + [
+        '1' => $this->t('1 degree'),
+        '2' => $this->t('2 degrees'),
+        '3' => $this->t('3 degrees'),
+        '5' => $this->t('5 degrees'),
+        '-1' => $this->t('-1 degree'),
+        '-2' => $this->t('-2 degrees'),
+        '-3' => $this->t('-3 degrees'),
+        '-5' => $this->t('-5 degrees'),
+      ],
+      'hover_transform_scale' => $none + [
+        'scale-90' => $this->t('Scale Down (90%)'),
+        'scale-95' => $this->t('Slightly Scale Down (95%)'),
+        'scale-105' => $this->t('Slightly Scale Up (105%)'),
+        'scale-110' => $this->t('Scale Up (110%)'),
+        'scale-125' => $this->t('Enlarge (125%)'),
+      ],
+      'hover_box_shadow' => $none + [
+        'sm' => $this->t('Small Shadow'),
+        'md' => $this->t('Medium Shadow'),
+        'lg' => $this->t('Large Shadow'),
+        'xl' => $this->t('Extra Large Shadow'),
+        'inner' => $this->t('Inner Shadow'),
+      ],
+      'hover_filter' => $none + [
+        'grayscale-to-color' => $this->t('Grayscale to Color'),
+        'brightness-down' => $this->t('Brightness Down'),
+        'brightness-up' => $this->t('Brightness Up'),
+      ],
+      'hover_font_size' => $none + [
+        'size-90' => $this->t('Smaller (90%)'),
+        'size-95' => $this->t('Slightly Smaller (95%)'),
+        'size-105' => $this->t('Slightly Larger (105%)'),
+        'size-110' => $this->t('Larger (110%)'),
+        'size-125' => $this->t('Much Larger (125%)'),
+      ],
+    ];
+
+    return $options[$key] ?? [];
   }
 
   /**
@@ -251,7 +341,7 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
   }
 
   /**
-   * Applies hover effects (transform, box shadow, filter, font size) to the build array.
+   * Applies hover effects to the build array.
    *
    * @param array &$build
    *   The render array, passed by reference.
@@ -280,23 +370,6 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       }
     }
     return $applied;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultConfiguration(): array {
-    return [
-      'box_shadow_option' => self::NONE_OPTION_KEY,
-      'filter_option' => self::NONE_OPTION_KEY,
-      'opacity_option' => self::NONE_OPTION_KEY,
-      'transform_scale_option' => self::NONE_OPTION_KEY,
-      'transform_rotate_option' => self::NONE_OPTION_KEY,
-      'hover_transform_scale_option' => self::NONE_OPTION_KEY,
-      'hover_box_shadow_option' => self::NONE_OPTION_KEY,
-      'hover_filter_option' => self::NONE_OPTION_KEY,
-      'hover_font_size_option' => self::NONE_OPTION_KEY,
-    ];
   }
 
 }

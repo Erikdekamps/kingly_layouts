@@ -23,24 +23,16 @@ class ContainerTypeService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The options service.
-   */
-  protected OptionsService $optionsService;
-
-  /**
    * Constructs a new ContainerTypeService object.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\OptionsService $options_service
-   *   The options service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, OptionsService $options_service) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->optionsService = $options_service;
   }
 
   /**
@@ -50,7 +42,7 @@ class ContainerTypeService implements KinglyLayoutsDisplayOptionInterface {
     $form['container_type'] = [
       '#type' => 'select',
       '#title' => $this->t('Container Type'),
-      '#options' => $this->optionsService->getOptions('container_type'),
+      '#options' => $this->getContainerTypeOptions(),
       '#default_value' => $configuration['container_type'],
       '#description' => $this->t("Select how the layout container should behave: <br> <strong>Boxed:</strong> Standard container with a maximum width. <br> <strong>Full Width (Background Only):</strong> The background spans the full viewport width, but the content remains aligned with the site's main content area. Horizontal padding will be applied *within* this content area. <br> <strong>Edge to Edge (Full Bleed):</strong> Both the background and content span the full viewport width. <br> <strong>Full Screen Hero:</strong> The section fills the entire viewport height and width."),
       '#weight' => -9,
@@ -83,6 +75,21 @@ class ContainerTypeService implements KinglyLayoutsDisplayOptionInterface {
   public static function defaultConfiguration(): array {
     return [
       'container_type' => 'boxed',
+    ];
+  }
+
+  /**
+   * Gets the options for the container type select list.
+   *
+   * @return array
+   *   An array of container type options.
+   */
+  private function getContainerTypeOptions(): array {
+    return [
+      'boxed' => $this->t('Boxed'),
+      'full' => $this->t('Full Width (Background Only)'),
+      'edge-to-edge' => $this->t('Edge to Edge (Full Bleed)'),
+      'hero' => $this->t('Full Screen Hero'),
     ];
   }
 

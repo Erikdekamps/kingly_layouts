@@ -23,24 +23,16 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The options service.
-   */
-  protected OptionsService $optionsService;
-
-  /**
    * Constructs a new TypographyService object.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\OptionsService $options_service
-   *   The options service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, OptionsService $options_service) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->optionsService = $options_service;
   }
 
   /**
@@ -57,7 +49,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     $form['typography']['font_family_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Font Family'),
-      '#options' => $this->optionsService->getOptions('font_family'),
+      '#options' => $this->getTypographyOptions('font_family'),
       '#default_value' => $configuration['font_family_option'],
       '#description' => $this->t('Select a pre-defined font family.'),
     ];
@@ -77,7 +69,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     $form['typography']['font_size_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Font Size'),
-      '#options' => $this->optionsService->getOptions('font_size'),
+      '#options' => $this->getTypographyOptions('font_size'),
       '#default_value' => $configuration['font_size_option'],
       '#description' => $this->t('Set the base font size for text within this section.'),
     ];
@@ -85,7 +77,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     $form['typography']['font_weight_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Font Weight'),
-      '#options' => $this->optionsService->getOptions('font_weight'),
+      '#options' => $this->getTypographyOptions('font_weight'),
       '#default_value' => $configuration['font_weight_option'],
       '#description' => $this->t('Set the boldness of the text.'),
     ];
@@ -93,7 +85,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     $form['typography']['line_height_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Line Height'),
-      '#options' => $this->optionsService->getOptions('line_height'),
+      '#options' => $this->getTypographyOptions('line_height'),
       '#default_value' => $configuration['line_height_option'],
       '#description' => $this->t('Adjust the spacing between lines of text.'),
     ];
@@ -101,7 +93,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     $form['typography']['letter_spacing_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Letter Spacing'),
-      '#options' => $this->optionsService->getOptions('letter_spacing'),
+      '#options' => $this->getTypographyOptions('letter_spacing'),
       '#default_value' => $configuration['letter_spacing_option'],
       '#description' => $this->t('Adjust the spacing between individual letters.'),
     ];
@@ -109,7 +101,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     $form['typography']['text_transform_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Text Transform'),
-      '#options' => $this->optionsService->getOptions('text_transform'),
+      '#options' => $this->getTypographyOptions('text_transform'),
       '#default_value' => $configuration['text_transform_option'],
       '#description' => $this->t('Change the capitalization of the text.'),
     ];
@@ -168,7 +160,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
           'kingly_layouts_custom_font_' . hash('sha256', $configuration['custom_font_url']),
         ];
         // Apply the font family using the helper to infer a CSS-safe value.
-        $build['#attributes']['style'][] = 'font-family: ' . $this->optionsService->getCustomFontImportCssValue($configuration['custom_font_url']) . ';';
+        $build['#attributes']['style'][] = 'font-family: ' . $this->getCustomFontImportCssValue($configuration['custom_font_url']) . ';';
         $has_typography_styles = TRUE;
       }
       else {
@@ -212,6 +204,101 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
       'letter_spacing_option' => self::NONE_OPTION_KEY,
       'text_transform_option' => self::NONE_OPTION_KEY,
     ];
+  }
+
+  /**
+   * Gets typography-related options.
+   *
+   * @param string $key
+   *   The key for the specific options to retrieve.
+   *
+   * @return array
+   *   An array of options.
+   */
+  private function getTypographyOptions(string $key): array {
+    $none = [self::NONE_OPTION_KEY => $this->t('None')];
+    $options = [
+      'font_family' => $none + [
+        'sans-serif' => $this->t('Sans-serif (Generic)'),
+        'serif' => $this->t('Serif (Generic)'),
+        'monospace' => $this->t('Monospace (Generic)'),
+        'custom-import' => $this->t('Custom Font (via URL)'),
+        'Arial, sans-serif' => $this->t('Arial'),
+        'Verdana, sans-serif' => $this->t('Verdana'),
+        'Helvetica, sans-serif' => $this->t('Helvetica'),
+        'Times New Roman, serif' => $this->t('Times New Roman'),
+        'Georgia, serif' => $this->t('Georgia'),
+        'Courier New, monospace' => $this->t('Courier New'),
+      ],
+      'font_size' => $none + [
+        '0.75rem' => $this->t('Extra Small (0.75rem)'),
+        '0.875rem' => $this->t('Small (0.875rem)'),
+        '1rem' => $this->t('Base (1rem)'),
+        '1.125rem' => $this->t('Large (1.125rem)'),
+        '1.25rem' => $this->t('Extra Large (1.25rem)'),
+        '1.5rem' => $this->t('2XL (1.5rem)'),
+        '1.875rem' => $this->t('3XL (1.875rem)'),
+        '2.25rem' => $this->t('4XL (2.25rem)'),
+        '3rem' => $this->t('5XL (3rem)'),
+      ],
+      'font_weight' => $none + [
+        '100' => $this->t('Thin (100)'),
+        '200' => $this->t('Extra Light (200)'),
+        '300' => $this->t('Light (300)'),
+        '400' => $this->t('Normal (400)'),
+        '500' => $this->t('Medium (500)'),
+        '600' => $this->t('Semi Bold (600)'),
+        '700' => $this->t('Bold (700)'),
+        '800' => $this->t('Extra Bold (800)'),
+        '900' => $this->t('Black (900)'),
+      ],
+      'line_height' => $none + [
+        '1' => $this->t('1 (Tight)'),
+        '1.25' => $this->t('1.25'),
+        '1.5' => $this->t('1.5 (Normal)'),
+        '1.75' => $this->t('1.75'),
+        '2' => $this->t('2 (Loose)'),
+      ],
+      'letter_spacing' => $none + [
+        '-0.05em' => $this->t('-0.05em (Tight)'),
+        '-0.025em' => $this->t('-0.025em'),
+        '0em' => $this->t('0em (Normal)'),
+        '0.025em' => $this->t('0.025em'),
+        '0.05em' => $this->t('0.05em (Loose)'),
+        '0.1em' => $this->t('0.1em (Extra Loose)'),
+      ],
+      'text_transform' => $none + [
+        'none' => $this->t('None'),
+        'uppercase' => $this->t('Uppercase'),
+        'lowercase' => $this->t('Lowercase'),
+        'capitalize' => $this->t('Capitalize'),
+      ],
+    ];
+
+    return $options[$key] ?? [];
+  }
+
+  /**
+   * Generates a CSS font-family value for a custom font import.
+   *
+   * This extracts the font family name from the Google Fonts URL structure
+   * or provides a generic fallback.
+   *
+   * @param string $url
+   *   The custom font URL.
+   *
+   * @return string
+   *   The CSS font-family value, including a fallback.
+   */
+  private function getCustomFontImportCssValue(string $url): string {
+    // Attempt to parse font family from Google Fonts URL.
+    if (preg_match('/family=([^&:]+)/', $url, $matches)) {
+      $font_name = str_replace('+', ' ', $matches[1]);
+      // Add a generic fallback.
+      return "'" . $font_name . "', sans-serif";
+    }
+    // Generic fallback if URL doesn't match a known pattern.
+    return 'sans-serif';
   }
 
 }

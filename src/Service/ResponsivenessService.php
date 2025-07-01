@@ -21,24 +21,16 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The options service.
-   */
-  protected OptionsService $optionsService;
-
-  /**
    * Constructs a new ResponsivenessService object.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\OptionsService $options_service
-   *   The options service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, OptionsService $options_service) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->optionsService = $options_service;
   }
 
   /**
@@ -55,7 +47,7 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
     $form['responsiveness']['hide_on_breakpoint'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Hide on Breakpoint'),
-      '#options' => $this->optionsService->getOptions('hide_on_breakpoint'),
+      '#options' => $this->getBreakpointOptions(),
       '#default_value' => $configuration['hide_on_breakpoint'],
       '#description' => $this->t('Hide this entire layout section on specific screen sizes.'),
     ];
@@ -81,6 +73,29 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
       // Apply the CSS classes to hide the element on specified breakpoints.
       $this->applyHideOnBreakpointClasses($build, $configuration);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultConfiguration(): array {
+    return [
+      'hide_on_breakpoint' => [],
+    ];
+  }
+
+  /**
+   * Gets the options for the breakpoint checkboxes.
+   *
+   * @return array
+   *   An array of breakpoint options.
+   */
+  private function getBreakpointOptions(): array {
+    return [
+      'mobile' => $this->t('Mobile'),
+      'tablet' => $this->t('Tablet'),
+      'desktop' => $this->t('Desktop'),
+    ];
   }
 
   /**
@@ -120,15 +135,6 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
         $build['#attributes']['class'][] = 'kingly-layout-hide-on-' . $breakpoint;
       }
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultConfiguration(): array {
-    return [
-      'hide_on_breakpoint' => [],
-    ];
   }
 
 }

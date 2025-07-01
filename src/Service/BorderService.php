@@ -23,11 +23,6 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The options service.
-   */
-  protected OptionsService $optionsService;
-
-  /**
    * The color service.
    */
   protected ColorService $colorService;
@@ -39,15 +34,12 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\OptionsService $options_service
-   *   The options service.
    * @param \Drupal\kingly_layouts\Service\ColorService $color_service
    *   The color service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, OptionsService $options_service, ColorService $color_service) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, ColorService $color_service) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->optionsService = $options_service;
     $this->colorService = $color_service;
   }
 
@@ -55,7 +47,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $color_options = $this->optionsService->getColorOptions();
+    $color_options = $this->colorService->getColorOptions();
 
     $form['border'] = [
       '#type' => 'details',
@@ -76,7 +68,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
     $form['border']['border_width_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Width'),
-      '#options' => $this->optionsService->getOptions('border_width'),
+      '#options' => $this->getBorderOptions('width'),
       '#default_value' => $configuration['border_width_option'],
       '#states' => [
         'visible' => [
@@ -87,7 +79,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
     $form['border']['border_style_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Style'),
-      '#options' => $this->optionsService->getOptions('border_style'),
+      '#options' => $this->getBorderOptions('style'),
       '#default_value' => $configuration['border_style_option'],
       '#states' => [
         'visible' => [
@@ -98,7 +90,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
     $form['border']['border_radius_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Radius'),
-      '#options' => $this->optionsService->getOptions('border_radius'),
+      '#options' => $this->getBorderOptions('radius'),
       '#default_value' => $configuration['border_radius_option'],
     ];
 
@@ -136,6 +128,53 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
     if ($has_border) {
       $build['#attached']['library'][] = 'kingly_layouts/borders';
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultConfiguration(): array {
+    return [
+      'border_radius_option' => self::NONE_OPTION_KEY,
+      'border_color' => self::NONE_OPTION_KEY,
+      'border_width_option' => self::NONE_OPTION_KEY,
+      'border_style_option' => self::NONE_OPTION_KEY,
+    ];
+  }
+
+  /**
+   * Returns border-related options.
+   *
+   * @param string $type
+   *   The type of border options to return (width, style, or radius).
+   *
+   * @return array
+   *   An array of border options.
+   */
+  private function getBorderOptions(string $type): array {
+    $none = [self::NONE_OPTION_KEY => $this->t('None')];
+    $options = [
+      'width' => $none + [
+        'sm' => $this->t('Small (1px)'),
+        'md' => $this->t('Medium (2px)'),
+        'lg' => $this->t('Large (4px)'),
+      ],
+      'style' => $none + [
+        'solid' => $this->t('Solid'),
+        'dashed' => $this->t('Dashed'),
+        'dotted' => $this->t('Dotted'),
+      ],
+      'radius' => $none + [
+        'xs' => $this->t('Extra Small (0.25rem)'),
+        'sm' => $this->t('Small (0.5rem)'),
+        'md' => $this->t('Medium (1rem)'),
+        'lg' => $this->t('Large (2rem)'),
+        'xl' => $this->t('Extra Large (4rem)'),
+        'full' => $this->t('Full (Pill/Circle)'),
+      ],
+    ];
+
+    return $options[$type] ?? [];
   }
 
   /**
@@ -182,18 +221,6 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       return TRUE;
     }
     return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultConfiguration(): array {
-    return [
-      'border_radius_option' => self::NONE_OPTION_KEY,
-      'border_color' => self::NONE_OPTION_KEY,
-      'border_width_option' => self::NONE_OPTION_KEY,
-      'border_style_option' => self::NONE_OPTION_KEY,
-    ];
   }
 
 }
