@@ -7,18 +7,8 @@ use Drupal\Core\Layout\LayoutDefault;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\kingly_layouts\Service\AlignmentService;
-use Drupal\kingly_layouts\Service\AnimationService;
-use Drupal\kingly_layouts\Service\BackgroundService;
-use Drupal\kingly_layouts\Service\BorderService;
-use Drupal\kingly_layouts\Service\ColorService;
-use Drupal\kingly_layouts\Service\ContainerTypeService;
-use Drupal\kingly_layouts\Service\CustomAttributesService;
 use Drupal\kingly_layouts\Service\DisplayOptionCollector;
-use Drupal\kingly_layouts\Service\ResponsivenessService;
-use Drupal\kingly_layouts\Service\ShadowsEffectsService;
-use Drupal\kingly_layouts\Service\SpacingService;
-use Drupal\kingly_layouts\Service\TypographyService;
+use Drupal\kingly_layouts\Service\DisplayOptionServiceCollector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -117,25 +107,16 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration = parent::defaultConfiguration();
     $configuration['sizing_option'] = 'default';
 
-    // This is the one place where we need to know the service class names.
-    // This is the necessary compromise to satisfy the plugin lifecycle, as
-    // this method is called before services are injected.
-    $service_classes = [
-      ContainerTypeService::class,
-      SpacingService::class,
-      ColorService::class,
-      TypographyService::class,
-      BorderService::class,
-      AlignmentService::class,
-      AnimationService::class,
-      BackgroundService::class,
-      ShadowsEffectsService::class,
-      ResponsivenessService::class,
-      CustomAttributesService::class,
-    ];
+    // Dynamically discover all service classes tagged with
+    // 'kingly_layouts.display_option'.
+    $service_classes = DisplayOptionServiceCollector::getClassNames();
 
+    // Iterate through the discovered classes and merge their default
+    // configurations. This is done statically, before DI is available.
     foreach ($service_classes as $class) {
-      $configuration = array_merge($configuration, $class::defaultConfiguration());
+      if (method_exists($class, 'defaultConfiguration')) {
+        $configuration = array_merge($configuration, $class::defaultConfiguration());
+      }
     }
 
     return $configuration;
