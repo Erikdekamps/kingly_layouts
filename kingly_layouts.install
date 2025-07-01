@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Kingly Layouts module.
+ */
+
+use Drupal\taxonomy\Entity\Term;
+
+/**
+ * Implements hook_install().
+ *
+ * This hook is fired when the module is first enabled.
+ * It ensures that essential default color terms are created.
+ */
+function kingly_layouts_install(): void {
+  // Ensure the 'kingly_css_color' vocabulary exists before adding terms.
+  // The vocabulary is typically provided by the module's configuration
+  // synchronization, but we add this check for robustness.
+  /** @var \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage */
+  $vocabulary_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_vocabulary');
+  if (!$vocabulary_storage->load('kingly_css_color')) {
+    // If the vocabulary does not exist, there's a problem with installation.
+    // Log an error or throw an exception if strict; for install, a warning
+    // might be sufficient as config import should handle vocabulary creation.
+    return;
+  }
+
+  // Define the default colors to add.
+  $default_colors = [
+    'Black' => '#000000',
+    'White' => '#ffffff',
+  ];
+
+  // Load the term storage for the 'taxonomy_term' entity type.
+  /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+
+  // Iterate over the default colors.
+  foreach ($default_colors as $name => $hex_code) {
+    // Check if a term with this name already exists in the vocabulary.
+    // This prevents duplicate terms on re-installation or if terms were
+    // manually added.
+    $existing_terms = $term_storage->loadByProperties([
+      'name' => $name,
+      'vid' => 'kingly_css_color',
+    ]);
+
+    // If no existing term is found, create a new one.
+    if (empty($existing_terms)) {
+      // Create a new taxonomy term entity.
+      $term = Term::create([
+        'name' => $name,
+        'vid' => 'kingly_css_color',
+        // Assign the hex code to the custom field.
+        'field_kingly_css_color' => $hex_code,
+      ]);
+
+      // Save the new term.
+      $term->save();
+    }
+  }
+}
