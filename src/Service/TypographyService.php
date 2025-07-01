@@ -54,18 +54,6 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Select a pre-defined font family.'),
     ];
 
-    $form['typography']['custom_font_url'] = [
-      '#type' => 'url',
-      '#title' => $this->t('Custom Font URL'),
-      '#default_value' => $configuration['custom_font_url'],
-      '#description' => $this->t('Enter a URL for a custom font (e.g., from Google Fonts or a font hosting service). This will be imported using @import.'),
-      '#states' => [
-        'visible' => [
-          ':input[name="layout_settings[typography][font_family_option]"]' => ['value' => 'custom-import'],
-        ],
-      ],
-    ];
-
     $form['typography']['font_size_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Font Size'),
@@ -122,16 +110,6 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     $configuration['line_height_option'] = $values['line_height_option'] ?? self::NONE_OPTION_KEY;
     $configuration['letter_spacing_option'] = $values['letter_spacing_option'] ?? self::NONE_OPTION_KEY;
     $configuration['text_transform_option'] = $values['text_transform_option'] ?? self::NONE_OPTION_KEY;
-
-    // Handle custom_font_url conditionally based on the chosen
-    // font_family_option. If 'custom-import' is selected, store the submitted
-    // URL; otherwise, clear it.
-    if ($configuration['font_family_option'] === 'custom-import') {
-      $configuration['custom_font_url'] = trim($values['custom_font_url'] ?? '');
-    }
-    else {
-      $configuration['custom_font_url'] = '';
-    }
   }
 
   /**
@@ -142,32 +120,9 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
 
     // Apply inline styles for various typography properties.
     if ($configuration['font_family_option'] !== self::NONE_OPTION_KEY) {
-      if ($configuration['font_family_option'] === 'custom-import' && !empty($configuration['custom_font_url'])) {
-        // For custom font imports, add the @import rule directly to the HTML
-        // head.
-        // This ensures the font is loaded.
-        $build['#attached']['html_head'][] = [
-          [
-            '#tag' => 'style',
-            '#attributes' => [
-              'type' => 'text/css',
-            ],
-            // Ensure the @import URL is properly quoted.
-            '#value' => '@import url("' . $configuration['custom_font_url'] . '");',
-          ],
-          // Use a unique key based on the URL to prevent duplicates if the same
-          // font is used in multiple sections.
-          'kingly_layouts_custom_font_' . hash('sha256', $configuration['custom_font_url']),
-        ];
-        // Apply the font family using the helper to infer a CSS-safe value.
-        $build['#attributes']['style'][] = 'font-family: ' . $this->getCustomFontImportCssValue($configuration['custom_font_url']) . ';';
-        $has_typography_styles = TRUE;
-      }
-      else {
-        // Apply the pre-defined font family as an inline style.
-        $this->applyInlineStyleFromOption($build, 'font-family', 'font_family_option', $configuration);
-        $has_typography_styles = TRUE;
-      }
+      // Apply the pre-defined font family as an inline style.
+      $this->applyInlineStyleFromOption($build, 'font-family', 'font_family_option', $configuration);
+      $has_typography_styles = TRUE;
     }
 
     $inline_style_map = [
@@ -197,7 +152,6 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
   public static function defaultConfiguration(): array {
     return [
       'font_family_option' => self::NONE_OPTION_KEY,
-      'custom_font_url' => '',
       'font_size_option' => self::NONE_OPTION_KEY,
       'font_weight_option' => self::NONE_OPTION_KEY,
       'line_height_option' => self::NONE_OPTION_KEY,
@@ -222,13 +176,18 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
         'sans-serif' => $this->t('Sans-serif (Generic)'),
         'serif' => $this->t('Serif (Generic)'),
         'monospace' => $this->t('Monospace (Generic)'),
-        'custom-import' => $this->t('Custom Font (via URL)'),
-        'Arial, sans-serif' => $this->t('Arial'),
-        'Verdana, sans-serif' => $this->t('Verdana'),
-        'Helvetica, sans-serif' => $this->t('Helvetica'),
-        'Times New Roman, serif' => $this->t('Times New Roman'),
+        'cursive' => $this->t('Cursive (Generic)'),
+        'fantasy' => $this->t('Fantasy (Generic)'),
+        'Arial, Helvetica, sans-serif' => $this->t('Arial'),
+        'Verdana, Geneva, sans-serif' => $this->t('Verdana'),
+        'Tahoma, Geneva, sans-serif' => $this->t('Tahoma'),
+        '"Trebuchet MS", Helvetica, sans-serif' => $this->t('Trebuchet MS'),
+        '"Gill Sans", "Gill Sans MT", Calibri, sans-serif' => $this->t('Gill Sans'),
+        'Times, "Times New Roman", serif' => $this->t('Times New Roman'),
         'Georgia, serif' => $this->t('Georgia'),
-        'Courier New, monospace' => $this->t('Courier New'),
+        'Palatino, "Palatino Linotype", "Book Antiqua", serif' => $this->t('Palatino'),
+        '"Courier New", Courier, monospace' => $this->t('Courier New'),
+        '"Lucida Console", Monaco, monospace' => $this->t('Lucida Console'),
       ],
       'font_size' => $none + [
         '0.75rem' => $this->t('Extra Small (0.75rem)'),
@@ -276,29 +235,6 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
     ];
 
     return $options[$key] ?? [];
-  }
-
-  /**
-   * Generates a CSS font-family value for a custom font import.
-   *
-   * This extracts the font family name from the Google Fonts URL structure
-   * or provides a generic fallback.
-   *
-   * @param string $url
-   *   The custom font URL.
-   *
-   * @return string
-   *   The CSS font-family value, including a fallback.
-   */
-  private function getCustomFontImportCssValue(string $url): string {
-    // Attempt to parse font family from Google Fonts URL.
-    if (preg_match('/family=([^&:]+)/', $url, $matches)) {
-      $font_name = str_replace('+', ' ', $matches[1]);
-      // Add a generic fallback.
-      return "'" . $font_name . "', sans-serif";
-    }
-    // Generic fallback if URL doesn't match a known pattern.
-    return 'sans-serif';
   }
 
 }

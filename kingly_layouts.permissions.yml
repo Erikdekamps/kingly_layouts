@@ -20,7 +20,7 @@ administer kingly layouts colors:
 
 administer kingly layouts typography:
   title: 'Administer Kingly Layouts: Typography'
-  description: 'Allow users to configure typography options (font family, size, weight, line height, letter spacing, text transform, custom font URL) for Kingly layouts.'
+  description: 'Allow users to configure typography options (font family, size, weight, line height, letter spacing, text transform) for Kingly layouts.'
   restrict access: true
 
 administer kingly layouts border:
