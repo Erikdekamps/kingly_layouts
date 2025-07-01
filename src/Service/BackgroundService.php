@@ -2,6 +2,7 @@
 
 namespace Drupal\kingly_layouts\Service;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -617,7 +618,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    */
   private function applyBackgroundVideo(array &$build, array $configuration): bool {
     $media_url = $configuration['background_media_url'];
-    if (!empty($media_url)) {
+    if (!empty($media_url) && UrlHelper::isValid($media_url, TRUE)) {
       $build['#attributes']['class'][] = 'kingly-layout--has-bg-video';
       $build['video_background'] = [
         '#theme' => 'kingly_background_video',
