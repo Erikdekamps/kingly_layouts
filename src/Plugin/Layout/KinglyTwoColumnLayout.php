@@ -29,7 +29,7 @@ class KinglyTwoColumnLayout extends KinglyLayoutBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSizingOptions(): array {
+  public function getSizingOptions(): array {
     return [
       '50-50' => $this->t('50/50'),
       '25-75' => $this->t('25/75'),
