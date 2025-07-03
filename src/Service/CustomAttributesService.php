@@ -49,7 +49,6 @@ class CustomAttributesService implements KinglyLayoutsDisplayOptionInterface {
       '#type' => 'details',
       '#title' => $this->t('Custom Attributes'),
       '#open' => FALSE,
-      '#weight' => 100,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts custom attributes'),
     ];
     $form[$form_key]['custom_css_id'] = [
