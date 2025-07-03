@@ -40,6 +40,13 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'color';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function defaultConfiguration(): array {
     return [
       'foreground_color' => '',
@@ -50,14 +57,15 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['colors'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
-      '#title' => $this->t('Colors'),
+      '#title' => $this->t('Color'),
       '#open' => FALSE,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts colors'),
     ];
 
-    $form['colors']['foreground_color'] = [
+    $form[$form_key]['foreground_color'] = [
       '#type' => 'color',
       '#title' => $this->t('Foreground Color'),
       '#default_value' => $configuration['foreground_color'],
@@ -77,7 +85,8 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $values = $form_state->getValue('colors', []);
+    $form_key = $this->getFormKey();
+    $values = $form_state->getValue($form_key, []);
     // Ensure the hex code is stored, or an empty string if not provided.
     $configuration['foreground_color'] = $values['foreground_color'] ?? '';
   }

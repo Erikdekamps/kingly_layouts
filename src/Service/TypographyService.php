@@ -38,15 +38,23 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'typography';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['typography'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Typography'),
       '#open' => FALSE,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts typography'),
     ];
 
-    $form['typography']['font_family_option'] = [
+    $form[$form_key]['font_family_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Font Family'),
       '#options' => $this->getTypographyOptions('font_family'),
@@ -54,7 +62,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Select a pre-defined font family.'),
     ];
 
-    $form['typography']['font_size_option'] = [
+    $form[$form_key]['font_size_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Font Size'),
       '#options' => $this->getTypographyOptions('font_size'),
@@ -62,7 +70,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Set the base font size for text within this section.'),
     ];
 
-    $form['typography']['font_weight_option'] = [
+    $form[$form_key]['font_weight_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Font Weight'),
       '#options' => $this->getTypographyOptions('font_weight'),
@@ -70,7 +78,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Set the boldness of the text.'),
     ];
 
-    $form['typography']['line_height_option'] = [
+    $form[$form_key]['line_height_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Line Height'),
       '#options' => $this->getTypographyOptions('line_height'),
@@ -78,7 +86,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Adjust the spacing between lines of text.'),
     ];
 
-    $form['typography']['letter_spacing_option'] = [
+    $form[$form_key]['letter_spacing_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Letter Spacing'),
       '#options' => $this->getTypographyOptions('letter_spacing'),
@@ -86,7 +94,7 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Adjust the spacing between individual letters.'),
     ];
 
-    $form['typography']['text_transform_option'] = [
+    $form[$form_key]['text_transform_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Text Transform'),
       '#options' => $this->getTypographyOptions('text_transform'),
@@ -101,7 +109,8 @@ class TypographyService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $values = $form_state->getValue('typography', []);
+    $form_key = $this->getFormKey();
+    $values = $form_state->getValue($form_key, []);
 
     // Explicitly set each configuration value from the submitted form values.
     $configuration['font_family_option'] = $values['font_family_option'] ?? self::NONE_OPTION_KEY;

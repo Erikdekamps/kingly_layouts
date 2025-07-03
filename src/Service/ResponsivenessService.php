@@ -36,15 +36,23 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'responsiveness';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['responsiveness'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Responsiveness'),
       '#open' => FALSE,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts responsiveness'),
     ];
 
-    $form['responsiveness']['hide_on_breakpoint'] = [
+    $form[$form_key]['hide_on_breakpoint'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Hide on Breakpoint'),
       '#options' => $this->getBreakpointOptions(),
@@ -59,7 +67,8 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $values = $form_state->getValue('responsiveness', []);
+    $form_key = $this->getFormKey();
+    $values = $form_state->getValue($form_key, []);
     $configuration['hide_on_breakpoint'] = array_filter($values['hide_on_breakpoint'] ?? []);
   }
 

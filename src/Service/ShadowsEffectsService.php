@@ -38,45 +38,53 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'shadows_effects';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['shadows_effects'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Shadows & Effects'),
       '#open' => FALSE,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts shadows effects'),
     ];
-    $form['shadows_effects']['static_effects'] = [
+    $form[$form_key]['static_effects'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Static Effects'),
       '#description' => $this->t('These effects are applied to the layout section by default.'),
     ];
-    $form['shadows_effects']['static_effects']['box_shadow_option'] = [
+    $form[$form_key]['static_effects']['box_shadow_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Box Shadow'),
       '#options' => $this->getEffectsOptions('box_shadow'),
       '#default_value' => $configuration['box_shadow_option'],
     ];
-    $form['shadows_effects']['static_effects']['filter_option'] = [
+    $form[$form_key]['static_effects']['filter_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Filter'),
       '#options' => $this->getEffectsOptions('filter'),
       '#default_value' => $configuration['filter_option'],
     ];
-    $form['shadows_effects']['static_effects']['opacity_option'] = [
+    $form[$form_key]['static_effects']['opacity_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Opacity'),
       '#options' => $this->getEffectsOptions('opacity'),
       '#default_value' => $configuration['opacity_option'],
       '#description' => $this->t('Adjust the overall transparency of the layout section.'),
     ];
-    $form['shadows_effects']['static_effects']['transform_scale_option'] = [
+    $form[$form_key]['static_effects']['transform_scale_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Scale'),
       '#options' => $this->getEffectsOptions('transform_scale'),
       '#default_value' => $configuration['transform_scale_option'],
       '#description' => $this->t('Scale the size of the layout section.'),
     ];
-    $form['shadows_effects']['static_effects']['transform_rotate_option'] = [
+    $form[$form_key]['static_effects']['transform_rotate_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Rotate'),
       '#options' => $this->getEffectsOptions('transform_rotate'),
@@ -84,33 +92,33 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Rotate the layout section.'),
     ];
 
-    $form['shadows_effects']['hover_effects'] = [
+    $form[$form_key]['hover_effects'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Hover Effects'),
       '#description' => $this->t('These effects are applied to the layout section when a user hovers over it.'),
     ];
-    $form['shadows_effects']['hover_effects']['hover_transform_scale_option'] = [
+    $form[$form_key]['hover_effects']['hover_transform_scale_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Hover Scale'),
       '#options' => $this->getEffectsOptions('hover_transform_scale'),
       '#default_value' => $configuration['hover_transform_scale_option'],
       '#description' => $this->t('Adjust the scale of the layout section on hover.'),
     ];
-    $form['shadows_effects']['hover_effects']['hover_box_shadow_option'] = [
+    $form[$form_key]['hover_effects']['hover_box_shadow_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Hover Box Shadow'),
       '#options' => $this->getEffectsOptions('hover_box_shadow'),
       '#default_value' => $configuration['hover_box_shadow_option'],
       '#description' => $this->t('Apply a box shadow to the layout section on hover.'),
     ];
-    $form['shadows_effects']['hover_effects']['hover_filter_option'] = [
+    $form[$form_key]['hover_effects']['hover_filter_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Hover Filter'),
       '#options' => $this->getEffectsOptions('hover_filter'),
       '#default_value' => $configuration['hover_filter_option'],
       '#description' => $this->t('Apply a visual filter to the layout section on hover.'),
     ];
-    $form['shadows_effects']['hover_effects']['hover_font_size_option'] = [
+    $form[$form_key]['hover_effects']['hover_font_size_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Hover Font Size'),
       '#options' => $this->getEffectsOptions('hover_font_size'),
@@ -125,7 +133,8 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $values = $form_state->getValue('shadows_effects', []);
+    $form_key = $this->getFormKey();
+    $values = $form_state->getValue($form_key, []);
 
     // Static effects.
     foreach ([

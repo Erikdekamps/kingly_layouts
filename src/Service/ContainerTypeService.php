@@ -38,8 +38,17 @@ class ContainerTypeService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    // This form element is not a details group, so its key is the element key.
+    return 'container_type';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['container_type'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'select',
       '#title' => $this->t('Container Type'),
       '#options' => $this->getContainerTypeOptions(),
@@ -55,7 +64,8 @@ class ContainerTypeService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $configuration['container_type'] = $form_state->getValue('container_type', 'boxed');
+    $form_key = $this->getFormKey();
+    $configuration['container_type'] = $form_state->getValue($form_key, 'boxed');
   }
 
   /**

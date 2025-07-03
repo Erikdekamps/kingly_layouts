@@ -31,6 +31,14 @@ class SizingService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    // This form element is not a details group, so its key is the element key.
+    return 'sizing_option';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
     // Get layout instance from form state.
     $layout = $form_state->get('layout_instance');
@@ -51,7 +59,8 @@ class SizingService implements KinglyLayoutsDisplayOptionInterface {
 
     // Only show sizing form if there are actual options to choose from.
     if (count($sizing_options) > 1) {
-      $form['sizing_option'] = [
+      $form_key = $this->getFormKey();
+      $form[$form_key] = [
         '#type' => 'select',
         '#title' => $this->t('Column sizing'),
         '#options' => $sizing_options,
@@ -69,7 +78,8 @@ class SizingService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $sizing_value = $form_state->getValue('sizing_option');
+    $form_key = $this->getFormKey();
+    $sizing_value = $form_state->getValue($form_key);
     if ($sizing_value !== NULL) {
       $configuration['sizing_option'] = $sizing_value;
     }

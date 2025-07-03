@@ -40,15 +40,23 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'spacing';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['spacing'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Spacing'),
       '#open' => FALSE,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts spacing'),
     ];
 
-    $form['spacing']['horizontal_padding_option'] = [
+    $form[$form_key]['horizontal_padding_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Horizontal Padding'),
       '#options' => $this->getScaleOptions(),
@@ -56,7 +64,7 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Select the horizontal padding for the layout. For "Full Width (Background Only)" layouts, this padding is added to the default content alignment. For "Edge to Edge" layouts, this padding is applied from the viewport edge.'),
     ];
 
-    $form['spacing']['vertical_padding_option'] = [
+    $form[$form_key]['vertical_padding_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Vertical Padding'),
       '#options' => $this->getScaleOptions(),
@@ -64,7 +72,7 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Select the desired vertical padding (top and bottom) for the layout container.'),
     ];
 
-    $form['spacing']['gap_option'] = [
+    $form[$form_key]['gap_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Gap'),
       '#options' => $this->getScaleOptions(),
@@ -72,7 +80,7 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Select the desired gap between layout columns/regions.'),
     ];
 
-    $form['spacing']['horizontal_margin_option'] = [
+    $form[$form_key]['horizontal_margin_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Horizontal Margin'),
       '#options' => $this->getScaleOptions(),
@@ -80,7 +88,7 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Select the horizontal margin for the layout. This margin will not be applied if "Full Width" or "Edge to Edge" is selected.'),
     ];
 
-    $form['spacing']['vertical_margin_option'] = [
+    $form[$form_key]['vertical_margin_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Vertical Margin'),
       '#options' => $this->getScaleOptions(),
@@ -112,7 +120,8 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $spacing_values = $form_state->getValue('spacing', []);
+    $form_key = $this->getFormKey();
+    $spacing_values = $form_state->getValue($form_key, []);
     foreach ([
       'horizontal_padding_option',
       'vertical_padding_option',
