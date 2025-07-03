@@ -6,23 +6,34 @@
  */
 
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 
 /**
  * Implements hook_install().
  *
  * This hook is fired when the module is first enabled.
- * It imports configuration and ensures that essential default color terms are created.
+ * It creates the vocabulary and default color terms.
  */
 function kingly_layouts_install(): void {
-  // Import the module's configuration first to ensure vocabulary exists.
-  \Drupal::service('config.installer')->installDefaultConfig('module', 'kingly_layouts');
-
-  // Now check if the vocabulary exists after config import.
-  /** @var \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage */
+  // First, ensure the vocabulary exists (create if config import failed).
   $vocabulary_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_vocabulary');
-  if (!$vocabulary_storage->load('kingly_css_color')) {
-    \Drupal::logger('kingly_layouts')->error('Vocabulary kingly_css_color not found after configuration import.');
-    return;
+  $vocabulary = $vocabulary_storage->load('kingly_css_color');
+
+  if (!$vocabulary) {
+    // Create vocabulary programmatically if config import didn't work.
+    $vocabulary = Vocabulary::create([
+      'vid' => 'kingly_css_color',
+      'name' => 'Kingly CSS Colors',
+      'description' => 'Color vocabulary for Kingly Layouts module',
+    ]);
+    $vocabulary->save();
+    \Drupal::logger('kingly_layouts')->notice('Created vocabulary kingly_css_color programmatically.');
+  }
+
+  // Ensure field storage and field instances exist.
+  $field_storage_config = \Drupal::configFactory()->get('field.storage.taxonomy_term.field_kingly_css_color');
+  if ($field_storage_config->isNew()) {
+    \Drupal::service('config.installer')->installOptionalConfig();
   }
 
   // Define the default colors to add.
@@ -32,7 +43,6 @@ function kingly_layouts_install(): void {
   ];
 
   // Load the term storage for the 'taxonomy_term' entity type.
-  /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
   $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
 
   // Iterate over the default colors.
@@ -45,15 +55,27 @@ function kingly_layouts_install(): void {
 
     // If no existing term is found, create a new one.
     if (empty($existing_terms)) {
-      // Create a new taxonomy term entity.
-      $term = Term::create([
-        'name' => $name,
-        'vid' => 'kingly_css_color',
-        'field_kingly_css_color' => $hex_code,
-      ]);
+      try {
+        // Create a new taxonomy term entity.
+        $term = Term::create([
+          'name' => $name,
+          'vid' => 'kingly_css_color',
+          'field_kingly_css_color' => $hex_code,
+        ]);
 
-      // Save the new term.
-      $term->save();
+        // Save the new term.
+        $term->save();
+        \Drupal::logger('kingly_layouts')->info('Created term: @name with color @color', [
+          '@name' => $name,
+          '@color' => $hex_code,
+        ]);
+      }
+      catch (\Exception $e) {
+        \Drupal::logger('kingly_layouts')->error('Failed to create term @name: @error', [
+          '@name' => $name,
+          '@error' => $e->getMessage(),
+        ]);
+      }
     }
   }
 }
