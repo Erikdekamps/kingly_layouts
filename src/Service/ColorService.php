@@ -7,6 +7,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
+use Drupal\kingly_layouts\KinglyLayoutsValidationTrait;
 
 /**
  * Service to manage color options for Kingly Layouts.
@@ -16,6 +17,7 @@ use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
 class ColorService implements KinglyLayoutsDisplayOptionInterface {
 
   use StringTranslationTrait;
+  use KinglyLayoutsValidationTrait;
 
   /**
    * The current user.
@@ -33,6 +35,15 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
   public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultConfiguration(): array {
+    return [
+      'foreground_color' => '',
+    ];
   }
 
   /**
@@ -79,33 +90,6 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
     // Validate if the stored color is a valid hex code before applying.
     if (!empty($foreground_color) && preg_match('/^#([a-fA-F0-9]{6})$/', $foreground_color)) {
       $build['#attributes']['style'][] = 'color: ' . $foreground_color . ';';
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultConfiguration(): array {
-    return [
-      'foreground_color' => '',
-    ];
-  }
-
-  /**
-   * Validates a color hex code form element.
-   *
-   * @param array $element
-   *   The form element to validate.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public function validateColorHex(array &$element, FormStateInterface $form_state): void {
-    $value = $element['#value'];
-    // Check if a value is provided and if it matches the hex color pattern.
-    // The pattern ensures it starts with '#' and is followed by exactly 6 hex
-    // characters.
-    if (!empty($value) && !preg_match('/^#([a-fA-F0-9]{6})$/', $value)) {
-      $form_state->setError($element, $this->t('The color must be a valid 6-digit hex code starting with # (e.g., #RRGGBB).'));
     }
   }
 
