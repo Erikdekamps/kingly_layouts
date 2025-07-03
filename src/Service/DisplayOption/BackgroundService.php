@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\kingly_layouts\Service;
+namespace Drupal\kingly_layouts\Service\DisplayOption;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Form\FormStateInterface;
