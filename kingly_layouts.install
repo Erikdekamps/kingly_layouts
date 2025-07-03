@@ -11,18 +11,17 @@ use Drupal\taxonomy\Entity\Term;
  * Implements hook_install().
  *
  * This hook is fired when the module is first enabled.
- * It ensures that essential default color terms are created.
+ * It imports configuration and ensures that essential default color terms are created.
  */
 function kingly_layouts_install(): void {
-  // Ensure the 'kingly_css_color' vocabulary exists before adding terms.
-  // The vocabulary is typically provided by the module's configuration
-  // synchronization, but we add this check for robustness.
+  // Import the module's configuration first to ensure vocabulary exists.
+  \Drupal::service('config.installer')->installDefaultConfig('module', 'kingly_layouts');
+
+  // Now check if the vocabulary exists after config import.
   /** @var \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage */
   $vocabulary_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_vocabulary');
   if (!$vocabulary_storage->load('kingly_css_color')) {
-    // If the vocabulary does not exist, there's a problem with installation.
-    // Log an error or throw an exception if strict; for install, a warning
-    // might be sufficient as config import should handle vocabulary creation.
+    \Drupal::logger('kingly_layouts')->error('Vocabulary kingly_css_color not found after configuration import.');
     return;
   }
 
@@ -39,8 +38,6 @@ function kingly_layouts_install(): void {
   // Iterate over the default colors.
   foreach ($default_colors as $name => $hex_code) {
     // Check if a term with this name already exists in the vocabulary.
-    // This prevents duplicate terms on re-installation or if terms were
-    // manually added.
     $existing_terms = $term_storage->loadByProperties([
       'name' => $name,
       'vid' => 'kingly_css_color',
@@ -52,7 +49,6 @@ function kingly_layouts_install(): void {
       $term = Term::create([
         'name' => $name,
         'vid' => 'kingly_css_color',
-        // Assign the hex code to the custom field.
         'field_kingly_css_color' => $hex_code,
       ]);
 
