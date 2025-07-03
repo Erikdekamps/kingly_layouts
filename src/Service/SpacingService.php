@@ -196,11 +196,11 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
     $h_padding_effective = $configuration['horizontal_padding_option'];
 
     // For 'full' and 'edge-to-edge' container types, the horizontal padding
-    // is handled differently by CSS. The `kingly-layout-padding-x-` class
+    // is handled differently by CSS. The `kl-padding-x-` class
     // sets a CSS variable, which the container CSS then consumes.
     // 'hero' also handles horizontal padding differently.
-    $this->applyClassFromConfig($build, 'kingly-layout-padding-x-', $h_padding_effective, $configuration);
-    $this->applyClassFromConfig($build, 'kingly-layout-padding-y-', 'vertical_padding_option', $configuration);
+    $this->applyClassFromConfig($build, 'kl-padding-x-', $h_padding_effective, $configuration);
+    $this->applyClassFromConfig($build, 'kl-padding-y-', 'vertical_padding_option', $configuration);
   }
 
   /**
@@ -212,7 +212,7 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
    *   The layout's current configuration.
    */
   private function applyGapClass(array &$build, array $configuration): void {
-    $this->applyClassFromConfig($build, 'kingly-layout-gap-', 'gap_option', $configuration);
+    $this->applyClassFromConfig($build, 'kl-gap-', 'gap_option', $configuration);
   }
 
   /**
@@ -238,9 +238,9 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
     }
 
     if ($apply_horizontal_margin) {
-      $this->applyClassFromConfig($build, 'kingly-layout-margin-x-', 'horizontal_margin_option', $configuration);
+      $this->applyClassFromConfig($build, 'kl-margin-x-', 'horizontal_margin_option', $configuration);
     }
-    $this->applyClassFromConfig($build, 'kingly-layout-margin-y-', 'vertical_margin_option', $configuration);
+    $this->applyClassFromConfig($build, 'kl-margin-y-', 'vertical_margin_option', $configuration);
   }
 
 }

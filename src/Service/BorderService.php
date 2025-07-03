@@ -190,7 +190,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    */
   private function applyBorderRadius(array &$build, array $configuration): bool {
     if ($configuration['border_radius_option'] !== self::NONE_OPTION_KEY) {
-      $this->applyClassFromConfig($build, 'kingly-layout-border-radius-', 'border_radius_option', $configuration);
+      $this->applyClassFromConfig($build, 'kl-border-radius-', 'border_radius_option', $configuration);
       return TRUE;
     }
     return FALSE;
@@ -216,8 +216,8 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       $border_width = $configuration['border_width_option'] !== self::NONE_OPTION_KEY ? $configuration['border_width_option'] : 'sm';
       $border_style = $configuration['border_style_option'] !== self::NONE_OPTION_KEY ? $configuration['border_style_option'] : 'solid';
 
-      $this->applyClassFromConfig($build, 'kingly-layout-border-width-', $border_width, $configuration);
-      $this->applyClassFromConfig($build, 'kingly-layout-border-style-', $border_style, $configuration);
+      $this->applyClassFromConfig($build, 'kl-border-width-', $border_width, $configuration);
+      $this->applyClassFromConfig($build, 'kl-border-style-', $border_style, $configuration);
       return TRUE;
     }
     return FALSE;

@@ -20,11 +20,11 @@
  * Example if you wanted base classes for some typography elements,
  * but for this feature, inline styles are preferred for flexibility.
  *
-.kingly-layout--font-serif {
-  font-family: var(--kingly-font-serif);
+.kl--font-serif {
+  font-family: var(--kl-font-serif);
 }
-.kingly-layout--font-size-lg {
-  font-size: var(--kingly-font-size-lg);
+.kl--font-size-lg {
+  font-size: var(--kl-font-size-lg);
 }
  */
 

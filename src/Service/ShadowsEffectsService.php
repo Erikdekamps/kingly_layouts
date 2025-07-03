@@ -168,11 +168,11 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
     // libraries and the base animation class for transitions.
     if ($has_effects) {
       $build['#attached']['library'][] = 'kingly_layouts/effects';
-      // The 'animations' library contains the base 'kingly-animate' class
+      // The 'animations' library contains the base 'kl-animate' class
       // and its transition properties, which are essential for smooth
       // hover effects.
       $build['#attached']['library'][] = 'kingly_layouts/animations';
-      $build['#attributes']['class'][] = 'kingly-animate';
+      $build['#attributes']['class'][] = 'kl-animate';
     }
   }
 
@@ -289,8 +289,8 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
   private function applyStaticClassBasedEffects(array &$build, array $configuration): bool {
     $applied = FALSE;
     $class_map = [
-      'box_shadow_option' => 'kingly-layout-shadow-',
-      'filter_option' => 'kingly-layout-filter-',
+      'box_shadow_option' => 'kl-shadow-',
+      'filter_option' => 'kl-filter-',
     ];
     foreach ($class_map as $config_key => $prefix) {
       if ($configuration[$config_key] !== self::NONE_OPTION_KEY) {
@@ -354,10 +354,10 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
   private function applyHoverEffects(array &$build, array $configuration): bool {
     $applied = FALSE;
     $hover_class_map = [
-      'hover_transform_scale_option' => 'kingly-layout--hover-scale-',
-      'hover_box_shadow_option' => 'kingly-layout--hover-shadow-',
-      'hover_filter_option' => 'kingly-layout--hover-filter-',
-      'hover_font_size_option' => 'kingly-layout--hover-font-size-',
+      'hover_transform_scale_option' => 'kl--hover-scale-',
+      'hover_box_shadow_option' => 'kl--hover-shadow-',
+      'hover_filter_option' => 'kl--hover-filter-',
+      'hover_font_size_option' => 'kl--hover-font-size-',
     ];
 
     foreach ($hover_class_map as $config_key => $prefix) {

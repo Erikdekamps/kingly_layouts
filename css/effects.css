@@ -1,123 +1,123 @@
 /**
 * @file
 * Provides shadow and filter effect utility styles for Kingly Layouts.
-  */
+*/
+
+/* We define variables for these font sizes, making them easily adjustable
+   and allowing for more granular control if needed in the future. */
+:root {
+  --kl-font-size-90: 0.9em;
+  --kl-font-size-95: 0.95em;
+  --kl-font-size-105: 1.05em;
+  --kl-font-size-110: 1.1em;
+  --kl-font-size-125: 1.25em;
+}
 
 /* --- Shadows & Effects Utilities --- */
 
 /* Box Shadow */
-.kingly-layout-shadow-sm {
-  box-shadow: 0 1px 2px 0 var(--kingly-shadow-color-light);
+.kl-shadow-sm {
+  box-shadow: 0 1px 2px 0 var(--kl-shadow-color-light);
 }
-.kingly-layout-shadow-md {
-  box-shadow: 0 4px 6px -1px var(--kingly-shadow-color-medium), 0 2px 4px -1px var(--kingly-shadow-color-dark);
+.kl-shadow-md {
+  box-shadow: 0 4px 6px -1px var(--kl-shadow-color-medium), 0 2px 4px -1px var(--kl-shadow-color-dark);
 }
-.kingly-layout-shadow-lg {
-  box-shadow: 0 10px 15px -3px var(--kingly-shadow-color-medium), 0 4px 6px -2px var(--kingly-shadow-color-light);
+.kl-shadow-lg {
+  box-shadow: 0 10px 15px -3px var(--kl-shadow-color-medium), 0 4px 6px -2px var(--kl-shadow-color-light);
 }
-.kingly-layout-shadow-xl {
-  box-shadow: 0 20px 25px -5px var(--kingly-shadow-color-medium), 0 10px 10px -5px var(--kingly-shadow-color-xl-dark);
+.kl-shadow-xl {
+  box-shadow: 0 20px 25px -5px var(--kl-shadow-color-medium), 0 10px 10px -5px var(--kl-shadow-color-xl-dark);
 }
-.kingly-layout-shadow-inner {
-  box-shadow: inset 0 2px 4px 0 var(--kingly-shadow-color-dark);
+.kl-shadow-inner {
+  box-shadow: inset 0 2px 4px 0 var(--kl-shadow-color-dark);
 }
 
 /* Filter */
-.kingly-layout-filter-grayscale {
+.kl-filter-grayscale {
   filter: grayscale(100%);
 }
-.kingly-layout-filter-blur {
+.kl-filter-blur {
   filter: blur(5px); /* This value could also be a variable if you have a blur scale */
 }
-.kingly-layout-filter-sepia {
+.kl-filter-sepia {
   filter: sepia(100%);
 }
-.kingly-layout-filter-brightness {
+.kl-filter-brightness {
   filter: brightness(1.5); /* This value could also be a variable if you have a brightness scale */
 }
 
 /* --- Hover Effects --- */
 
 /* Hover Transform Scale */
-.kingly-layout--hover-scale-90:hover {
+.kl--hover-scale-90:hover {
   transform: scale(0.9);
 }
-.kingly-layout--hover-scale-95:hover {
+.kl--hover-scale-95:hover {
   transform: scale(0.95);
 }
-.kingly-layout--hover-scale-105:hover {
+.kl--hover-scale-105:hover {
   transform: scale(1.05);
 }
-.kingly-layout--hover-scale-110:hover {
+.kl--hover-scale-110:hover {
   transform: scale(1.1);
 }
-.kingly-layout--hover-scale-125:hover {
+.kl--hover-scale-125:hover {
   transform: scale(1.25);
 }
 
 /* Hover Box Shadow */
-.kingly-layout--hover-shadow-sm:hover {
-  box-shadow: 0 1px 2px 0 var(--kingly-shadow-color-light);
+.kl--hover-shadow-sm:hover {
+  box-shadow: 0 1px 2px 0 var(--kl-shadow-color-light);
 }
-.kingly-layout--hover-shadow-md:hover {
-  box-shadow: 0 4px 6px -1px var(--kingly-shadow-color-medium), 0 2px 4px -1px var(--kingly-shadow-color-dark);
+.kl--hover-shadow-md:hover {
+  box-shadow: 0 4px 6px -1px var(--kl-shadow-color-medium), 0 2px 4px -1px var(--kl-shadow-color-dark);
 }
-.kingly-layout--hover-shadow-lg:hover {
-  box-shadow: 0 10px 15px -3px var(--kingly-shadow-color-medium), 0 4px 6px -2px var(--kingly-shadow-color-light);
+.kl--hover-shadow-lg:hover {
+  box-shadow: 0 10px 15px -3px var(--kl-shadow-color-medium), 0 4px 6px -2px var(--kl-shadow-color-light);
 }
-.kingly-layout--hover-shadow-xl:hover {
-  box-shadow: 0 20px 25px -5px var(--kingly-shadow-color-medium), 0 10px 10px -5px var(--kingly-shadow-color-xl-dark);
+.kl--hover-shadow-xl:hover {
+  box-shadow: 0 20px 25px -5px var(--kl-shadow-color-medium), 0 10px 10px -5px var(--kl-shadow-color-xl-dark);
 }
-.kingly-layout--hover-shadow-inner:hover {
-  box-shadow: inset 0 2px 4px 0 var(--kingly-shadow-color-dark);
+.kl--hover-shadow-inner:hover {
+  box-shadow: inset 0 2px 4px 0 var(--kl-shadow-color-dark);
 }
 
 /* Hover Filters (Initial state + Hover state) */
 /* Grayscale to Color */
-.kingly-layout--hover-filter-grayscale-to-color {
+.kl--hover-filter-grayscale-to-color {
   filter: grayscale(100%);
 }
-.kingly-layout--hover-filter-grayscale-to-color:hover {
+.kl--hover-filter-grayscale-to-color:hover {
   filter: grayscale(0%);
 }
 
 /* Brightness Change */
 /* Base brightness is 1 (normal). Change it on hover. */
-.kingly-layout--hover-filter-brightness-down {
+.kl--hover-filter-brightness-down {
   filter: brightness(1);
 }
-.kingly-layout--hover-filter-brightness-down:hover {
+.kl--hover-filter-brightness-down:hover {
   filter: brightness(0.75);
 }
-.kingly-layout--hover-filter-brightness-up {
+.kl--hover-filter-brightness-up {
   filter: brightness(1);
 }
-.kingly-layout--hover-filter-brightness-up:hover {
+.kl--hover-filter-brightness-up:hover {
   filter: brightness(1.25);
 }
 
-/* We define variables for these font sizes, making them easily adjustable
-   and allowing for more granular control if needed in the future. */
-:root {
-  --kingly-font-size-90: 0.9em;
-  --kingly-font-size-95: 0.95em;
-  --kingly-font-size-105: 1.05em;
-  --kingly-font-size-110: 1.1em;
-  --kingly-font-size-125: 1.25em;
+.kl--hover-font-size-size-90:hover {
+  font-size: var(--kl-font-size-90);
 }
-
-.kingly-layout--hover-font-size-size-90:hover {
-  font-size: var(--kingly-font-size-90);
+.kl--hover-font-size-size-95:hover {
+  font-size: var(--kl-font-size-95);
 }
-.kingly-layout--hover-font-size-size-95:hover {
-  font-size: var(--kingly-font-size-95);
+.kl--hover-font-size-size-105:hover {
+  font-size: var(--kl-font-size-105);
 }
-.kingly-layout--hover-font-size-size-105:hover {
-  font-size: var(--kingly-font-size-105);
+.kl--hover-font-size-size-110:hover {
+  font-size: var(--kl-font-size-110);
 }
-.kingly-layout--hover-font-size-size-110:hover {
-  font-size: var(--kingly-font-size-110);
-}
-.kingly-layout--hover-font-size-size-125:hover {
-  font-size: var(--kingly-font-size-125);
+.kl--hover-font-size-size-125:hover {
+  font-size: var(--kl-font-size-125);
 }

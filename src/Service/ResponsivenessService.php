@@ -132,7 +132,7 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
   private function applyHideOnBreakpointClasses(array &$build, array $configuration): void {
     foreach ($configuration['hide_on_breakpoint'] as $breakpoint) {
       if ($breakpoint) {
-        $build['#attributes']['class'][] = 'kingly-layout-hide-on-' . $breakpoint;
+        $build['#attributes']['class'][] = 'kl-hide-on-' . $breakpoint;
       }
     }
   }

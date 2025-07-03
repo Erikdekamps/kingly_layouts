@@ -151,7 +151,7 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
    */
   private function applyVerticalAlignmentClass(array &$build, array $configuration, bool $is_v_align_set): void {
     if ($is_v_align_set) {
-      $this->applyClassFromConfig($build, 'kingly-layout-align-content-', 'vertical_alignment', $configuration);
+      $this->applyClassFromConfig($build, 'kl-align-content-', 'vertical_alignment', $configuration);
     }
   }
 
@@ -167,7 +167,7 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
    */
   private function applyHorizontalAlignmentClass(array &$build, array $configuration, bool $is_h_align_set): void {
     if ($is_h_align_set) {
-      $this->applyClassFromConfig($build, 'kingly-layout-justify-content-', 'horizontal_alignment', $configuration);
+      $this->applyClassFromConfig($build, 'kl-justify-content-', 'horizontal_alignment', $configuration);
     }
   }
 

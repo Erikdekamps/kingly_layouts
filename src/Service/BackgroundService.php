@@ -619,7 +619,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
   private function applyBackgroundVideo(array &$build, array $configuration): bool {
     $media_url = $configuration['background_media_url'];
     if (!empty($media_url) && UrlHelper::isValid($media_url, TRUE)) {
-      $build['#attributes']['class'][] = 'kingly-layout--has-bg-video';
+      $build['#attributes']['class'][] = 'kl--has-bg-video';
       $build['video_background'] = [
         '#theme' => 'kingly_background_video',
         '#video_url' => $media_url,
@@ -685,11 +685,11 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     if (in_array($background_type, ['image', 'video', 'gradient']) && $overlay_hex) {
       $overlay_opacity = $configuration['background_overlay_opacity'];
       if ($overlay_opacity !== self::NONE_OPTION_KEY) {
-        $build['#attributes']['class'][] = 'kingly-layout--has-bg-overlay';
+        $build['#attributes']['class'][] = 'kl--has-bg-overlay';
         $build['overlay'] = [
           '#type' => 'container',
           '#attributes' => [
-            'class' => ['kingly-layout__bg-overlay'],
+            'class' => ['kl__bg-overlay'],
             'style' => [
               'background-color: ' . $overlay_hex . ';',
               'opacity: ' . ((float) $overlay_opacity / 100) . ';',
