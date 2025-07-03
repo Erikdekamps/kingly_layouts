@@ -28,7 +28,7 @@
     if they exist in the content array, respecting their weights.
     This is more maintainable than checking for each element individually.
     #}
-    {{ content|without('content') }}
+    {{ content|without('first', 'second', 'third') }}
 
     {% if content.first %}
       <div {{ region_attributes.first.addClass('layout__region', 'layout__region--first') }}>
