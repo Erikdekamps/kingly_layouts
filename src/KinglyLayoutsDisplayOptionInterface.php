@@ -20,6 +20,14 @@ interface KinglyLayoutsDisplayOptionInterface {
   public const NONE_OPTION_KEY = '_none';
 
   /**
+   * Gets the unique key for the form element group this service provides.
+   *
+   * @return string
+   *   The form key (e.g., 'animation', 'spacing').
+   */
+  public function getFormKey(): string;
+
+  /**
    * Builds the form elements for this display option category.
    *
    * @param array $form
