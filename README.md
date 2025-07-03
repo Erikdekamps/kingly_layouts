@@ -16,6 +16,9 @@ user interface.
   across all modern browsers.
 * **Rich Display Options**: A comprehensive set of controls to customize every
   aspect of a layout section.
+* **Direct Color Input**: Instead of a predefined palette, colors (for
+  foreground, background, borders, and gradients) are now directly entered
+  using a color picker, providing full flexibility.
 * **Dynamic Backgrounds**: Supports solid colors, gradients, images (with
   parallax), and self-hosted background videos.
 * **On-Scroll Animations**: Animate sections as they enter the viewport using
@@ -31,7 +34,6 @@ user interface.
 ## Requirements
 
 * Drupal Core Layout Discovery module (`drupal:layout_discovery`)
-* Drupal Core Taxonomy module (`drupal:taxonomy`)
 
 ## Installation
 
@@ -44,29 +46,11 @@ user interface.
 
 ## Configuration
 
-For the module's color-related options to function correctly, you must first
-configure the color palette.
+Kingly Layouts is designed to be configured directly within Drupal's Layout
+Builder
+interface. There are no module-level configuration pages.
 
-### Step 1: Configure Color Palette
-
-The module uses a Taxonomy vocabulary to manage a centralized list of colors
-that will be available in the layout configuration UI.
-
-1. Navigate to the vocabulary at **Structure > Taxonomy > Kingly CSS Color
-   ** (`/admin/structure/taxonomy/manage/kingly_css_color/overview`).
-2. Click **Add term** to create a new color option.
-3. Fill in the fields:
-
-* **Name**: The human-readable name for the color (e.g., "Brand Blue", "Light
-  Gray").
-  This is what users will see in the dropdown menus.
-* **CSS Color**: The exact CSS hex code for the color. **It must be a 6-digit
-  hex code starting with `#`** (e.g., `#0D6EFD`, `#F8F9FA`).
-
-4. Save the term.
-5. Repeat this process for all the colors you want in your site's palette.
-
-### Step 2: Using Kingly Layouts in Layout Builder
+### Using Kingly Layouts in Layout Builder
 
 1. When managing the layout for a content type or a custom page, click **Add
    section**.
@@ -106,14 +90,13 @@ Control the space inside and around the layout using a consistent scale.
 
 ### Colors
 
-* **Foreground Color**: Sets the text color for the entire section. The
-  available options are populated from the **Kingly CSS Color** vocabulary you
-  configured.
+* **Foreground Color**: Sets the text color for the entire section using a
+  color picker. Enter a 6-digit hex code (e.g., `#RRGGBB`).
 
 ### Border
 
-* **Border Color, Width, & Style**: Apply a border using a color from your
-  palette and a pre-defined thickness
+* **Border Color, Width, & Style**: Apply a border by entering a hex color code
+  directly, along with a pre-defined thickness
   and style (solid, dashed, dotted).
 * **Border Radius**: Round the corners of the layout, with options from `Small`
   to `Full (Pill/Circle)`.
@@ -130,16 +113,16 @@ Control the space inside and around the layout using a consistent scale.
 
 * **Background Type**: Choose between a solid color, an image, a video, or a
   gradient.
-* **Color Options**: When 'Color' is selected, choose a background color from
-  your palette and set its opacity.
+* **Color Options**: When 'Color' is selected, choose a background color using
+  the color picker and set its opacity.
 * **Media Options**: Provide a URL for a background image or video. For images,
   control
   position, repeat, size, and attachment (for parallax effects). For videos,
   control loop, autoplay, and mute settings.
-* **Gradient Options**: Configure linear or radial gradients using two colors
-  from your palette.
+* **Gradient Options**: Configure linear or radial gradients using two direct
+  hex color inputs.
 * **Overlay**: Add a semi-transparent color overlay on top of any background
-  media to improve text readability.
+  media to improve text readability, using a color picker.
 
 ### Shadows & Effects
 

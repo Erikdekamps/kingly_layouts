@@ -1,15 +1,16 @@
 {
-    "name": "erikdekamps/kingly_layouts",
-    "type": "drupal-module",
-    "description": "A Drupal module that provides Kingly layouts with a column sizing layout option.",
-    "keywords": [
-        "recipe",
-        "Drupal base install",
-        "best practices",
-        "simple install"
-    ],
-    "license": "GPL-2.0-or-later",
-    "require": {
-        "drupal/core": "^10.3 || ^11"
-    }
+  "name": "erikdekamps/kingly_layouts",
+  "type": "drupal-module",
+  "description": "A Drupal module that provides Kingly layouts with a column sizing layout option.",
+  "keywords": [
+    "recipe",
+    "Drupal base install",
+    "best practices",
+    "simple install"
+  ],
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "drupal/core": "^10.3 || ^11",
+    "drupal/color_field": "^3.0"
+  }
 }

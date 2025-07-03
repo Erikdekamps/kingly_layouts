@@ -12,6 +12,9 @@ use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
 
 /**
  * Service to manage background options for Kingly Layouts.
+ *
+ * This service now uses direct color input fields instead of taxonomy terms
+ * for background, overlay, and gradient colors.
  */
 class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
 
@@ -25,6 +28,9 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
 
   /**
    * The color service.
+   *
+   * While not directly used for picking colors anymore, it provides hex to RGB
+   * conversion if needed and is conceptually related.
    */
   protected ColorService $colorService;
 
@@ -48,8 +54,6 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $color_options = $this->colorService->getColorOptions();
-
     $form['background'] = [
       '#type' => 'details',
       '#title' => $this->t('Background'),
@@ -99,26 +103,30 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
         ],
       ],
     ];
-    if (count($color_options) > 1) {
-      $form['background']['color_settings']['background_color'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Background Color'),
-        '#options' => $color_options,
-        '#default_value' => $configuration['background_color'],
-      ];
-      $form['background']['color_settings']['background_opacity'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Background Opacity'),
-        '#options' => $this->getBackgroundOptions('opacity'),
-        '#default_value' => $configuration['background_opacity'],
-        '#description' => $this->t('Set the opacity for the background color. This requires a background color to be selected.'),
-        '#states' => [
-          'visible' => [
-            ':input[name="layout_settings[background][color_settings][background_color]"]' => ['!value' => self::NONE_OPTION_KEY],
-          ],
+    $form['background']['color_settings']['background_color'] = [
+      '#type' => 'color',
+      '#title' => $this->t('Background Color'),
+      '#default_value' => $configuration['background_color'],
+      '#description' => $this->t('Enter a hex code for the background color (e.g., #F0F0F0).'),
+      '#attributes' => [
+        'type' => 'color',
+      ],
+      '#pattern' => '#[0-9a-fA-F]{6}',
+      // Add server-side validation for the hex color format.
+      '#element_validate' => [[$this, 'validateColorHex']],
+    ];
+    $form['background']['color_settings']['background_opacity'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Background Opacity'),
+      '#options' => $this->getBackgroundOptions('opacity'),
+      '#default_value' => $configuration['background_opacity'],
+      '#description' => $this->t('Set the opacity for the background color. This requires a background color to be selected.'),
+      '#states' => [
+        'visible' => [
+          [':input[name="layout_settings[background][color_settings][background_color]"]' => ['!value' => '']],
         ],
-      ];
-    }
+      ],
+    ];
 
     // --- Overlay Settings (Common for Image, Video, Gradient) ---
     $form['background']['overlay_settings'] = [
@@ -136,11 +144,16 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       ],
     ];
     $form['background']['overlay_settings']['background_overlay_color'] = [
-      '#type' => 'select',
+      '#type' => 'textfield',
       '#title' => $this->t('Overlay Color'),
-      '#options' => $color_options,
       '#default_value' => $configuration['background_overlay_color'],
-      '#description' => $this->t('Select a color for the overlay. The overlay sits on top of the background media, but behind the content.'),
+      '#description' => $this->t('Enter a hex code for the overlay color (e.g., #000000). The overlay sits on top of the background media, but behind the content.'),
+      '#attributes' => [
+        'type' => 'color',
+      ],
+      '#pattern' => '#[0-9a-fA-F]{6}',
+      // Add server-side validation for the hex color format.
+      '#element_validate' => [[$this, 'validateColorHex']],
     ];
     $form['background']['overlay_settings']['background_overlay_opacity'] = [
       '#type' => 'select',
@@ -150,7 +163,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Set the opacity for the overlay color. This requires an overlay color to be selected.'),
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background][overlay_settings][background_overlay_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+          [':input[name="layout_settings[background][overlay_settings][background_overlay_color]"]' => ['!value' => '']],
         ],
       ],
     ];
@@ -262,16 +275,28 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       '#default_value' => $configuration['background_gradient_type'],
     ];
     $form['background']['gradient_settings']['background_gradient_start_color'] = [
-      '#type' => 'select',
+      '#type' => 'color',
       '#title' => $this->t('Start Color'),
-      '#options' => $color_options,
       '#default_value' => $configuration['background_gradient_start_color'],
+      '#description' => $this->t('Enter a hex code for the start color (e.g., #FFFFFF).'),
+      '#attributes' => [
+        'type' => 'color',
+      ],
+      '#pattern' => '#[0-9a-fA-F]{6}',
+      // Add server-side validation for the hex color format.
+      '#element_validate' => [[$this, 'validateColorHex']],
     ];
     $form['background']['gradient_settings']['background_gradient_end_color'] = [
-      '#type' => 'select',
+      '#type' => 'color',
       '#title' => $this->t('End Color'),
-      '#options' => $color_options,
       '#default_value' => $configuration['background_gradient_end_color'],
+      '#description' => $this->t('Enter a hex code for the end color (e.g., #000000).'),
+      '#attributes' => [
+        'type' => 'color',
+      ],
+      '#pattern' => '#[0-9a-fA-F]{6}',
+      // Add server-side validation for the hex color format.
+      '#element_validate' => [[$this, 'validateColorHex']],
     ];
     $form['background']['gradient_settings']['linear_gradient_settings'] = [
       '#type' => 'container',
@@ -334,10 +359,12 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     }
 
     $configuration['background_media_url'] = $media_url;
+    // Min height is disabled for 'hero' container type, so its value should be
+    // empty.
     $configuration['background_media_min_height'] = ($values['container_type'] === 'hero') ? '' : $min_height;
 
     // Color settings.
-    $configuration['background_color'] = $background_values['color_settings']['background_color'] ?? self::NONE_OPTION_KEY;
+    $configuration['background_color'] = $background_values['color_settings']['background_color'] ?? '';
     $configuration['background_opacity'] = $background_values['color_settings']['background_opacity'] ?? self::NONE_OPTION_KEY;
 
     // Image settings.
@@ -363,14 +390,14 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
 
     // Gradient settings.
     $configuration['background_gradient_type'] = $background_values['gradient_settings']['background_gradient_type'] ?? 'linear';
-    $configuration['background_gradient_start_color'] = $background_values['gradient_settings']['background_gradient_start_color'] ?? self::NONE_OPTION_KEY;
-    $configuration['background_gradient_end_color'] = $background_values['gradient_settings']['background_gradient_end_color'] ?? self::NONE_OPTION_KEY;
+    $configuration['background_gradient_start_color'] = $background_values['gradient_settings']['background_gradient_start_color'] ?? '';
+    $configuration['background_gradient_end_color'] = $background_values['gradient_settings']['background_gradient_end_color'] ?? '';
     $configuration['background_gradient_linear_direction'] = $background_values['gradient_settings']['linear_gradient_settings']['background_gradient_linear_direction'] ?? 'to bottom';
     $configuration['background_gradient_radial_shape'] = $background_values['gradient_settings']['radial_gradient_settings']['background_gradient_radial_shape'] ?? 'ellipse';
     $configuration['background_gradient_radial_position'] = $background_values['gradient_settings']['radial_gradient_settings']['background_gradient_radial_position'] ?? 'center';
 
     // Overlay settings.
-    $configuration['background_overlay_color'] = $background_values['overlay_settings']['background_overlay_color'] ?? self::NONE_OPTION_KEY;
+    $configuration['background_overlay_color'] = $background_values['overlay_settings']['background_overlay_color'] ?? '';
     $configuration['background_overlay_opacity'] = $background_values['overlay_settings']['background_overlay_opacity'] ?? self::NONE_OPTION_KEY;
   }
 
@@ -413,7 +440,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
   public static function defaultConfiguration(): array {
     return [
       'background_type' => 'color',
-      'background_color' => self::NONE_OPTION_KEY,
+      'background_color' => '',
       'background_opacity' => self::NONE_OPTION_KEY,
       'background_media_url' => '',
       'background_media_min_height' => '',
@@ -425,11 +452,11 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       'background_video_autoplay' => TRUE,
       'background_video_muted' => TRUE,
       'background_video_preload' => 'auto',
-      'background_overlay_color' => self::NONE_OPTION_KEY,
+      'background_overlay_color' => '',
       'background_overlay_opacity' => self::NONE_OPTION_KEY,
       'background_gradient_type' => 'linear',
-      'background_gradient_start_color' => self::NONE_OPTION_KEY,
-      'background_gradient_end_color' => self::NONE_OPTION_KEY,
+      'background_gradient_start_color' => '',
+      'background_gradient_end_color' => '',
       'background_gradient_linear_direction' => 'to bottom',
       'background_gradient_radial_shape' => 'ellipse',
       'background_gradient_radial_position' => 'center',
@@ -567,7 +594,9 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    *   TRUE if a background color was applied, FALSE otherwise.
    */
   private function applyBackgroundColor(array &$build, array $configuration): bool {
-    if (($background_color_hex = $this->colorService->getTermColorHex($configuration['background_color']))) {
+    $background_color_hex = $configuration['background_color'];
+    // Validate if the stored color is a valid hex code before applying.
+    if (!empty($background_color_hex) && preg_match('/^#([a-fA-F0-9]{6})$/', $background_color_hex)) {
       $opacity_value = $configuration['background_opacity'];
       if ($opacity_value !== self::NONE_OPTION_KEY && ($rgb = $this->hexToRgb($background_color_hex))) {
         $alpha = (float) $opacity_value / 100;
@@ -646,10 +675,12 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    *   TRUE if a background gradient was applied, FALSE otherwise.
    */
   private function applyBackgroundGradient(array &$build, array $configuration): bool {
-    $start_hex = $this->colorService->getTermColorHex($configuration['background_gradient_start_color']);
-    $end_hex = $this->colorService->getTermColorHex($configuration['background_gradient_end_color']);
+    $start_hex = $configuration['background_gradient_start_color'];
+    $end_hex = $configuration['background_gradient_end_color'];
 
-    if ($start_hex && $end_hex) {
+    // Validate both colors are valid hex codes.
+    if (!empty($start_hex) && preg_match('/^#([a-fA-F0-9]{6})$/', $start_hex) &&
+      !empty($end_hex) && preg_match('/^#([a-fA-F0-9]{6})$/', $end_hex)) {
       if ($configuration['background_gradient_type'] === 'linear') {
         $direction = $configuration['background_gradient_linear_direction'];
         $gradient = "linear-gradient({$direction}, {$start_hex}, {$end_hex})";
@@ -681,18 +712,19 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    *   TRUE if an overlay was applied, FALSE otherwise.
    */
   private function applyBackgroundOverlay(array &$build, array $configuration, string $background_type): bool {
-    $overlay_hex = $this->colorService->getTermColorHex($configuration['background_overlay_color']);
-    if (in_array($background_type, ['image', 'video', 'gradient']) && $overlay_hex) {
+    $overlay_hex = $configuration['background_overlay_color'];
+    // Validate if the stored color is a valid hex code before applying.
+    if (in_array($background_type, ['image', 'video', 'gradient']) &&
+      !empty($overlay_hex) && preg_match('/^#([a-fA-F0-9]{6})$/', $overlay_hex)) {
       $overlay_opacity = $configuration['background_overlay_opacity'];
-      if ($overlay_opacity !== self::NONE_OPTION_KEY) {
+      if ($overlay_opacity !== self::NONE_OPTION_KEY && ($rgb = $this->hexToRgb($overlay_hex))) {
         $build['#attributes']['class'][] = 'kl--has-bg-overlay';
         $build['overlay'] = [
           '#type' => 'container',
           '#attributes' => [
             'class' => ['kl__bg-overlay'],
             'style' => [
-              'background-color: ' . $overlay_hex . ';',
-              'opacity: ' . ((float) $overlay_opacity / 100) . ';',
+              "background-color: rgba({$rgb[0]}, {$rgb[1]}, {$rgb[2]}, " . ((float) $overlay_opacity / 100) . ');',
             ],
           ],
           '#weight' => -99,
@@ -730,6 +762,24 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     }
 
     return [$r, $g, $b];
+  }
+
+  /**
+   * Validates a color hex code form element.
+   *
+   * @param array $element
+   *   The form element to validate.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public function validateColorHex(array &$element, FormStateInterface $form_state): void {
+    $value = $element['#value'];
+    // Check if a value is provided and if it matches the hex color pattern.
+    // The pattern ensures it starts with '#' and is followed by exactly 6 hex
+    // characters.
+    if (!empty($value) && !preg_match('/^#([a-fA-F0-9]{6})$/', $value)) {
+      $form_state->setError($element, $this->t('The color must be a valid 6-digit hex code starting with # (e.g., #RRGGBB).'));
+    }
   }
 
 }

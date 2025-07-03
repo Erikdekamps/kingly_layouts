@@ -1,8 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-name: 'Kingly CSS Color'
-vid: kingly_css_color
-description: 'Provides a list of CSS colors to be used in Kingly layouts.'
-weight: 0
-new_revision: false

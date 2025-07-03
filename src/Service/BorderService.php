@@ -11,6 +11,9 @@ use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
 
 /**
  * Service to manage border options for Kingly Layouts.
+ *
+ * This service now uses a direct color input field instead of a taxonomy term
+ * for border color.
  */
 class BorderService implements KinglyLayoutsDisplayOptionInterface {
 
@@ -24,6 +27,9 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
 
   /**
    * The color service.
+   *
+   * While not directly used for picking colors anymore, it is conceptually
+   * related and might be useful for other color operations later.
    */
   protected ColorService $colorService;
 
@@ -47,8 +53,6 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $color_options = $this->colorService->getColorOptions();
-
     $form['border'] = [
       '#type' => 'details',
       '#title' => $this->t('Border'),
@@ -56,15 +60,19 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       '#access' => $this->currentUser->hasPermission('administer kingly layouts border'),
     ];
 
-    if (count($color_options) > 1) {
-      $form['border']['border_color'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Border Color'),
-        '#options' => $color_options,
-        '#default_value' => $configuration['border_color'],
-        '#description' => $this->t('Selecting a color will enable the border options below.'),
-      ];
-    }
+    $form['border']['border_color'] = [
+      '#type' => 'color',
+      '#title' => $this->t('Border Color'),
+      '#default_value' => $configuration['border_color'],
+      '#description' => $this->t('Enter a hex code for the border color (e.g., #CCCCCC). Selecting a color will enable the border options below.'),
+      '#attributes' => [
+        'type' => 'color',
+      ],
+      '#pattern' => '#[0-9a-fA-F]{6}',
+      // Add server-side validation for the hex color format.
+      '#element_validate' => [[$this, 'validateColorHex']],
+    ];
+
     $form['border']['border_width_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Width'),
@@ -72,7 +80,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       '#default_value' => $configuration['border_width_option'],
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[border][border_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+          [':input[name="layout_settings[border][border_color]"]' => ['!value' => '']],
         ],
       ],
     ];
@@ -83,7 +91,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       '#default_value' => $configuration['border_style_option'],
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[border][border_color]"]' => ['!value' => self::NONE_OPTION_KEY],
+          [':input[name="layout_settings[border][border_color]"]' => ['!value' => '']],
         ],
       ],
     ];
@@ -102,14 +110,12 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
     $values = $form_state->getValue('border', []);
-    foreach ([
-      'border_color',
-      'border_width_option',
-      'border_style_option',
-      'border_radius_option',
-    ] as $key) {
-      $configuration[$key] = $values[$key] ?? self::NONE_OPTION_KEY;
-    }
+    // Store the color as a string.
+    $configuration['border_color'] = $values['border_color'] ?? '';
+    // Use the default if 'None' is explicitly selected for other options.
+    $configuration['border_width_option'] = $values['border_width_option'] ?? self::NONE_OPTION_KEY;
+    $configuration['border_style_option'] = $values['border_style_option'] ?? self::NONE_OPTION_KEY;
+    $configuration['border_radius_option'] = $values['border_radius_option'] ?? self::NONE_OPTION_KEY;
   }
 
   /**
@@ -136,7 +142,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
   public static function defaultConfiguration(): array {
     return [
       'border_radius_option' => self::NONE_OPTION_KEY,
-      'border_color' => self::NONE_OPTION_KEY,
+      'border_color' => '',
       'border_width_option' => self::NONE_OPTION_KEY,
       'border_style_option' => self::NONE_OPTION_KEY,
     ];
@@ -208,11 +214,13 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    *   TRUE if border properties were applied, FALSE otherwise.
    */
   private function applyBorderProperties(array &$build, array $configuration): bool {
-    if ($border_color_hex = $this->colorService->getTermColorHex($configuration['border_color'])) {
+    $border_color_hex = $configuration['border_color'];
+    // Validate if the stored color is a valid hex code before applying.
+    if (!empty($border_color_hex) && preg_match('/^#([a-fA-F0-9]{6})$/', $border_color_hex)) {
       $build['#attributes']['style'][] = 'border-color: ' . $border_color_hex . ';';
 
       // Set default width and style if 'None' is selected for them, but color
-      // is.
+      // is present.
       $border_width = $configuration['border_width_option'] !== self::NONE_OPTION_KEY ? $configuration['border_width_option'] : 'sm';
       $border_style = $configuration['border_style_option'] !== self::NONE_OPTION_KEY ? $configuration['border_style_option'] : 'solid';
 
@@ -221,6 +229,24 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Validates a color hex code form element.
+   *
+   * @param array $element
+   *   The form element to validate.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public function validateColorHex(array &$element, FormStateInterface $form_state): void {
+    $value = $element['#value'];
+    // Check if a value is provided and if it matches the hex color pattern.
+    // The pattern ensures it starts with '#' and is followed by exactly 6 hex
+    // characters.
+    if (!empty($value) && !preg_match('/^#([a-fA-F0-9]{6})$/', $value)) {
+      $form_state->setError($element, $this->t('The color must be a valid 6-digit hex code starting with # (e.g., #RRGGBB).'));
+    }
   }
 
 }
