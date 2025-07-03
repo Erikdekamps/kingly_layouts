@@ -5,36 +5,36 @@
 
 :root {
   /* Spacing Scale */
-  --kingly-spacing-xs: 0.25rem;
-  --kingly-spacing-sm: 0.5rem;
-  --kingly-spacing-md: 1rem;
-  --kingly-spacing-lg: 2rem;
-  --kingly-spacing-xl: 4rem;
+  --kl-spacing-xs: 0.25rem;
+  --kl-spacing-sm: 0.5rem;
+  --kl-spacing-md: 1rem;
+  --kl-spacing-lg: 2rem;
+  --kl-spacing-xl: 4rem;
   /*
   * Additional horizontal padding.
   * This variable is set by the padding-x utilities and consumed by the
   * container type rules to prevent style clashes.
   */
-  --kingly-padding-x-additional: 0rem;
+  --kl-padding-x-additional: 0rem;
   /* Border Radius Scale */
-  --kingly-border-radius-xs: 0.25rem;
-  --kingly-border-radius-sm: 0.5rem;
-  --kingly-border-radius-md: 1rem;
-  --kingly-border-radius-lg: 2rem;
-  --kingly-border-radius-xl: 4rem;
-  --kingly-border-radius-full: 9999px; /* Large value for pill/circle effect */
+  --kl-border-radius-xs: 0.25rem;
+  --kl-border-radius-sm: 0.5rem;
+  --kl-border-radius-md: 1rem;
+  --kl-border-radius-lg: 2rem;
+  --kl-border-radius-xl: 4rem;
+  --kl-border-radius-full: 9999px; /* Large value for pill/circle effect */
   /* Border Width Scale */
-  --kingly-border-width-sm: 1px;
-  --kingly-border-width-md: 2px;
-  --kingly-border-width-lg: 4px;
+  --kl-border-width-sm: 1px;
+  --kl-border-width-md: 2px;
+  --kl-border-width-lg: 4px;
   /* Breakpoints (adjust to match your theme's actual breakpoints) */
-  --kingly-breakpoint-mobile-max: 767px;
-  --kingly-breakpoint-tablet-min: 768px;
-  --kingly-breakpoint-tablet-max: 1023px;
-  --kingly-breakpoint-desktop-min: 1024px;
+  --kl-breakpoint-mobile-max: 767px;
+  --kl-breakpoint-tablet-min: 768px;
+  --kl-breakpoint-tablet-max: 1023px;
+  --kl-breakpoint-desktop-min: 1024px;
   /* Shadow Colors (example, could be more granular if needed) */
-  --kingly-shadow-color-light: rgba(0, 0, 0, 0.05);
-  --kingly-shadow-color-medium: rgba(0, 0, 0, 0.1);
-  --kingly-shadow-color-dark: rgba(0, 0, 0, 0.06);
-  --kingly-shadow-color-xl-dark: rgba(0, 0, 0, 0.04);
+  --kl-shadow-color-light: rgba(0, 0, 0, 0.05);
+  --kl-shadow-color-medium: rgba(0, 0, 0, 0.1);
+  --kl-shadow-color-dark: rgba(0, 0, 0, 0.06);
+  --kl-shadow-color-xl-dark: rgba(0, 0, 0, 0.04);
 }

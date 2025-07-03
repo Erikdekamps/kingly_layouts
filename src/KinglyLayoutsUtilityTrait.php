@@ -17,7 +17,7 @@ trait KinglyLayoutsUtilityTrait {
    * @param array &$build
    *   The render array.
    * @param string $class_prefix
-   *   The prefix for the CSS class (e.g., 'kingly-layout-padding-x-').
+   *   The prefix for the CSS class (e.g., 'kl-padding-x-').
    * @param string $config_key_or_value
    *   The configuration key (e.g., 'horizontal_padding_option') or a direct
    *   string value (e.g., 'sm') to use for the class suffix.

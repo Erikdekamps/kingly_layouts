@@ -8,7 +8,7 @@
    * Attaches the animation-on-scroll behavior.
    *
    * This script uses the IntersectionObserver API to add a 'is-visible' class
-   * to elements with the '.kingly-animate' class when they enter the viewport.
+   * to elements with the '.kl-animate' class when they enter the viewport.
    *
    * @type {Drupal~behavior}
    *
@@ -26,7 +26,7 @@
      */
     attach(context, settings) {
       // Use once() to ensure the behavior is attached only once per element.
-      const animatedElements = once('kingly-animation', '.kingly-animate', context);
+      const animatedElements = once('kingly-animation', '.kl-animate', context);
 
       if (!animatedElements.length) {
         return;

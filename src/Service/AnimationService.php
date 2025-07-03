@@ -242,7 +242,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
    *   The render array, passed by reference.
    */
   private function applyBaseAnimationClasses(array &$build): void {
-    $build['#attributes']['class'][] = 'kingly-animate';
+    $build['#attributes']['class'][] = 'kl-animate';
   }
 
   /**
@@ -254,10 +254,10 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
    *   The layout's current configuration.
    */
   private function applySpecificAnimationClasses(array &$build, array $configuration): void {
-    $this->applyClassFromConfig($build, 'kingly-animate--', 'animation_type', $configuration);
+    $this->applyClassFromConfig($build, 'kl-animate--', 'animation_type', $configuration);
 
     if ($configuration['animation_type'] === 'slide-in' && $configuration['slide_direction'] !== self::NONE_OPTION_KEY) {
-      $this->applyClassFromConfig($build, 'kingly-animate--direction-', 'slide_direction', $configuration);
+      $this->applyClassFromConfig($build, 'kl-animate--direction-', 'slide_direction', $configuration);
     }
   }
 

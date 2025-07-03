@@ -7,23 +7,23 @@
 
 /* Hide on Breakpoint */
 /* Using common breakpoints, adjust as per theme's actual breakpoints */
-@media (max-width: var(--kingly-breakpoint-mobile-max)) {
+@media (max-width: var(--kl-breakpoint-mobile-max)) {
   /* Mobile */
-  .kingly-layout-hide-on-mobile {
+  .kl-hide-on-mobile {
     display: none !important;
   }
 }
 
-@media (min-width: var(--kingly-breakpoint-tablet-min)) and (max-width: var(--kingly-breakpoint-tablet-max)) {
+@media (min-width: var(--kl-breakpoint-tablet-min)) and (max-width: var(--kl-breakpoint-tablet-max)) {
   /* Tablet */
-  .kingly-layout-hide-on-tablet {
+  .kl-hide-on-tablet {
     display: none !important;
   }
 }
 
-@media (min-width: var(--kingly-breakpoint-desktop-min)) {
+@media (min-width: var(--kl-breakpoint-desktop-min)) {
   /* Desktop */
-  .kingly-layout-hide-on-desktop {
+  .kl-hide-on-desktop {
     display: none !important;
   }
 }

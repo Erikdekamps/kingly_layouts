@@ -4,7 +4,7 @@
   */
 
 /* Base class for all animated elements. Defines the transition. */
-.kingly-animate {
+.kl-animate {
   /* Default transition properties, can be overridden by inline styles from PHP. */
   transition-property: opacity, transform, filter, box-shadow, font-size;
   transition-duration: 0.6s;
@@ -14,42 +14,42 @@
 /* --- Animation Types --- */
 
 /* Fade In Animation */
-.kingly-animate--fade-in {
+.kl-animate--fade-in {
   opacity: 0;
 }
-.kingly-animate--fade-in.is-visible {
+.kl-animate--fade-in.is-visible {
   opacity: 1;
 }
 
 /* Slide In Animation (Base) */
-.kingly-animate--slide-in {
+.kl-animate--slide-in {
   opacity: 0;
   /* Initial transform will be set by direction classes */
 }
-.kingly-animate--slide-in.is-visible {
+.kl-animate--slide-in.is-visible {
   opacity: 1;
   transform: translate(0, 0); /* Reset transform to origin */
 }
 
-/* --- Slide Directions (applied in conjunction with kingly-animate--slide-in) --- */
+/* --- Slide Directions (applied in conjunction with kl-animate--slide-in) --- */
 
 /* Slide In From Bottom */
-.kingly-animate--direction-up {
+.kl-animate--direction-up {
   transform: translateY(40px);
 }
 
 /* Slide In From Top */
-.kingly-animate--direction-down {
+.kl-animate--direction-down {
   transform: translateY(-40px);
 }
 
 /* Slide In From Right (moves left) */
-.kingly-animate--direction-right {
+.kl-animate--direction-right {
   transform: translateX(40px);
 }
 
 /* Slide In From Left (moves right) */
-.kingly-animate--direction-left {
+.kl-animate--direction-left {
   transform: translateX(-40px);
 }
 
@@ -59,7 +59,7 @@
 * This disables transitions and ensures elements are visible by default.
   */
 @media (prefers-reduced-motion: reduce) {
-  .kingly-animate {
+  .kl-animate {
     transition-property: none;
     transform: none !important;
     opacity: 1 !important;
