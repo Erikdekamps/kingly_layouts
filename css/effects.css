@@ -96,7 +96,6 @@
   filter: brightness(1.25);
 }
 
-/* New: Hover Font Size */
 /* We define variables for these font sizes, making them easily adjustable
    and allowing for more granular control if needed in the future. */
 :root {

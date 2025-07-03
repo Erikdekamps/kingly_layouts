@@ -49,7 +49,6 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    // Correctly get services from the passed-in $container object.
     return new static(
       $configuration,
       $plugin_id,
@@ -68,18 +67,8 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Ensure display option defaults are set before building the form.
     $this->ensureDisplayOptionDefaults();
 
-    $sizing_options = $this->getSizingOptions();
-    $default_sizing = $this->configuration['sizing_option'] ?? key($sizing_options);
-
-    $form['sizing_option'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Column sizing'),
-      '#options' => $sizing_options,
-      '#default_value' => $default_sizing,
-      '#description' => $this->t('Select the desired column width distribution.'),
-      '#weight' => -10,
-      '#access' => $this->currentUser->hasPermission('administer kingly layouts sizing'),
-    ];
+    // Store layout instance for services that need it.
+    $form_state->set('layout_instance', $this);
 
     // Delegate form building to each collected service.
     foreach ($this->displayOptionCollector->getAll() as $service) {
@@ -108,7 +97,11 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    */
   public function defaultConfiguration(): array {
     $configuration = parent::defaultConfiguration();
-    $configuration['sizing_option'] = 'default';
+
+    // Set default sizing option based on available options from the different
+    // layouts' getSizingOptions() methods.
+    $sizing_options = $this->getSizingOptions();
+    $configuration['sizing_option'] = key($sizing_options);
 
     return $configuration;
   }
@@ -116,14 +109,13 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   /**
    * Returns the available sizing options for this layout.
    */
-  abstract protected function getSizingOptions(): array;
+  abstract public function getSizingOptions(): array;
 
   /**
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::submitConfigurationForm($form, $form_state);
-    $this->configuration['sizing_option'] = $form_state->getValue('sizing_option');
 
     // Delegate form submission to each collected service.
     foreach ($this->displayOptionCollector->getAll() as $service) {
@@ -136,25 +128,22 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
    */
   public function build(array $regions): array {
     $build = parent::build($regions);
-    $build['#attributes']['class'] = $build['#attributes']['class'] ?? [];
-    $build['#attributes']['style'] = $build['#attributes']['style'] ?? [];
 
-    if (!empty($this->configuration['sizing_option']) && $this->configuration['sizing_option'] !== 'default') {
-      $layout_id = $this->getPluginDefinition()->id();
-      $build['#attributes']['class'][] = 'layout--' . $layout_id . '--' . $this->configuration['sizing_option'];
-    }
+    // Initialize attributes once.
+    $build['#attributes'] = array_merge($build['#attributes'] ?? [], [
+      'class' => $build['#attributes']['class'] ?? [],
+    ]);
+
+    // Store layout reference for services that need it.
+    $build['#layout'] = $this;
 
     // Delegate build processing to each collected service.
     foreach ($this->displayOptionCollector->getAll() as $service) {
       $service->processBuild($build, $this->configuration);
     }
 
-    if (empty($build['#attributes']['style'])) {
-      unset($build['#attributes']['style']);
-    }
-    if (empty($build['#attributes']['class'])) {
-      unset($build['#attributes']['class']);
-    }
+    // Clean up empty attributes.
+    $build['#attributes'] = array_filter($build['#attributes']);
 
     return $build;
   }

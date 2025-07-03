@@ -1,63 +1,77 @@
 services:
   kingly_layouts.display_option_collector:
     class: Drupal\kingly_layouts\Service\DisplayOptionCollector
-    arguments: [!tagged_iterator kingly_layouts.display_option]
-  kingly_layouts.hook.form_alter:
-    class: Drupal\kingly_layouts\Hook\FormAlterHooks
-    tags:
-      - { name: hook_subscriber }
-  kingly_layouts.container_type:
-    class: Drupal\kingly_layouts\Service\ContainerTypeService
-    arguments: ['@current_user', '@string_translation']
-    tags:
-      - { name: kingly_layouts.display_option, priority: 100 }
-  kingly_layouts.spacing:
-    class: Drupal\kingly_layouts\Service\SpacingService
-    arguments: ['@current_user', '@string_translation']
-    tags:
-      - { name: kingly_layouts.display_option, priority: 90 }
-  kingly_layouts.color:
-    class: Drupal\kingly_layouts\Service\ColorService
-    arguments: ['@current_user', '@string_translation', '@entity_type.manager', '@cache.default']
-    tags:
-      - { name: kingly_layouts.display_option, priority: 80 }
-  kingly_layouts.typography:
-    class: Drupal\kingly_layouts\Service\TypographyService
-    arguments: ['@current_user', '@string_translation']
-    tags:
-      - { name: kingly_layouts.display_option, priority: 75 }
-  kingly_layouts.border:
-    class: Drupal\kingly_layouts\Service\BorderService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.color']
-    tags:
-      - { name: kingly_layouts.display_option, priority: 70 }
-  kingly_layouts.alignment:
+    arguments:
+      - !tagged_iterator kingly_layouts.display_option
+
+  kingly_layouts.alignment_service:
     class: Drupal\kingly_layouts\Service\AlignmentService
-    arguments: ['@current_user', '@string_translation']
+    arguments: [ '@current_user', '@string_translation' ]
     tags:
-      - { name: kingly_layouts.display_option, priority: 60 }
-  kingly_layouts.animation:
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.sizing_service:
+    class: Drupal\kingly_layouts\Service\SizingService
+    arguments: [ '@current_user', '@string_translation' ]
+    tags:
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.animation_service:
     class: Drupal\kingly_layouts\Service\AnimationService
-    arguments: ['@current_user', '@string_translation']
+    arguments: [ '@current_user', '@string_translation' ]
     tags:
-      - { name: kingly_layouts.display_option, priority: 50 }
-  kingly_layouts.background:
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.color_service:
+    class: Drupal\kingly_layouts\Service\ColorService
+    arguments: [ '@current_user', '@string_translation', '@entity_type.manager', '@cache.default' ]
+    tags:
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.background_service:
     class: Drupal\kingly_layouts\Service\BackgroundService
-    arguments: ['@current_user', '@string_translation', '@kingly_layouts.color']
+    arguments: [ '@current_user', '@string_translation', '@kingly_layouts.color_service' ]
     tags:
-      - { name: kingly_layouts.display_option, priority: 40 }
-  kingly_layouts.shadows_effects:
-    class: Drupal\kingly_layouts\Service\ShadowsEffectsService
-    arguments: ['@current_user', '@string_translation']
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.border_service:
+    class: Drupal\kingly_layouts\Service\BorderService
+    arguments: [ '@current_user', '@string_translation', '@kingly_layouts.color_service' ]
     tags:
-      - { name: kingly_layouts.display_option, priority: 30 }
-  kingly_layouts.responsiveness:
-    class: Drupal\kingly_layouts\Service\ResponsivenessService
-    arguments: ['@current_user', '@string_translation']
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.container_type_service:
+    class: Drupal\kingly_layouts\Service\ContainerTypeService
+    arguments: [ '@current_user', '@string_translation' ]
     tags:
-      - { name: kingly_layouts.display_option, priority: 20 }
-  kingly_layouts.custom_attributes:
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.custom_attributes_service:
     class: Drupal\kingly_layouts\Service\CustomAttributesService
-    arguments: ['@current_user', '@string_translation']
+    arguments: [ '@current_user', '@string_translation' ]
     tags:
-      - { name: kingly_layouts.display_option, priority: 10 }
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.responsiveness_service:
+    class: Drupal\kingly_layouts\Service\ResponsivenessService
+    arguments: [ '@current_user', '@string_translation' ]
+    tags:
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.shadows_effects_service:
+    class: Drupal\kingly_layouts\Service\ShadowsEffectsService
+    arguments: [ '@current_user', '@string_translation' ]
+    tags:
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.spacing_service:
+    class: Drupal\kingly_layouts\Service\SpacingService
+    arguments: [ '@current_user', '@string_translation' ]
+    tags:
+      - { name: kingly_layouts.display_option }
+
+  kingly_layouts.typography_service:
+    class: Drupal\kingly_layouts\Service\TypographyService
+    arguments: [ '@current_user', '@string_translation' ]
+    tags:
+      - { name: kingly_layouts.display_option }

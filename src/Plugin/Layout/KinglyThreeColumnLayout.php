@@ -32,7 +32,7 @@ class KinglyThreeColumnLayout extends KinglyLayoutBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSizingOptions(): array {
+  public function getSizingOptions(): array {
     return [
       '33-34-33' => $this->t('33/34/33'),
       '25-50-25' => $this->t('25/50/25'),

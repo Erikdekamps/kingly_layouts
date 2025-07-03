@@ -35,7 +35,7 @@ class KinglyFourColumnLayout extends KinglyLayoutBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSizingOptions(): array {
+  public function getSizingOptions(): array {
     return [
       '25-25-25-25' => $this->t('25/25/25/25'),
       '40-20-20-20' => $this->t('40/20/20/20'),
