@@ -7,18 +7,7 @@ use Drupal\Core\Layout\LayoutDefault;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\kingly_layouts\Service\AlignmentService;
-use Drupal\kingly_layouts\Service\AnimationService;
-use Drupal\kingly_layouts\Service\BackgroundService;
-use Drupal\kingly_layouts\Service\BorderService;
-use Drupal\kingly_layouts\Service\ColorService;
-use Drupal\kingly_layouts\Service\ContainerTypeService;
-use Drupal\kingly_layouts\Service\CustomAttributesService;
 use Drupal\kingly_layouts\Service\DisplayOptionCollector;
-use Drupal\kingly_layouts\Service\ResponsivenessService;
-use Drupal\kingly_layouts\Service\ShadowsEffectsService;
-use Drupal\kingly_layouts\Service\SpacingService;
-use Drupal\kingly_layouts\Service\TypographyService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -76,6 +65,9 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form = parent::buildConfigurationForm($form, $form_state);
 
+    // Ensure display option defaults are set before building the form.
+    $this->ensureDisplayOptionDefaults();
+
     $sizing_options = $this->getSizingOptions();
     $default_sizing = $this->configuration['sizing_option'] ?? key($sizing_options);
 
@@ -98,15 +90,16 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
   }
 
   /**
-   * {@inheritdoc}
+   * Ensures display option defaults are loaded into configuration.
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
-    parent::submitConfigurationForm($form, $form_state);
-    $this->configuration['sizing_option'] = $form_state->getValue('sizing_option');
-
-    // Delegate form submission to each collected service.
+  protected function ensureDisplayOptionDefaults(): void {
     foreach ($this->displayOptionCollector->getAll() as $service) {
-      $service->submitConfigurationForm($form, $form_state, $this->configuration);
+      $defaults = $service->defaultConfiguration();
+      foreach ($defaults as $key => $value) {
+        if (!isset($this->configuration[$key])) {
+          $this->configuration[$key] = $value;
+        }
+      }
     }
   }
 
@@ -117,28 +110,25 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $configuration = parent::defaultConfiguration();
     $configuration['sizing_option'] = 'default';
 
-    // This is the one place where we need to know the service class names.
-    // This is the necessary compromise to satisfy the plugin lifecycle, as
-    // this method is called before services are injected.
-    $service_classes = [
-      ContainerTypeService::class,
-      SpacingService::class,
-      ColorService::class,
-      TypographyService::class,
-      BorderService::class,
-      AlignmentService::class,
-      AnimationService::class,
-      BackgroundService::class,
-      ShadowsEffectsService::class,
-      ResponsivenessService::class,
-      CustomAttributesService::class,
-    ];
-
-    foreach ($service_classes as $class) {
-      $configuration = array_merge($configuration, $class::defaultConfiguration());
-    }
-
     return $configuration;
+  }
+
+  /**
+   * Returns the available sizing options for this layout.
+   */
+  abstract protected function getSizingOptions(): array;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
+    parent::submitConfigurationForm($form, $form_state);
+    $this->configuration['sizing_option'] = $form_state->getValue('sizing_option');
+
+    // Delegate form submission to each collected service.
+    foreach ($this->displayOptionCollector->getAll() as $service) {
+      $service->submitConfigurationForm($form, $form_state, $this->configuration);
+    }
   }
 
   /**
@@ -168,10 +158,5 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
 
     return $build;
   }
-
-  /**
-   * Returns the available sizing options for this layout.
-   */
-  abstract protected function getSizingOptions(): array;
 
 }
