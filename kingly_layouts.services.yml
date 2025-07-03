@@ -24,7 +24,7 @@ services:
 
   kingly_layouts.color_service:
     class: Drupal\kingly_layouts\Service\ColorService
-    arguments: [ '@current_user', '@string_translation', '@entity_type.manager', '@cache.default' ]
+    arguments: [ '@current_user', '@string_translation' ]
     tags:
       - { name: kingly_layouts.display_option }
 
