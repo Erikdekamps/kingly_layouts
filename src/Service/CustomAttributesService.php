@@ -36,21 +36,29 @@ class CustomAttributesService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'custom_attributes';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['custom_attributes'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Custom Attributes'),
       '#open' => FALSE,
       '#weight' => 100,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts custom attributes'),
     ];
-    $form['custom_attributes']['custom_css_id'] = [
+    $form[$form_key]['custom_css_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Custom ID'),
       '#default_value' => $configuration['custom_css_id'],
       '#description' => $this->t('Enter a unique ID for this layout section (e.g., `my-unique-section`). Must be unique on the page and contain only letters, numbers, hyphens, and underscores.'),
     ];
-    $form['custom_attributes']['custom_css_class'] = [
+    $form[$form_key]['custom_css_class'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Custom CSS Classes'),
       '#default_value' => $configuration['custom_css_class'],
@@ -64,7 +72,8 @@ class CustomAttributesService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $values = $form_state->getValue('custom_attributes', []);
+    $form_key = $this->getFormKey();
+    $values = $form_state->getValue($form_key, []);
     $configuration['custom_css_id'] = trim($values['custom_css_id'] ?? '');
     $configuration['custom_css_class'] = trim($values['custom_css_class'] ?? '');
   }

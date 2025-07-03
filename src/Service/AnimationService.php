@@ -38,15 +38,23 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'animation';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['animation'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Animation'),
       '#open' => FALSE,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts animation'),
     ];
 
-    $form['animation']['animation_type'] = [
+    $form[$form_key]['animation_type'] = [
       '#type' => 'select',
       '#title' => $this->t('Animation Type'),
       '#options' => $this->getAnimationOptions('type'),
@@ -54,7 +62,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Select an animation to apply when the layout scrolls into view. This defines the start and end states.'),
     ];
 
-    $form['animation']['slide_direction'] = [
+    $form[$form_key]['slide_direction'] = [
       '#type' => 'select',
       '#title' => $this->t('Slide Direction'),
       '#options' => $this->getAnimationOptions('slide_direction'),
@@ -62,12 +70,12 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Select the direction for slide-in animations.'),
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[animation][animation_type]"]' => ['value' => 'slide-in'],
+          ':input[name="layout_settings[' . $form_key . '][animation_type]"]' => ['value' => 'slide-in'],
         ],
       ],
     ];
 
-    $form['animation']['transition_property'] = [
+    $form[$form_key]['transition_property'] = [
       '#type' => 'select',
       '#title' => $this->t('Transition Property'),
       '#options' => $this->getAnimationOptions('transition_property'),
@@ -75,12 +83,12 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('The CSS property that the transition will animate.'),
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[animation][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
+          ':input[name="layout_settings[' . $form_key . '][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
         ],
       ],
     ];
 
-    $form['animation']['transition_duration'] = [
+    $form[$form_key]['transition_duration'] = [
       '#type' => 'select',
       '#title' => $this->t('Transition Duration'),
       '#options' => $this->getAnimationOptions('transition_duration'),
@@ -88,12 +96,12 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('How long the animation takes to complete.'),
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[animation][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
+          ':input[name="layout_settings[' . $form_key . '][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
         ],
       ],
     ];
 
-    $form['animation']['transition_timing_function'] = [
+    $form[$form_key]['transition_timing_function'] = [
       '#type' => 'select',
       '#title' => $this->t('Transition Speed Curve'),
       '#options' => $this->getAnimationOptions('transition_timing_function'),
@@ -101,12 +109,12 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('The speed curve of the animation.'),
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[animation][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
+          ':input[name="layout_settings[' . $form_key . '][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
         ],
       ],
     ];
 
-    $form['animation']['transition_delay'] = [
+    $form[$form_key]['transition_delay'] = [
       '#type' => 'select',
       '#title' => $this->t('Transition Delay'),
       '#options' => $this->getAnimationOptions('transition_delay'),
@@ -114,7 +122,7 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('The delay before the animation starts.'),
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[animation][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
+          ':input[name="layout_settings[' . $form_key . '][animation_type]"]' => ['!value' => self::NONE_OPTION_KEY],
         ],
       ],
     ];
@@ -126,7 +134,8 @@ class AnimationService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $values = $form_state->getValue('animation', []);
+    $form_key = $this->getFormKey();
+    $values = $form_state->getValue($form_key, []);
     foreach ([
       'animation_type',
       'slide_direction',

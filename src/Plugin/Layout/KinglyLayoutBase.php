@@ -70,8 +70,19 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Store layout instance for services that need it.
     $form_state->set('layout_instance', $this);
 
-    // Delegate form building to each collected service.
+    // Collect services and their form keys to be sorted.
+    $sorted_services = [];
     foreach ($this->displayOptionCollector->getAll() as $service) {
+      // Use the form key provided by the service for sorting.
+      $sorted_services[$service->getFormKey()] = $service;
+    }
+
+    // Sort the services alphabetically by their form key.
+    ksort($sorted_services);
+
+    // Delegate form building to each service in the determined order.
+    // This ensures the form fields appear in a consistent, alphabetical order.
+    foreach ($sorted_services as $service) {
       $form = $service->buildConfigurationForm($form, $form_state, $this->configuration);
     }
 
@@ -118,6 +129,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     parent::submitConfigurationForm($form, $form_state);
 
     // Delegate form submission to each collected service.
+    // The order of submission processing does not matter.
     foreach ($this->displayOptionCollector->getAll() as $service) {
       $service->submitConfigurationForm($form, $form_state, $this->configuration);
     }
@@ -138,6 +150,7 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     $build['#layout'] = $this;
 
     // Delegate build processing to each collected service.
+    // The order of build processing does not matter.
     foreach ($this->displayOptionCollector->getAll() as $service) {
       $service->processBuild($build, $this->configuration);
     }

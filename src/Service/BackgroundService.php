@@ -55,8 +55,16 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'background';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['background'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Background'),
       '#open' => FALSE,
@@ -64,7 +72,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     ];
 
     // --- Main Type Selector ---
-    $form['background']['background_type'] = [
+    $form[$form_key]['background_type'] = [
       '#type' => 'radios',
       '#title' => $this->t('Background Type'),
       '#options' => $this->getBackgroundOptions('type'),
@@ -73,18 +81,18 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     ];
 
     // Consolidated background_media_min_height field.
-    $form['background']['background_media_min_height'] = [
+    $form[$form_key]['background_media_min_height'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Minimum Height'),
       '#default_value' => $configuration['background_media_min_height'],
       '#description' => $this->t('Set a minimum height for the section. Include the unit (e.g., 400px, 50vh). Leave blank for default height.'),
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'image']],
+          [':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'image']],
           'or',
-          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'video']],
+          [':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'video']],
           'or',
-          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'gradient']],
+          [':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'gradient']],
         ],
         'disabled' => [
           ':input[name="layout_settings[container_type]"]' => ['value' => 'hero'],
@@ -95,17 +103,17 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     ];
 
     // --- Color Settings ---
-    $form['background']['color_settings'] = [
+    $form[$form_key]['color_settings'] = [
       '#type' => 'details',
       '#title' => $this->t('Color Options'),
       '#open' => TRUE,
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background][background_type]"]' => ['value' => 'color'],
+          ':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'color'],
         ],
       ],
     ];
-    $form['background']['color_settings']['background_color'] = [
+    $form[$form_key]['color_settings']['background_color'] = [
       '#type' => 'color',
       '#title' => $this->t('Background Color'),
       '#default_value' => $configuration['background_color'],
@@ -117,7 +125,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       // Add server-side validation for the hex color format.
       '#element_validate' => [[$this, 'validateColorHex']],
     ];
-    $form['background']['color_settings']['background_opacity'] = [
+    $form[$form_key]['color_settings']['background_opacity'] = [
       '#type' => 'select',
       '#title' => $this->t('Background Opacity'),
       '#options' => $this->getBackgroundOptions('opacity'),
@@ -125,27 +133,27 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Set the opacity for the background color. This requires a background color to be selected.'),
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[background][color_settings][background_color]"]' => ['!value' => '']],
+          [':input[name="layout_settings[' . $form_key . '][color_settings][background_color]"]' => ['!value' => '']],
         ],
       ],
     ];
 
     // --- Overlay Settings (Common for Image, Video, Gradient) ---
-    $form['background']['overlay_settings'] = [
+    $form[$form_key]['overlay_settings'] = [
       '#type' => 'details',
       '#title' => $this->t('Background Overlay'),
       '#open' => TRUE,
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'image']],
+          [':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'image']],
           'or',
-          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'video']],
+          [':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'video']],
           'or',
-          [':input[name="layout_settings[background][background_type]"]' => ['value' => 'gradient']],
+          [':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'gradient']],
         ],
       ],
     ];
-    $form['background']['overlay_settings']['background_overlay_color'] = [
+    $form[$form_key]['overlay_settings']['background_overlay_color'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Overlay Color'),
       '#default_value' => $configuration['background_overlay_color'],
@@ -157,7 +165,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       // Add server-side validation for the hex color format.
       '#element_validate' => [[$this, 'validateColorHex']],
     ];
-    $form['background']['overlay_settings']['background_overlay_opacity'] = [
+    $form[$form_key]['overlay_settings']['background_overlay_opacity'] = [
       '#type' => 'select',
       '#title' => $this->t('Overlay Opacity'),
       '#options' => $this->getBackgroundOptions('overlay_opacity'),
@@ -165,50 +173,50 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Set the opacity for the overlay color. This requires an overlay color to be selected.'),
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[background][overlay_settings][background_overlay_color]"]' => ['!value' => '']],
+          [':input[name="layout_settings[' . $form_key . '][overlay_settings][background_overlay_color]"]' => ['!value' => '']],
         ],
       ],
     ];
 
     // --- Image Settings ---
-    $form['background']['image_settings'] = [
+    $form[$form_key]['image_settings'] = [
       '#type' => 'details',
       '#title' => $this->t('Image Options'),
       '#open' => TRUE,
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background][background_type]"]' => ['value' => 'image'],
+          ':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'image'],
         ],
       ],
     ];
-    $form['background']['image_settings']['background_media_url'] = [
+    $form[$form_key]['image_settings']['background_media_url'] = [
       '#type' => 'url',
       '#title' => $this->t('Image URL'),
       '#default_value' => $configuration['background_media_url'],
       '#description' => $this->t('Enter the full, absolute URL for the background image.'),
     ];
-    $form['background']['image_settings']['background_image_position'] = [
+    $form[$form_key]['image_settings']['background_image_position'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Position'),
       '#options' => $this->getBackgroundOptions('image_position'),
       '#default_value' => $configuration['background_image_position'],
       '#description' => $this->t("Select the starting position of the background image. This is most noticeable when the image is not set to 'cover' or 'contain'."),
     ];
-    $form['background']['image_settings']['background_image_repeat'] = [
+    $form[$form_key]['image_settings']['background_image_repeat'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Repeat'),
       '#options' => $this->getBackgroundOptions('image_repeat'),
       '#default_value' => $configuration['background_image_repeat'],
       '#description' => $this->t('Define if and how the background image should repeat.'),
     ];
-    $form['background']['image_settings']['background_image_size'] = [
+    $form[$form_key]['image_settings']['background_image_size'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Size'),
       '#options' => $this->getBackgroundOptions('image_size'),
       '#default_value' => $configuration['background_image_size'],
       '#description' => $this->t("'Cover' will fill the entire area, potentially cropping the image. 'Contain' will show the entire image, potentially leaving empty space."),
     ];
-    $form['background']['image_settings']['background_image_attachment'] = [
+    $form[$form_key]['image_settings']['background_image_attachment'] = [
       '#type' => 'select',
       '#title' => $this->t('Image Attachment'),
       '#options' => $this->getBackgroundOptions('image_attachment'),
@@ -217,38 +225,38 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     ];
 
     // --- Video Settings ---
-    $form['background']['video_settings'] = [
+    $form[$form_key]['video_settings'] = [
       '#type' => 'details',
       '#title' => $this->t('Video Options'),
       '#open' => TRUE,
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background][background_type]"]' => ['value' => 'video'],
+          ':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'video'],
         ],
       ],
     ];
-    $form['background']['video_settings']['background_media_url'] = [
+    $form[$form_key]['video_settings']['background_media_url'] = [
       '#type' => 'url',
       '#title' => $this->t('Video URL'),
       '#default_value' => $configuration['background_media_url'],
       '#description' => $this->t('Enter the full, absolute URL for the video file (e.g., https://example.com/video.mp4). YouTube or Vimeo URLs are not supported.'),
     ];
-    $form['background']['video_settings']['background_video_loop'] = [
+    $form[$form_key]['video_settings']['background_video_loop'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Loop video'),
       '#default_value' => $configuration['background_video_loop'],
     ];
-    $form['background']['video_settings']['background_video_autoplay'] = [
+    $form[$form_key]['video_settings']['background_video_autoplay'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Autoplay video'),
       '#default_value' => $configuration['background_video_autoplay'],
     ];
-    $form['background']['video_settings']['background_video_muted'] = [
+    $form[$form_key]['video_settings']['background_video_muted'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Mute video'),
       '#default_value' => $configuration['background_video_muted'],
     ];
-    $form['background']['video_settings']['background_video_preload'] = [
+    $form[$form_key]['video_settings']['background_video_preload'] = [
       '#type' => 'select',
       '#title' => $this->t('Preload video'),
       '#options' => [
@@ -260,23 +268,23 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     ];
 
     // --- Gradient Settings ---
-    $form['background']['gradient_settings'] = [
+    $form[$form_key]['gradient_settings'] = [
       '#type' => 'details',
       '#title' => $this->t('Gradient Options'),
       '#open' => TRUE,
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background][background_type]"]' => ['value' => 'gradient'],
+          ':input[name="layout_settings[' . $form_key . '][background_type]"]' => ['value' => 'gradient'],
         ],
       ],
     ];
-    $form['background']['gradient_settings']['background_gradient_type'] = [
+    $form[$form_key]['gradient_settings']['background_gradient_type'] = [
       '#type' => 'radios',
       '#title' => $this->t('Gradient Type'),
       '#options' => $this->getBackgroundOptions('gradient_type'),
       '#default_value' => $configuration['background_gradient_type'],
     ];
-    $form['background']['gradient_settings']['background_gradient_start_color'] = [
+    $form[$form_key]['gradient_settings']['background_gradient_start_color'] = [
       '#type' => 'color',
       '#title' => $this->t('Start Color'),
       '#default_value' => $configuration['background_gradient_start_color'],
@@ -288,7 +296,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       // Add server-side validation for the hex color format.
       '#element_validate' => [[$this, 'validateColorHex']],
     ];
-    $form['background']['gradient_settings']['background_gradient_end_color'] = [
+    $form[$form_key]['gradient_settings']['background_gradient_end_color'] = [
       '#type' => 'color',
       '#title' => $this->t('End Color'),
       '#default_value' => $configuration['background_gradient_end_color'],
@@ -300,35 +308,35 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       // Add server-side validation for the hex color format.
       '#element_validate' => [[$this, 'validateColorHex']],
     ];
-    $form['background']['gradient_settings']['linear_gradient_settings'] = [
+    $form[$form_key]['gradient_settings']['linear_gradient_settings'] = [
       '#type' => 'container',
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background][gradient_settings][background_gradient_type]"]' => ['value' => 'linear'],
+          ':input[name="layout_settings[' . $form_key . '][gradient_settings][background_gradient_type]"]' => ['value' => 'linear'],
         ],
       ],
     ];
-    $form['background']['gradient_settings']['linear_gradient_settings']['background_gradient_linear_direction'] = [
+    $form[$form_key]['gradient_settings']['linear_gradient_settings']['background_gradient_linear_direction'] = [
       '#type' => 'select',
       '#title' => $this->t('Direction'),
       '#options' => $this->getBackgroundOptions('gradient_linear_direction'),
       '#default_value' => $configuration['background_gradient_linear_direction'],
     ];
-    $form['background']['gradient_settings']['radial_gradient_settings'] = [
+    $form[$form_key]['gradient_settings']['radial_gradient_settings'] = [
       '#type' => 'container',
       '#states' => [
         'visible' => [
-          ':input[name="layout_settings[background][gradient_settings][background_gradient_type]"]' => ['value' => 'radial'],
+          ':input[name="layout_settings[' . $form_key . '][gradient_settings][background_gradient_type]"]' => ['value' => 'radial'],
         ],
       ],
     ];
-    $form['background']['gradient_settings']['radial_gradient_settings']['background_gradient_radial_shape'] = [
+    $form[$form_key]['gradient_settings']['radial_gradient_settings']['background_gradient_radial_shape'] = [
       '#type' => 'select',
       '#title' => $this->t('Shape'),
       '#options' => $this->getBackgroundOptions('gradient_radial_shape'),
       '#default_value' => $configuration['background_gradient_radial_shape'],
     ];
-    $form['background']['gradient_settings']['radial_gradient_settings']['background_gradient_radial_position'] = [
+    $form[$form_key]['gradient_settings']['radial_gradient_settings']['background_gradient_radial_position'] = [
       '#type' => 'select',
       '#title' => $this->t('Position'),
       '#options' => $this->getBackgroundOptions('gradient_radial_position'),
@@ -343,7 +351,8 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
     $values = $form_state->getValues();
-    $background_values = $values['background'];
+    $form_key = $this->getFormKey();
+    $background_values = $values[$form_key];
     $configuration['background_type'] = $background_values['background_type'];
 
     // Consolidate shared fields based on background type.

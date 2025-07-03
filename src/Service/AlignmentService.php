@@ -38,15 +38,23 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'alignment';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['alignment'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Alignment'),
       '#open' => FALSE,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts alignment'),
     ];
 
-    $form['alignment']['vertical_alignment'] = [
+    $form[$form_key]['vertical_alignment'] = [
       '#type' => 'select',
       '#title' => $this->t('Vertical Alignment'),
       '#options' => $this->getAlignmentOptions('vertical'),
@@ -54,7 +62,7 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
       '#description' => $this->t('Align content vertically within the layout. This assumes the layout uses Flexbox or Grid. "Stretch" makes columns in the same row equal height.'),
     ];
 
-    $form['alignment']['horizontal_alignment'] = [
+    $form[$form_key]['horizontal_alignment'] = [
       '#type' => 'select',
       '#title' => $this->t('Horizontal Alignment'),
       '#options' => $this->getAlignmentOptions('horizontal'),
@@ -69,7 +77,8 @@ class AlignmentService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $alignment_values = $form_state->getValue('alignment', []);
+    $form_key = $this->getFormKey();
+    $alignment_values = $form_state->getValue($form_key, []);
     $defaults = self::defaultConfiguration();
     $configuration['vertical_alignment'] = $alignment_values['vertical_alignment'] ?? $defaults['vertical_alignment'];
     $configuration['horizontal_alignment'] = $alignment_values['horizontal_alignment'] ?? $defaults['horizontal_alignment'];

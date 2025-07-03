@@ -54,15 +54,23 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFormKey(): string {
+    return 'border';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
-    $form['border'] = [
+    $form_key = $this->getFormKey();
+    $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Border'),
       '#open' => FALSE,
       '#access' => $this->currentUser->hasPermission('administer kingly layouts border'),
     ];
 
-    $form['border']['border_color'] = [
+    $form[$form_key]['border_color'] = [
       '#type' => 'color',
       '#title' => $this->t('Border Color'),
       '#default_value' => $configuration['border_color'],
@@ -75,29 +83,29 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       '#element_validate' => [[$this, 'validateColorHex']],
     ];
 
-    $form['border']['border_width_option'] = [
+    $form[$form_key]['border_width_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Width'),
       '#options' => $this->getBorderOptions('width'),
       '#default_value' => $configuration['border_width_option'],
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[border][border_color]"]' => ['!value' => '']],
+          [':input[name="layout_settings[' . $form_key . '][border_color]"]' => ['!value' => '']],
         ],
       ],
     ];
-    $form['border']['border_style_option'] = [
+    $form[$form_key]['border_style_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Style'),
       '#options' => $this->getBorderOptions('style'),
       '#default_value' => $configuration['border_style_option'],
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[border][border_color]"]' => ['!value' => '']],
+          [':input[name="layout_settings[' . $form_key . '][border_color]"]' => ['!value' => '']],
         ],
       ],
     ];
-    $form['border']['border_radius_option'] = [
+    $form[$form_key]['border_radius_option'] = [
       '#type' => 'select',
       '#title' => $this->t('Border Radius'),
       '#options' => $this->getBorderOptions('radius'),
@@ -111,7 +119,8 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
-    $values = $form_state->getValue('border', []);
+    $form_key = $this->getFormKey();
+    $values = $form_state->getValue($form_key, []);
     // Store the color as a string.
     $configuration['border_color'] = $values['border_color'] ?? '';
     // Use the default if 'None' is explicitly selected for other options.
