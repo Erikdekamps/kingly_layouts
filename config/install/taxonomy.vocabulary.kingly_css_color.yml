@@ -1,8 +1,9 @@
 uuid: 9a1b8c2d-7e6f-4a5b-8d3c-9c0a1b2e3f4a
 langcode: en
 status: true
-dependencies: { }
+dependencies: {  }
 name: 'Kingly CSS Color'
 vid: kingly_css_color
 description: 'Provides a list of CSS colors to be used in Kingly layouts.'
 weight: 0
+new_revision: false

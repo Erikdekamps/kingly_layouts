@@ -5,6 +5,14 @@ dependencies:
   config:
     - field.field.taxonomy_term.kingly_css_color.field_kingly_css_color
     - taxonomy.vocabulary.kingly_css_color
+  module:
+    - field_layout
+    - layout_discovery
+third_party_settings:
+  field_layout:
+    id: layout_onecol
+    settings:
+      label: ''
 id: taxonomy_term.kingly_css_color.default
 targetEntityType: taxonomy_term
 bundle: kingly_css_color
@@ -17,7 +25,7 @@ content:
     settings:
       size: 10
       placeholder: '#RRGGBB'
-    third_party_settings: { }
+    third_party_settings: {  }
   name:
     type: string_textfield
     weight: 0
@@ -25,7 +33,14 @@ content:
     settings:
       size: 60
       placeholder: ''
-    third_party_settings: { }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 100
+    region: content
+    third_party_settings: {  }
 hidden:
   description: true
   path: true
