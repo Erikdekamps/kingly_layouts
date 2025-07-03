@@ -9,6 +9,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
 use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
+use Drupal\kingly_layouts\KinglyLayoutsValidationTrait;
 
 /**
  * Service to manage background options for Kingly Layouts.
@@ -20,6 +21,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
 
   use StringTranslationTrait;
   use KinglyLayoutsUtilityTrait;
+  use KinglyLayoutsValidationTrait;
 
   /**
    * The current user.
@@ -762,24 +764,6 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     }
 
     return [$r, $g, $b];
-  }
-
-  /**
-   * Validates a color hex code form element.
-   *
-   * @param array $element
-   *   The form element to validate.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public function validateColorHex(array &$element, FormStateInterface $form_state): void {
-    $value = $element['#value'];
-    // Check if a value is provided and if it matches the hex color pattern.
-    // The pattern ensures it starts with '#' and is followed by exactly 6 hex
-    // characters.
-    if (!empty($value) && !preg_match('/^#([a-fA-F0-9]{6})$/', $value)) {
-      $form_state->setError($element, $this->t('The color must be a valid 6-digit hex code starting with # (e.g., #RRGGBB).'));
-    }
   }
 
 }
