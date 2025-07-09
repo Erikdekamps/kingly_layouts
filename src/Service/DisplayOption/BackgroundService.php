@@ -116,13 +116,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $form[$form_key]['color_settings']['background_color'] = [
       '#type' => 'color',
       '#title' => $this->t('Background Color'),
-      '#default_value' => $configuration['background_color'],
-      '#description' => $this->t('Enter a hex code for the background color (e.g., #FFFFFF).'),
-      '#attributes' => [
-        'type' => 'color',
-      ],
-      '#pattern' => '#[0-9a-fA-F]{6}',
-      // Add server-side validation for the hex color format.
+      '#default_value' => $configuration['background_color'] ?: '#ffffff',
       '#element_validate' => [[$this, 'validateColorHex']],
     ];
     $form[$form_key]['color_settings']['background_opacity'] = [
@@ -130,12 +124,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       '#title' => $this->t('Background Opacity'),
       '#options' => $this->getBackgroundOptions('opacity'),
       '#default_value' => $configuration['background_opacity'],
-      '#description' => $this->t('Set the opacity for the background color. This requires a background color to be selected.'),
-      '#states' => [
-        'visible' => [
-          [':input[name="layout_settings[' . $form_key . '][color_settings][background_color]"]' => ['!value' => '']],
-        ],
-      ],
+      '#description' => $this->t('Set the opacity for the background color.'),
     ];
 
     // --- Overlay Settings (Common for Image, Video, Gradient) ---
@@ -153,27 +142,31 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
         ],
       ],
     ];
+    $form[$form_key]['overlay_settings']['background_overlay_enable'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add a color overlay'),
+      '#default_value' => !empty($configuration['background_overlay_color']),
+    ];
     $form[$form_key]['overlay_settings']['background_overlay_color'] = [
-      '#type' => 'textfield',
+      '#type' => 'color',
       '#title' => $this->t('Overlay Color'),
-      '#default_value' => $configuration['background_overlay_color'],
-      '#description' => $this->t('Enter a hex code for the overlay color (e.g., #FFFFFF). The overlay sits on top of the background media, but behind the content.'),
-      '#attributes' => [
-        'type' => 'color',
-      ],
-      '#pattern' => '#[0-9a-fA-F]{6}',
-      // Add server-side validation for the hex color format.
+      '#default_value' => $configuration['background_overlay_color'] ?: '#000000',
+      '#description' => $this->t('The overlay sits on top of the background media, but behind the content.'),
       '#element_validate' => [[$this, 'validateColorHex']],
+      '#states' => [
+        'visible' => [
+          ':input[name="layout_settings[' . $form_key . '][overlay_settings][background_overlay_enable]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
     $form[$form_key]['overlay_settings']['background_overlay_opacity'] = [
       '#type' => 'select',
       '#title' => $this->t('Overlay Opacity'),
       '#options' => $this->getBackgroundOptions('overlay_opacity'),
       '#default_value' => $configuration['background_overlay_opacity'],
-      '#description' => $this->t('Set the opacity for the overlay color. This requires an overlay color to be selected.'),
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[' . $form_key . '][overlay_settings][background_overlay_color]"]' => ['!value' => '']],
+          ':input[name="layout_settings[' . $form_key . '][overlay_settings][background_overlay_enable]"]' => ['checked' => TRUE],
         ],
       ],
     ];
@@ -287,25 +280,13 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $form[$form_key]['gradient_settings']['background_gradient_start_color'] = [
       '#type' => 'color',
       '#title' => $this->t('Start Color'),
-      '#default_value' => $configuration['background_gradient_start_color'],
-      '#description' => $this->t('Enter a hex code for the start color (e.g., #FFFFFF).'),
-      '#attributes' => [
-        'type' => 'color',
-      ],
-      '#pattern' => '#[0-9a-fA-F]{6}',
-      // Add server-side validation for the hex color format.
+      '#default_value' => $configuration['background_gradient_start_color'] ?: '#eeeeee',
       '#element_validate' => [[$this, 'validateColorHex']],
     ];
     $form[$form_key]['gradient_settings']['background_gradient_end_color'] = [
       '#type' => 'color',
       '#title' => $this->t('End Color'),
-      '#default_value' => $configuration['background_gradient_end_color'],
-      '#description' => $this->t('Enter a hex code for the end color (e.g., #FFFFFF).'),
-      '#attributes' => [
-        'type' => 'color',
-      ],
-      '#pattern' => '#[0-9a-fA-F]{6}',
-      // Add server-side validation for the hex color format.
+      '#default_value' => $configuration['background_gradient_end_color'] ?: '#ffffff',
       '#element_validate' => [[$this, 'validateColorHex']],
     ];
     $form[$form_key]['gradient_settings']['linear_gradient_settings'] = [
@@ -408,8 +389,14 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $configuration['background_gradient_radial_position'] = $background_values['gradient_settings']['radial_gradient_settings']['background_gradient_radial_position'] ?? 'center';
 
     // Overlay settings.
-    $configuration['background_overlay_color'] = $background_values['overlay_settings']['background_overlay_color'] ?? '';
-    $configuration['background_overlay_opacity'] = $background_values['overlay_settings']['background_overlay_opacity'] ?? self::NONE_OPTION_KEY;
+    if (!empty($background_values['overlay_settings']['background_overlay_enable'])) {
+      $configuration['background_overlay_color'] = $background_values['overlay_settings']['background_overlay_color'] ?? '';
+      $configuration['background_overlay_opacity'] = $background_values['overlay_settings']['background_overlay_opacity'] ?? self::NONE_OPTION_KEY;
+    }
+    else {
+      $configuration['background_overlay_color'] = '';
+      $configuration['background_overlay_opacity'] = self::NONE_OPTION_KEY;
+    }
   }
 
   /**
@@ -417,6 +404,10 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    */
   public function processBuild(array &$build, array $configuration): void {
     $background_type = $configuration['background_type'];
+    if ($background_type === 'none') {
+      return;
+    }
+
     $has_background = FALSE;
 
     // Apply minimum height if configured.
@@ -450,8 +441,8 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    */
   public static function defaultConfiguration(): array {
     return [
-      'background_type' => 'color',
-      'background_color' => '#FFFFFF',
+      'background_type' => 'none',
+      'background_color' => '',
       'background_opacity' => self::NONE_OPTION_KEY,
       'background_media_url' => '',
       'background_media_min_height' => '',
@@ -463,11 +454,11 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       'background_video_autoplay' => TRUE,
       'background_video_muted' => TRUE,
       'background_video_preload' => 'auto',
-      'background_overlay_color' => '#FFFFFF',
+      'background_overlay_color' => '',
       'background_overlay_opacity' => self::NONE_OPTION_KEY,
       'background_gradient_type' => 'linear',
-      'background_gradient_start_color' => '#FFFFFF',
-      'background_gradient_end_color' => '#FFFFFF',
+      'background_gradient_start_color' => '',
+      'background_gradient_end_color' => '',
       'background_gradient_linear_direction' => 'to bottom',
       'background_gradient_radial_shape' => 'ellipse',
       'background_gradient_radial_position' => 'center',
@@ -487,6 +478,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
     $none = [self::NONE_OPTION_KEY => $this->t('None')];
     $options = [
       'type' => [
+        'none' => $this->t('None'),
         'color' => $this->t('Color'),
         'image' => $this->t('Image'),
         'video' => $this->t('Video'),
@@ -724,7 +716,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    */
   private function applyBackgroundOverlay(array &$build, array $configuration, string $background_type): bool {
     $overlay_hex = $configuration['background_overlay_color'];
-    // Validate if the stored color is a valid hex code before applying.
+    // Validate that an overlay color is explicitly set.
     if (in_array($background_type, ['image', 'video', 'gradient']) &&
       !empty($overlay_hex) && preg_match('/^#([a-fA-F0-9]{6})$/', $overlay_hex)) {
       $overlay_opacity = $configuration['background_overlay_opacity'];

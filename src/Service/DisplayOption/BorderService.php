@@ -70,17 +70,23 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       '#access' => $this->currentUser->hasPermission('administer kingly layouts border'),
     ];
 
+    $form[$form_key]['border_color_enable'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Set a border color'),
+      '#description' => $this->t('Enable this to set a border. A border requires a color to be visible.'),
+      '#default_value' => !empty($configuration['border_color']),
+    ];
+
     $form[$form_key]['border_color'] = [
       '#type' => 'color',
       '#title' => $this->t('Border Color'),
-      '#default_value' => $configuration['border_color'],
-      '#description' => $this->t('Enter a hex code for the border color (e.g., #FFFFFF). Selecting a color will enable the border options below.'),
-      '#attributes' => [
-        'type' => 'color',
-      ],
-      '#pattern' => '#[0-9a-fA-F]{6}',
-      // Add server-side validation for the hex color format.
+      '#default_value' => $configuration['border_color'] ?: '#000000',
       '#element_validate' => [[$this, 'validateColorHex']],
+      '#states' => [
+        'visible' => [
+          ':input[name="layout_settings[' . $form_key . '][border_color_enable]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $form[$form_key]['border_width_option'] = [
@@ -90,7 +96,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       '#default_value' => $configuration['border_width_option'],
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[' . $form_key . '][border_color]"]' => ['!value' => '']],
+          ':input[name="layout_settings[' . $form_key . '][border_color_enable]"]' => ['checked' => TRUE],
         ],
       ],
     ];
@@ -101,7 +107,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       '#default_value' => $configuration['border_style_option'],
       '#states' => [
         'visible' => [
-          [':input[name="layout_settings[' . $form_key . '][border_color]"]' => ['!value' => '']],
+          ':input[name="layout_settings[' . $form_key . '][border_color_enable]"]' => ['checked' => TRUE],
         ],
       ],
     ];
@@ -121,11 +127,21 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
     $form_key = $this->getFormKey();
     $values = $form_state->getValue($form_key, []);
-    // Store the color as a string.
-    $configuration['border_color'] = $values['border_color'] ?? '';
-    // Use the default if 'None' is explicitly selected for other options.
-    $configuration['border_width_option'] = $values['border_width_option'] ?? self::NONE_OPTION_KEY;
-    $configuration['border_style_option'] = $values['border_style_option'] ?? self::NONE_OPTION_KEY;
+
+    if (!empty($values['border_color_enable'])) {
+      // Store the color as a string.
+      $configuration['border_color'] = $values['border_color'] ?? '';
+      $configuration['border_width_option'] = $values['border_width_option'] ?? self::NONE_OPTION_KEY;
+      $configuration['border_style_option'] = $values['border_style_option'] ?? self::NONE_OPTION_KEY;
+    }
+    else {
+      // If border is not enabled, clear the color and related properties.
+      $configuration['border_color'] = '';
+      $configuration['border_width_option'] = self::NONE_OPTION_KEY;
+      $configuration['border_style_option'] = self::NONE_OPTION_KEY;
+    }
+
+    // Border radius can be set independently.
     $configuration['border_radius_option'] = $values['border_radius_option'] ?? self::NONE_OPTION_KEY;
   }
 
@@ -153,7 +169,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
   public static function defaultConfiguration(): array {
     return [
       'border_radius_option' => self::NONE_OPTION_KEY,
-      'border_color' => '#FFFFFF',
+      'border_color' => '',
       'border_width_option' => self::NONE_OPTION_KEY,
       'border_style_option' => self::NONE_OPTION_KEY,
     ];
@@ -226,12 +242,11 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    */
   private function applyBorderProperties(array &$build, array $configuration): bool {
     $border_color_hex = $configuration['border_color'];
-    // Validate if the stored color is a valid hex code before applying.
+    // Validate that a color value is explicitly set.
     if (!empty($border_color_hex) && preg_match('/^#([a-fA-F0-9]{6})$/', $border_color_hex)) {
       $build['#attributes']['style'][] = 'border-color: ' . $border_color_hex . ';';
 
-      // Set default width and style if 'None' is selected for them, but color
-      // is present.
+      // Set default width and style if 'None' is selected, but color is set.
       $border_width = $configuration['border_width_option'] !== self::NONE_OPTION_KEY ? $configuration['border_width_option'] : 'sm';
       $border_style = $configuration['border_style_option'] !== self::NONE_OPTION_KEY ? $configuration['border_style_option'] : 'solid';
 
