@@ -140,10 +140,22 @@ abstract class KinglyLayoutBase extends LayoutDefault implements PluginFormInter
     // Store layout reference for services that need it.
     $build['#layout'] = $this;
 
-    // Delegate build processing to each collected service.
-    // The order of build processing does not matter.
+    // Collect all default configurations from the services.
+    $all_defaults = [];
     foreach ($this->displayOptionCollector->getAll() as $service) {
-      $service->processBuild($build, $this->configuration);
+      // array_merge is used here to combine defaults from all services.
+      $all_defaults = array_merge($all_defaults, $service::defaultConfiguration());
+    }
+
+    // Merge the instance's saved configuration over the complete set of
+    // defaults. This guarantees that every key expected by a service's
+    // processBuild() method will exist, which is crucial for programmatic
+    // rendering contexts like search indexing.
+    $final_configuration = array_merge($all_defaults, $this->configuration);
+
+    // Delegate build processing to each collected service.
+    foreach ($this->displayOptionCollector->getAll() as $service) {
+      $service->processBuild($build, $final_configuration);
     }
 
     // Clean up empty attributes.
