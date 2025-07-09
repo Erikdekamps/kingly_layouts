@@ -42,7 +42,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\ColorService $color_service
+   * @param \Drupal\kingly_layouts\Service\DisplayOption\ColorService $color_service
    *   The color service.
    */
   public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, ColorService $color_service) {
@@ -74,7 +74,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
       '#type' => 'color',
       '#title' => $this->t('Border Color'),
       '#default_value' => $configuration['border_color'],
-      '#description' => $this->t('Enter a hex code for the border color (e.g., #CCCCCC). Selecting a color will enable the border options below.'),
+      '#description' => $this->t('Enter a hex code for the border color (e.g., #FFFFFF). Selecting a color will enable the border options below.'),
       '#attributes' => [
         'type' => 'color',
       ],
@@ -153,7 +153,7 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
   public static function defaultConfiguration(): array {
     return [
       'border_radius_option' => self::NONE_OPTION_KEY,
-      'border_color' => '',
+      'border_color' => '#FFFFFF',
       'border_width_option' => self::NONE_OPTION_KEY,
       'border_style_option' => self::NONE_OPTION_KEY,
     ];
