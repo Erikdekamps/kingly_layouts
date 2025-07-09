@@ -49,7 +49,7 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
    */
   public static function defaultConfiguration(): array {
     return [
-      'foreground_color' => '',
+      'foreground_color' => '#FFFFFF',
     ];
   }
 
@@ -69,7 +69,7 @@ class ColorService implements KinglyLayoutsDisplayOptionInterface {
       '#type' => 'color',
       '#title' => $this->t('Foreground Color'),
       '#default_value' => $configuration['foreground_color'],
-      '#description' => $this->t('Select the text color for this section. Enter a hex code (e.g., #000000).'),
+      '#description' => $this->t('Select the text color for this section. Enter a hex code (e.g., #FFFFFF).'),
       '#attributes' => [
         'type' => 'color',
       ],

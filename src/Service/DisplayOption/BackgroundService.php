@@ -43,7 +43,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\ColorService $color_service
+   * @param \Drupal\kingly_layouts\Service\DisplayOption\ColorService $color_service
    *   The color service.
    */
   public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, ColorService $color_service) {
@@ -117,7 +117,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       '#type' => 'color',
       '#title' => $this->t('Background Color'),
       '#default_value' => $configuration['background_color'],
-      '#description' => $this->t('Enter a hex code for the background color (e.g., #F0F0F0).'),
+      '#description' => $this->t('Enter a hex code for the background color (e.g., #FFFFFF).'),
       '#attributes' => [
         'type' => 'color',
       ],
@@ -157,7 +157,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       '#type' => 'textfield',
       '#title' => $this->t('Overlay Color'),
       '#default_value' => $configuration['background_overlay_color'],
-      '#description' => $this->t('Enter a hex code for the overlay color (e.g., #000000). The overlay sits on top of the background media, but behind the content.'),
+      '#description' => $this->t('Enter a hex code for the overlay color (e.g., #FFFFFF). The overlay sits on top of the background media, but behind the content.'),
       '#attributes' => [
         'type' => 'color',
       ],
@@ -300,7 +300,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       '#type' => 'color',
       '#title' => $this->t('End Color'),
       '#default_value' => $configuration['background_gradient_end_color'],
-      '#description' => $this->t('Enter a hex code for the end color (e.g., #000000).'),
+      '#description' => $this->t('Enter a hex code for the end color (e.g., #FFFFFF).'),
       '#attributes' => [
         'type' => 'color',
       ],
@@ -451,7 +451,7 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
   public static function defaultConfiguration(): array {
     return [
       'background_type' => 'color',
-      'background_color' => '',
+      'background_color' => '#FFFFFF',
       'background_opacity' => self::NONE_OPTION_KEY,
       'background_media_url' => '',
       'background_media_min_height' => '',
@@ -463,11 +463,11 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
       'background_video_autoplay' => TRUE,
       'background_video_muted' => TRUE,
       'background_video_preload' => 'auto',
-      'background_overlay_color' => '',
+      'background_overlay_color' => '#FFFFFF',
       'background_overlay_opacity' => self::NONE_OPTION_KEY,
       'background_gradient_type' => 'linear',
-      'background_gradient_start_color' => '',
-      'background_gradient_end_color' => '',
+      'background_gradient_start_color' => '#FFFFFF',
+      'background_gradient_end_color' => '#FFFFFF',
       'background_gradient_linear_direction' => 'to bottom',
       'background_gradient_radial_shape' => 'ellipse',
       'background_gradient_radial_position' => 'center',
