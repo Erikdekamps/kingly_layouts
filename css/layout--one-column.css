@@ -21,6 +21,6 @@
 /*
   Note on .layout__region styles:
   No specific styling is needed for the region itself for layout purposes.
-  The parent grid container (.layout--kingly-onecol) controls the width
+  The parent grid container (.kl-one-column) controls the width
   and positioning of its direct children (the regions).
 */
