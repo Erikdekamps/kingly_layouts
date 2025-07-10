@@ -8,7 +8,7 @@
     On small screens (below 40em), grid items will naturally stack in a single column
     because no 'grid-template-columns' is defined for this breakpoint.
     Each direct child (.layout__region) will implicitly take up 100% width of its row.
-    The 'gap' property applied via utility classes (e.g., .kingly-layout-gap-md)
+    The 'gap' property applied via utility classes (e.g., .kl-gap-md)
     will correctly add vertical spacing between these stacked items.
   */
 }

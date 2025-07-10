@@ -7,7 +7,7 @@
   /*
     On small screens (below 40em), grid items will naturally stack in a single column
     because no 'grid-template-columns' is defined for this breakpoint.
-    The 'gap' property applied via utility classes (e.g., .kingly-layout-gap-md)
+    The 'gap' property applied via utility classes (e.g., .kl-gap-md)
     will correctly add vertical spacing between these stacked items.
   */
 }
