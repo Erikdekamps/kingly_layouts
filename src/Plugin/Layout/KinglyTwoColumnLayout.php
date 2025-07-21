@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 #[Layout(
   id: "kingly_twocol",
-  label: new TranslatableMarkup("Kingly: Two column"),
+  label: new TranslatableMarkup("Two column"),
   category: new TranslatableMarkup("Kingly"),
   template: "layout--kingly-twocol",
   library: "kingly_layouts/kingly_twocol",

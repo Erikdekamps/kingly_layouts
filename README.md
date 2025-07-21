@@ -55,7 +55,7 @@ interface. There are no module-level configuration pages.
 1. When managing the layout for a content type or a custom page, click **Add
    section**.
 2. In the right-hand sidebar, select one of the layouts prefixed with "Kingly" (
-   e.g., "Kingly: Two column").
+   e.g., "Two column").
 3. After adding the section, click **Configure section** on the section you just
    added.
 4. The sidebar will now display all the available Kingly Layouts options,

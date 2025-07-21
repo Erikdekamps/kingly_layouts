@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 #[Layout(
   id: "kingly_onecol",
-  label: new TranslatableMarkup("Kingly: One column"),
+  label: new TranslatableMarkup("One column"),
   category: new TranslatableMarkup("Kingly"),
   template: "kl-one-column",
   library: "kingly_layouts/kingly_onecol",
