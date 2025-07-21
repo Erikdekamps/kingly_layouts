@@ -1,5 +1,5 @@
 kingly_onecol:
-  label: 'Kingly: One column'
+  label: 'One column'
   category: 'Kingly'
   path: templates
   template: layout--kingly-onecol
@@ -13,7 +13,7 @@ kingly_onecol:
       label: Content
 
 kingly_twocol:
-  label: 'Kingly: Two column'
+  label: 'Two column'
   category: 'Kingly'
   path: templates
   template: layout--kingly-twocol
@@ -29,7 +29,7 @@ kingly_twocol:
       label: Second
 
 kingly_threecol:
-  label: 'Kingly: Three column'
+  label: 'Three column'
   category: 'Kingly'
   path: templates
   template: layout--kingly-threecol
@@ -47,7 +47,7 @@ kingly_threecol:
       label: Third
 
 kingly_fourcol:
-  label: 'Kingly: Four column'
+  label: 'Four column'
   category: 'Kingly'
   path: templates
   template: layout--kingly-fourcol
