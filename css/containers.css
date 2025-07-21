@@ -3,6 +3,10 @@
 * Provides container type styles for Kingly Layouts.
 */
 
+.kl {
+  display: grid;
+}
+
 /* --- Container Types --- */
 
 /*
