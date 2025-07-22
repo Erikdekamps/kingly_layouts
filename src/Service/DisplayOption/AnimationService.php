@@ -3,37 +3,11 @@
 namespace Drupal\kingly_layouts\Service\DisplayOption;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
-use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
 
 /**
  * Service to manage animation options for Kingly Layouts.
  */
-class AnimationService implements KinglyLayoutsDisplayOptionInterface {
-
-  use StringTranslationTrait;
-  use KinglyLayoutsUtilityTrait;
-
-  /**
-   * The current user.
-   */
-  protected AccountInterface $currentUser;
-
-  /**
-   * Constructs a new AnimationService object.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
-    $this->currentUser = $current_user;
-    $this->stringTranslation = $string_translation;
-  }
+class AnimationService extends DisplayOptionBase {
 
   /**
    * {@inheritdoc}
