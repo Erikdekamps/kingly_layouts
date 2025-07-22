@@ -3,37 +3,11 @@
 namespace Drupal\kingly_layouts\Service\DisplayOption;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
-use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
 
 /**
  * Service to manage shadow and effects options for Kingly Layouts.
  */
-class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
-
-  use StringTranslationTrait;
-  use KinglyLayoutsUtilityTrait;
-
-  /**
-   * The current user.
-   */
-  protected AccountInterface $currentUser;
-
-  /**
-   * Constructs a new ShadowsEffectsService object.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
-    $this->currentUser = $current_user;
-    $this->stringTranslation = $string_translation;
-  }
+class ShadowsEffectsService extends DisplayOptionBase {
 
   /**
    * {@inheritdoc}
@@ -273,11 +247,11 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
         'brightness-up' => $this->t('Brightness Up'),
       ],
       'hover_font_size' => $none + [
-        'size-90' => $this->t('Smaller (90%)'),
-        'size-95' => $this->t('Slightly Smaller (95%)'),
-        'size-105' => $this->t('Slightly Larger (105%)'),
-        'size-110' => $this->t('Larger (110%)'),
-        'size-125' => $this->t('Much Larger (125%)'),
+        '90' => $this->t('Smaller (90%)'),
+        '95' => $this->t('Slightly Smaller (95%)'),
+        '105' => $this->t('Slightly Larger (105%)'),
+        '110' => $this->t('Larger (110%)'),
+        '125' => $this->t('Much Larger (125%)'),
       ],
     ];
 

@@ -24,7 +24,7 @@ trait KinglyLayoutsUtilityTrait {
    * @param array $configuration
    *   The layout's current configuration.
    */
-  private function applyClassFromConfig(array &$build, string $class_prefix, string $config_key_or_value, array $configuration): void {
+  protected function applyClassFromConfig(array &$build, string $class_prefix, string $config_key_or_value, array $configuration): void {
     // Check if the provided string is a config key or a direct value.
     $value = $configuration[$config_key_or_value] ?? $config_key_or_value;
     if (!empty($value) && $value !== KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY) {
@@ -44,9 +44,9 @@ trait KinglyLayoutsUtilityTrait {
    * @param array $configuration
    *   The layout's current configuration.
    */
-  private function applyInlineStyleFromOption(array &$build, string $style_property, string $config_key, array $configuration): void {
+  protected function applyInlineStyleFromOption(array &$build, string $style_property, string $config_key, array $configuration): void {
     $value = $configuration[$config_key];
-    if ($value !== KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY) {
+    if (isset($value) && $value !== KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY && $value !== '') {
       $build['#attributes']['style'][] = $style_property . ': ' . $value . ';';
     }
   }

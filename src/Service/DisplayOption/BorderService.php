@@ -4,11 +4,7 @@ namespace Drupal\kingly_layouts\Service\DisplayOption;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
-use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
-use Drupal\kingly_layouts\KinglyLayoutsValidationTrait;
 
 /**
  * Service to manage border options for Kingly Layouts.
@@ -16,22 +12,12 @@ use Drupal\kingly_layouts\KinglyLayoutsValidationTrait;
  * This service now uses a direct color input field instead of a taxonomy term
  * for border color.
  */
-class BorderService implements KinglyLayoutsDisplayOptionInterface {
-
-  use StringTranslationTrait;
-  use KinglyLayoutsUtilityTrait;
-  use KinglyLayoutsValidationTrait;
-
-  /**
-   * The current user.
-   */
-  protected AccountInterface $currentUser;
+class BorderService extends DisplayOptionBase {
 
   /**
    * The color service.
    *
-   * While not directly used for picking colors anymore, it is conceptually
-   * related and might be useful for other color operations later.
+   * @var \Drupal\kingly_layouts\Service\DisplayOption\ColorService
    */
   protected ColorService $colorService;
 
@@ -46,8 +32,8 @@ class BorderService implements KinglyLayoutsDisplayOptionInterface {
    *   The color service.
    */
   public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, ColorService $color_service) {
-    $this->currentUser = $current_user;
-    $this->stringTranslation = $string_translation;
+    // Call the parent constructor to initialize currentUser and translator.
+    parent::__construct($current_user, $string_translation);
     $this->colorService = $color_service;
   }
 

@@ -1,22 +1,28 @@
-# Filename: kingly_layouts/kingly_layouts.libraries.yml
 variables:
   css:
     base:
       css/_variables.css: {}
+
+base:
+  css:
+    theme:
+      css/base.css: {}
+  dependencies:
+    - kingly_layouts/variables
 
 containers:
   css:
     theme:
       css/containers.css: {}
   dependencies:
-    - kingly_layouts/variables
+    - kingly_layouts/base
 
 spacing:
   css:
     theme:
       css/spacing.css: {}
   dependencies:
-    - kingly_layouts/variables
+    - kingly_layouts/base
 
 borders:
   css:
@@ -63,6 +69,7 @@ animations:
     - core/jquery
     - core/drupal
     - core/once
+    - kingly_layouts/variables
 
 typography:
   css:

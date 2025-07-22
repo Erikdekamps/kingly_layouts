@@ -3,39 +3,13 @@
 namespace Drupal\kingly_layouts\Service\DisplayOption;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
-use Drupal\kingly_layouts\KinglyLayoutsValidationTrait;
 
 /**
  * Service to manage color options for Kingly Layouts.
  *
  * This service now manages a direct color picker for foreground color.
  */
-class ColorService implements KinglyLayoutsDisplayOptionInterface {
-
-  use StringTranslationTrait;
-  use KinglyLayoutsValidationTrait;
-
-  /**
-   * The current user.
-   */
-  protected AccountInterface $currentUser;
-
-  /**
-   * Constructs a new ColorService object.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
-    $this->currentUser = $current_user;
-    $this->stringTranslation = $string_translation;
-  }
+class ColorService extends DisplayOptionBase {
 
   /**
    * {@inheritdoc}

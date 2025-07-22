@@ -5,10 +5,9 @@
 
 /* Base class for all animated elements. Defines the transition. */
 .kl-animate {
-  /* Default transition properties, can be overridden by inline styles from PHP. */
-  transition-property: opacity, transform, filter, box-shadow, font-size;
-  transition-duration: 0.6s;
-  transition-timing-function: ease-out;
+  transition-property: var(--kl-transition-properties-default);
+  transition-duration: var(--kl-transition-duration-default);
+  transition-timing-function: var(--kl-transition-timing-function-default);
 }
 
 /* --- Animation Types --- */

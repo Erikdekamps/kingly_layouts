@@ -3,10 +3,6 @@
 namespace Drupal\kingly_layouts\Service\DisplayOption;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
 
 /**
  * Service to manage responsiveness options for Kingly Layouts.
@@ -14,32 +10,7 @@ use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
  * This service uses a simple checkbox model to hide sections on specific
  * breakpoints, providing a more intuitive user experience.
  */
-class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
-
-  use StringTranslationTrait;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected AccountInterface $currentUser;
-
-  /**
-   * Constructs a new ResponsivenessService object.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
-  public function __construct(
-    AccountInterface $current_user,
-    TranslationInterface $string_translation,
-  ) {
-    $this->currentUser = $current_user;
-    $this->stringTranslation = $string_translation;
-  }
+class ResponsivenessService extends DisplayOptionBase {
 
   /**
    * {@inheritdoc}

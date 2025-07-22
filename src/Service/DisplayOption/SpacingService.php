@@ -4,10 +4,7 @@ namespace Drupal\kingly_layouts\Service\DisplayOption;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
-use Drupal\kingly_layouts\KinglyLayoutsUtilityTrait;
 use Drupal\kingly_layouts\Service\ResponsiveFieldService;
 
 /**
@@ -16,17 +13,7 @@ use Drupal\kingly_layouts\Service\ResponsiveFieldService;
  * This service now uses the ResponsiveFieldService to provide spacing controls
  * for different breakpoints.
  */
-class SpacingService implements KinglyLayoutsDisplayOptionInterface {
-
-  use StringTranslationTrait;
-  use KinglyLayoutsUtilityTrait;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected AccountInterface $currentUser;
+class SpacingService extends DisplayOptionBase {
 
   /**
    * The responsive field service.
@@ -46,8 +33,7 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
    *   The service for creating responsive fields.
    */
   public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, ResponsiveFieldService $responsive_field_service) {
-    $this->currentUser = $current_user;
-    $this->stringTranslation = $string_translation;
+    parent::__construct($current_user, $string_translation);
     $this->responsiveFieldService = $responsive_field_service;
   }
 
@@ -155,6 +141,11 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
     $has_spacing = $this->responsiveFieldService->processResponsiveClasses($build, $configuration, 'vertical_margin_option', 'kl-margin-y-') || $has_spacing;
 
     if ($has_spacing) {
+      // Attach the base library, which provides the consumer styles for
+      // padding, margin, and gap variables.
+      $build['#attached']['library'][] = 'kingly_layouts/base';
+      // Also attach the spacing library, which provides the utility classes
+      // that *set* the CSS variables.
       $build['#attached']['library'][] = 'kingly_layouts/spacing';
     }
   }

@@ -3,45 +3,21 @@
 namespace Drupal\kingly_layouts\Service\DisplayOption;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
 
 /**
  * Service to manage custom attribute options for Kingly Layouts.
  */
-class CustomAttributesService implements KinglyLayoutsDisplayOptionInterface {
-
-  use StringTranslationTrait;
+class CustomAttributesService extends DisplayOptionBase {
 
   /**
-   * The current user.
-   */
-  protected AccountInterface $currentUser;
-
-  /**
-   * Constructs a new CustomAttributesService object.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
-    $this->currentUser = $current_user;
-    $this->stringTranslation = $string_translation;
-  }
-
-  /**
-   * {@inheritdoc}
    */
   public function getFormKey(): string {
     return 'custom_attributes';
   }
 
   /**
-   * {@inheritdoc}
+   *
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
     $form_key = $this->getFormKey();
@@ -55,15 +31,16 @@ class CustomAttributesService implements KinglyLayoutsDisplayOptionInterface {
       '#type' => 'textfield',
       '#title' => $this->t('Custom ID'),
       '#default_value' => $configuration['custom_css_id'],
-      '#description' => $this->t('Enter a unique ID for this layout section (e.g., `my-unique-section`). Must be unique on the page and contain only letters, numbers, hyphens, and underscores.'),
+      '#description' => $this->t('Enter a unique ID for this layout section (e.g., `my-unique-section`).'),
+      '#element_validate' => [[$this, 'validateCssId']],
     ];
     $form[$form_key]['custom_css_class'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Custom CSS Classes'),
       '#default_value' => $configuration['custom_css_class'],
-      '#description' => $this->t('Add one or more custom CSS classes to this layout section, separated by spaces (e.g., `my-custom-class another-class`).'),
+      '#description' => $this->t('Add one or more custom CSS classes, separated by spaces.'),
+      '#element_validate' => [[$this, 'validateCssClasses']],
     ];
-
     return $form;
   }
 
@@ -73,8 +50,9 @@ class CustomAttributesService implements KinglyLayoutsDisplayOptionInterface {
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
     $form_key = $this->getFormKey();
     $values = $form_state->getValue($form_key, []);
+    // Using preg_split ensures multiple spaces are collapsed to a single space.
     $configuration['custom_css_id'] = trim($values['custom_css_id'] ?? '');
-    $configuration['custom_css_class'] = trim($values['custom_css_class'] ?? '');
+    $configuration['custom_css_class'] = implode(' ', preg_split('/\s+/', trim($values['custom_css_class'] ?? '')));
   }
 
   /**
