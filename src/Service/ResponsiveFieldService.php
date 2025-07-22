@@ -66,10 +66,9 @@ class ResponsiveFieldService {
       $default_value = $configuration[$config_key][$id] ?? KinglyLayoutsDisplayOptionInterface::NONE_OPTION_KEY;
       $fields_container[$field_key]['#default_value'] = $default_value;
 
-      // Remove description from subsequent fields to avoid repetition.
-      if ($id !== 'mobile') {
-        unset($fields_container[$field_key]['#description']);
-      }
+      // Always remove the description from the individual field.
+      // It will be applied to the parent fieldset instead for clarity.
+      unset($fields_container[$field_key]['#description']);
     }
 
     // Wrap the container in a fieldset to group them visually.

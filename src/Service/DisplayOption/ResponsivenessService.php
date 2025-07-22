@@ -10,6 +10,9 @@ use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
 
 /**
  * Service to manage responsiveness options for Kingly Layouts.
+ *
+ * This service uses a simple checkbox model to hide sections on specific
+ * breakpoints, providing a more intuitive user experience.
  */
 class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
 
@@ -17,6 +20,8 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
 
   /**
    * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
    */
   protected AccountInterface $currentUser;
 
@@ -28,7 +33,10 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
+  public function __construct(
+    AccountInterface $current_user,
+    TranslationInterface $string_translation,
+  ) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
   }
@@ -43,21 +51,30 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state, array $configuration): array {
+  public function buildConfigurationForm(
+    array $form,
+    FormStateInterface $form_state,
+    array $configuration,
+  ): array {
     $form_key = $this->getFormKey();
     $form[$form_key] = [
       '#type' => 'details',
       '#title' => $this->t('Responsiveness'),
       '#open' => FALSE,
-      '#access' => $this->currentUser->hasPermission('administer kingly layouts responsiveness'),
+      '#access' => $this->currentUser->hasPermission(
+        'administer kingly layouts responsiveness'
+      ),
     ];
 
-    $form[$form_key]['hide_on_breakpoint'] = [
+    $form[$form_key]['hide_on_breakpoints'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Hide on Breakpoint'),
+      '#title' => $this->t('Visibility'),
       '#options' => $this->getBreakpointOptions(),
-      '#default_value' => $configuration['hide_on_breakpoint'],
-      '#description' => $this->t('Hide this entire layout section on specific screen sizes.'),
+      '#default_value' => $configuration['hide_on_breakpoints'],
+      '#description' => $this->t(
+        'Select the breakpoints where this section should be completely hidden
+        (using CSS <code>display: none</code>).'
+      ),
     ];
 
     return $form;
@@ -66,21 +83,35 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
+  public function submitConfigurationForm(
+    array $form,
+    FormStateInterface $form_state,
+    array &$configuration,
+  ): void {
     $form_key = $this->getFormKey();
     $values = $form_state->getValue($form_key, []);
-    $configuration['hide_on_breakpoint'] = array_filter($values['hide_on_breakpoint'] ?? []);
+    // We filter the array to only store the keys of the checked boxes.
+    $configuration['hide_on_breakpoints'] = array_filter(
+      $values['hide_on_breakpoints'] ?? []
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function processBuild(array &$build, array $configuration): void {
-    if ($this->shouldApplyResponsiveness($configuration)) {
-      // Attach the necessary library for responsiveness.
-      $this->attachResponsivenessLibrary($build);
-      // Apply the CSS classes to hide the element on specified breakpoints.
-      $this->applyHideOnBreakpointClasses($build, $configuration);
+    $breakpoints_to_hide = $configuration['hide_on_breakpoints'] ?? [];
+
+    if (!empty($breakpoints_to_hide)) {
+      // Attach the library needed for the responsive classes.
+      $build['#attached']['library'][] = 'kingly_layouts/responsiveness';
+
+      // Add a CSS class for each breakpoint that was selected.
+      foreach ($breakpoints_to_hide as $breakpoint_id) {
+        if ($breakpoint_id) {
+          $build['#attributes']['class'][] = 'kl-hide-on-' . $breakpoint_id;
+        }
+      }
     }
   }
 
@@ -89,7 +120,7 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
    */
   public static function defaultConfiguration(): array {
     return [
-      'hide_on_breakpoint' => [],
+      'hide_on_breakpoints' => [],
     ];
   }
 
@@ -100,50 +131,12 @@ class ResponsivenessService implements KinglyLayoutsDisplayOptionInterface {
    *   An array of breakpoint options.
    */
   private function getBreakpointOptions(): array {
+    // The keys ('mobile', 'md', 'lg') directly map to the CSS class suffixes.
     return [
-      'mobile' => $this->t('Mobile'),
-      'tablet' => $this->t('Tablet'),
-      'desktop' => $this->t('Desktop'),
+      'mobile' => $this->t('Hide on Mobile (up to 767px)'),
+      'md' => $this->t('Hide on Medium (768px - 1023px)'),
+      'lg' => $this->t('Hide on Large (1024px and up)'),
     ];
-  }
-
-  /**
-   * Determines if responsiveness features should be applied.
-   *
-   * @param array $configuration
-   *   The layout's current configuration.
-   *
-   * @return bool
-   *   TRUE if any responsiveness option is configured, FALSE otherwise.
-   */
-  private function shouldApplyResponsiveness(array $configuration): bool {
-    return !empty($configuration['hide_on_breakpoint']);
-  }
-
-  /**
-   * Attaches the responsiveness library to the build array.
-   *
-   * @param array &$build
-   *   The render array, passed by reference.
-   */
-  private function attachResponsivenessLibrary(array &$build): void {
-    $build['#attached']['library'][] = 'kingly_layouts/responsiveness';
-  }
-
-  /**
-   * Applies CSS classes to hide the element on specific breakpoints.
-   *
-   * @param array &$build
-   *   The render array, passed by reference.
-   * @param array $configuration
-   *   The layout's current configuration.
-   */
-  private function applyHideOnBreakpointClasses(array &$build, array $configuration): void {
-    foreach ($configuration['hide_on_breakpoint'] as $breakpoint) {
-      if ($breakpoint) {
-        $build['#attributes']['class'][] = 'kl-hide-on-' . $breakpoint;
-      }
-    }
   }
 
 }
