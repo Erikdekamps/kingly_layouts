@@ -6,23 +6,24 @@
 /* --- Responsiveness Utilities --- */
 
 /* Hide on Breakpoint */
-/* Using common breakpoints, adjust as per theme's actual breakpoints */
-@media (max-width: var(--kl-breakpoint-mobile-max)) {
-  /* Mobile */
+/* Uses the new breakpoint variables for consistency. */
+
+/* Mobile (Up to tablet breakpoint) */
+@media (max-width: calc(var(--kl-breakpoint-tablet) - 1px)) {
   .kl-hide-on-mobile {
     display: none !important;
   }
 }
 
-@media (min-width: var(--kl-breakpoint-tablet-min)) and (max-width: var(--kl-breakpoint-tablet-max)) {
-  /* Tablet */
+/* Tablet (Between tablet and desktop breakpoints) */
+@media (min-width: var(--kl-breakpoint-tablet)) and (max-width: calc(var(--kl-breakpoint-desktop) - 1px)) {
   .kl-hide-on-tablet {
     display: none !important;
   }
 }
 
-@media (min-width: var(--kl-breakpoint-desktop-min)) {
-  /* Desktop */
+/* Desktop (From desktop breakpoint and up) */
+@media (min-width: var(--kl-breakpoint-desktop)) {
   .kl-hide-on-desktop {
     display: none !important;
   }

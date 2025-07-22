@@ -1,16 +1,12 @@
 /*
 * @file
-* Provides spacing utility styles for Kingly Layouts.
+* Provides responsive spacing utility styles for Kingly Layouts.
 */
 
-/* --- Spacing Utilities (Padding & Margin) --- */
+/* --- Base Spacing Utilities (Mobile First) --- */
+/* These apply from the smallest screen size up. */
 
-/*
-* Padding X
-* These utilities now ONLY set the --kl-padding-x-additional variable.
-* This variable is then consumed by the container type rules above to apply
-* the final padding value correctly, avoiding specificity conflicts.
-*/
+/* Padding X */
 .kl-padding-x-xs {
   --kl-padding-x-additional: var(--kl-spacing-xs);
 }
@@ -49,7 +45,7 @@
   padding-bottom: var(--kl-spacing-xl);
 }
 
-/* Gap (for flex/grid containers) */
+/* Gap */
 .kl-gap-xs {
   gap: var(--kl-spacing-xs);
 }
@@ -108,4 +104,212 @@
 .kl-margin-y-xl {
   margin-top: var(--kl-spacing-xl);
   margin-bottom: var(--kl-spacing-xl);
+}
+
+
+/* --- Medium (md) Breakpoint Overrides --- */
+@media (min-width: 768px) {
+  /* Padding X */
+  .md--kl-padding-x-xs {
+    --kl-padding-x-additional: var(--kl-spacing-xs);
+}
+  .md--kl-padding-x-sm {
+    --kl-padding-x-additional: var(--kl-spacing-sm);
+}
+  .md--kl-padding-x-md {
+    --kl-padding-x-additional: var(--kl-spacing-md);
+}
+  .md--kl-padding-x-lg {
+    --kl-padding-x-additional: var(--kl-spacing-lg);
+}
+  .md--kl-padding-x-xl {
+    --kl-padding-x-additional: var(--kl-spacing-xl);
+}
+
+  /* Padding Y */
+  .md--kl-padding-y-xs {
+    padding-top: var(--kl-spacing-xs);
+    padding-bottom: var(--kl-spacing-xs);
+}
+  .md--kl-padding-y-sm {
+    padding-top: var(--kl-spacing-sm);
+    padding-bottom: var(--kl-spacing-sm);
+}
+  .md--kl-padding-y-md {
+    padding-top: var(--kl-spacing-md);
+    padding-bottom: var(--kl-spacing-md);
+}
+  .md--kl-padding-y-lg {
+    padding-top: var(--kl-spacing-lg);
+    padding-bottom: var(--kl-spacing-lg);
+}
+  .md--kl-padding-y-xl {
+    padding-top: var(--kl-spacing-xl);
+    padding-bottom: var(--kl-spacing-xl);
+}
+
+  /* Gap */
+  .md--kl-gap-xs {
+    gap: var(--kl-spacing-xs);
+}
+  .md--kl-gap-sm {
+    gap: var(--kl-spacing-sm);
+}
+  .md--kl-gap-md {
+    gap: var(--kl-spacing-md);
+}
+  .md--kl-gap-lg {
+    gap: var(--kl-spacing-lg);
+}
+  .md--kl-gap-xl {
+    gap: var(--kl-spacing-xl);
+}
+
+  /* Margin X */
+  .md--kl-margin-x-xs {
+    margin-left: var(--kl-spacing-xs);
+    margin-right: var(--kl-spacing-xs);
+}
+  .md--kl-margin-x-sm {
+    margin-left: var(--kl-spacing-sm);
+    margin-right: var(--kl-spacing-sm);
+}
+  .md--kl-margin-x-md {
+    margin-left: var(--kl-spacing-md);
+    margin-right: var(--kl-spacing-md);
+}
+  .md--kl-margin-x-lg {
+    margin-left: var(--kl-spacing-lg);
+    margin-right: var(--kl-spacing-lg);
+}
+  .md--kl-margin-x-xl {
+    margin-left: var(--kl-spacing-xl);
+    margin-right: var(--kl-spacing-xl);
+}
+
+  /* Margin Y */
+  .md--kl-margin-y-xs {
+    margin-top: var(--kl-spacing-xs);
+    margin-bottom: var(--kl-spacing-xs);
+}
+  .md--kl-margin-y-sm {
+    margin-top: var(--kl-spacing-sm);
+    margin-bottom: var(--kl-spacing-sm);
+}
+  .md--kl-margin-y-md {
+    margin-top: var(--kl-spacing-md);
+    margin-bottom: var(--kl-spacing-md);
+}
+  .md--kl-margin-y-lg {
+    margin-top: var(--kl-spacing-lg);
+    margin-bottom: var(--kl-spacing-lg);
+}
+  .md--kl-margin-y-xl {
+    margin-top: var(--kl-spacing-xl);
+    margin-bottom: var(--kl-spacing-xl);
+}
+}
+
+
+/* --- Large (lg) Breakpoint Overrides --- */
+@media (min-width: 1024px) {
+  /* Padding X */
+  .lg--kl-padding-x-xs {
+    --kl-padding-x-additional: var(--kl-spacing-xs);
+}
+  .lg--kl-padding-x-sm {
+    --kl-padding-x-additional: var(--kl-spacing-sm);
+}
+  .lg--kl-padding-x-md {
+    --kl-padding-x-additional: var(--kl-spacing-md);
+}
+  .lg--kl-padding-x-lg {
+    --kl-padding-x-additional: var(--kl-spacing-lg);
+}
+  .lg--kl-padding-x-xl {
+    --kl-padding-x-additional: var(--kl-spacing-xl);
+}
+
+  /* Padding Y */
+  .lg--kl-padding-y-xs {
+    padding-top: var(--kl-spacing-xs);
+    padding-bottom: var(--kl-spacing-xs);
+}
+  .lg--kl-padding-y-sm {
+    padding-top: var(--kl-spacing-sm);
+    padding-bottom: var(--kl-spacing-sm);
+}
+  .lg--kl-padding-y-md {
+    padding-top: var(--kl-spacing-md);
+    padding-bottom: var(--kl-spacing-md);
+}
+  .lg--kl-padding-y-lg {
+    padding-top: var(--kl-spacing-lg);
+    padding-bottom: var(--kl-spacing-lg);
+}
+  .lg--kl-padding-y-xl {
+    padding-top: var(--kl-spacing-xl);
+    padding-bottom: var(--kl-spacing-xl);
+}
+
+  /* Gap */
+  .lg--kl-gap-xs {
+    gap: var(--kl-spacing-xs);
+}
+  .lg--kl-gap-sm {
+    gap: var(--kl-spacing-sm);
+}
+  .lg--kl-gap-md {
+    gap: var(--kl-spacing-md);
+}
+  .lg--kl-gap-lg {
+    gap: var(--kl-spacing-lg);
+}
+  .lg--kl-gap-xl {
+    gap: var(--kl-spacing-xl);
+}
+
+  /* Margin X */
+  .lg--kl-margin-x-xs {
+    margin-left: var(--kl-spacing-xs);
+    margin-right: var(--kl-spacing-xs);
+}
+  .lg--kl-margin-x-sm {
+    margin-left: var(--kl-spacing-sm);
+    margin-right: var(--kl-spacing-sm);
+}
+  .lg--kl-margin-x-md {
+    margin-left: var(--kl-spacing-md);
+    margin-right: var(--kl-spacing-md);
+}
+  .lg--kl-margin-x-lg {
+    margin-left: var(--kl-spacing-lg);
+    margin-right: var(--kl-spacing-lg);
+}
+  .lg--kl-margin-x-xl {
+    margin-left: var(--kl-spacing-xl);
+    margin-right: var(--kl-spacing-xl);
+}
+
+  /* Margin Y */
+  .lg--kl-margin-y-xs {
+    margin-top: var(--kl-spacing-xs);
+    margin-bottom: var(--kl-spacing-xs);
+}
+  .lg--kl-margin-y-sm {
+    margin-top: var(--kl-spacing-sm);
+    margin-bottom: var(--kl-spacing-sm);
+}
+  .lg--kl-margin-y-md {
+    margin-top: var(--kl-spacing-md);
+    margin-bottom: var(--kl-spacing-md);
+}
+  .lg--kl-margin-y-lg {
+    margin-top: var(--kl-spacing-lg);
+    margin-bottom: var(--kl-spacing-lg);
+}
+  .lg--kl-margin-y-xl {
+    margin-top: var(--kl-spacing-xl);
+    margin-bottom: var(--kl-spacing-xl);
+}
 }
