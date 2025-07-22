@@ -27,14 +27,6 @@
   --kl-border-width-sm: 1px;
   --kl-border-width-md: 2px;
   --kl-border-width-lg: 4px;
-  /* Breakpoints (match BreakpointService.php) */
-  --kl-breakpoint-md: 768px;
-  --kl-breakpoint-lg: 1024px;
-  /* Old Breakpoints (for backward compatibility if needed, will be phased out) */
-  --kl-breakpoint-mobile-max: 767px;
-  --kl-breakpoint-tablet-min: 768px;
-  --kl-breakpoint-tablet-max: 1023px;
-  --kl-breakpoint-desktop-min: 1024px;
   /* Shadow Colors (example, could be more granular if needed) */
   --kl-shadow-color-light: rgba(0, 0, 0, 0.05);
   --kl-shadow-color-medium: rgba(0, 0, 0, 0.1);
