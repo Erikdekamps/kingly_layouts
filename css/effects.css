@@ -1,21 +1,12 @@
 /**
-* @file
-* Provides shadow and filter effect utility styles for Kingly Layouts.
-*/
+ * @file
+ * Provides shadow, filter, and hover effect utility styles for Kingly Layouts.
+ *
+ * All design tokens (colors, scales, etc.) are defined in _variables.css.
+ * This file contains the rules that consume those variables.
+ */
 
-/* We define variables for these font sizes, making them easily adjustable
-   and allowing for more granular control if needed in the future. */
-:root {
-  --kl-font-size-90: 0.9em;
-  --kl-font-size-95: 0.95em;
-  --kl-font-size-105: 1.05em;
-  --kl-font-size-110: 1.1em;
-  --kl-font-size-125: 1.25em;
-}
-
-/* --- Shadows & Effects Utilities --- */
-
-/* Box Shadow */
+/* --- Static Box Shadow --- */
 .kl-shadow-sm {
   box-shadow: 0 1px 2px 0 var(--kl-shadow-color-light);
 }
@@ -32,37 +23,38 @@
   box-shadow: inset 0 2px 4px 0 var(--kl-shadow-color-dark);
 }
 
-/* Filter */
+/* --- Static Filter --- */
 .kl-filter-grayscale {
   filter: grayscale(100%);
 }
 .kl-filter-blur {
-  filter: blur(5px); /* This value could also be a variable if you have a blur scale */
+  filter: blur(5px);
 }
 .kl-filter-sepia {
   filter: sepia(100%);
 }
 .kl-filter-brightness {
-  filter: brightness(1.5); /* This value could also be a variable if you have a brightness scale */
+  filter: brightness(1.5);
 }
 
 /* --- Hover Effects --- */
+/* Note: These require the 'kl-animate' class from the animations library to transition smoothly. */
 
 /* Hover Transform Scale */
 .kl--hover-scale-90:hover {
-  transform: scale(0.9);
+  transform: scale(var(--kl-font-scale-90));
 }
 .kl--hover-scale-95:hover {
-  transform: scale(0.95);
+  transform: scale(var(--kl-font-scale-95));
 }
 .kl--hover-scale-105:hover {
-  transform: scale(1.05);
+  transform: scale(var(--kl-font-scale-105));
 }
 .kl--hover-scale-110:hover {
-  transform: scale(1.1);
+  transform: scale(var(--kl-font-scale-110));
 }
 .kl--hover-scale-125:hover {
-  transform: scale(1.25);
+  transform: scale(var(--kl-font-scale-125));
 }
 
 /* Hover Box Shadow */
@@ -82,8 +74,7 @@
   box-shadow: inset 0 2px 4px 0 var(--kl-shadow-color-dark);
 }
 
-/* Hover Filters (Initial state + Hover state) */
-/* Grayscale to Color */
+/* Hover Filters */
 .kl--hover-filter-grayscale-to-color {
   filter: grayscale(100%);
 }
@@ -91,14 +82,13 @@
   filter: grayscale(0%);
 }
 
-/* Brightness Change */
-/* Base brightness is 1 (normal). Change it on hover. */
 .kl--hover-filter-brightness-down {
   filter: brightness(1);
 }
 .kl--hover-filter-brightness-down:hover {
   filter: brightness(0.75);
 }
+
 .kl--hover-filter-brightness-up {
   filter: brightness(1);
 }
@@ -106,18 +96,19 @@
   filter: brightness(1.25);
 }
 
+/* Hover Font Size */
 .kl--hover-font-size-90:hover {
-  font-size: var(--kl-font-size-90);
+  font-size: 0.9em;
 }
 .kl--hover-font-size-95:hover {
-  font-size: var(--kl-font-size-95);
+  font-size: 0.95em;
 }
 .kl--hover-font-size-105:hover {
-  font-size: var(--kl-font-size-105);
+  font-size: 1.05em;
 }
 .kl--hover-font-size-110:hover {
-  font-size: var(--kl-font-size-110);
+  font-size: 1.1em;
 }
 .kl--hover-font-size-125:hover {
-  font-size: var(--kl-font-size-125);
+  font-size: 1.25em;
 }

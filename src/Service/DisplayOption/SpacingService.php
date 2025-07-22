@@ -155,6 +155,11 @@ class SpacingService implements KinglyLayoutsDisplayOptionInterface {
     $has_spacing = $this->responsiveFieldService->processResponsiveClasses($build, $configuration, 'vertical_margin_option', 'kl-margin-y-') || $has_spacing;
 
     if ($has_spacing) {
+      // Attach the base library, which provides the consumer styles for
+      // padding, margin, and gap variables.
+      $build['#attached']['library'][] = 'kingly_layouts/base';
+      // Also attach the spacing library, which provides the utility classes
+      // that *set* the CSS variables.
       $build['#attached']['library'][] = 'kingly_layouts/spacing';
     }
   }

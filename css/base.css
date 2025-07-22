@@ -1,0 +1,19 @@
+/*
+ * @file
+ * Provides the base consumer styles for Kingly Layouts.
+ * This file applies the variables set by utility classes.
+ */
+
+.kl {
+  display: grid;
+  /* Consume spacing variables using logical properties */
+  padding-inline-start: var(--kl-padding-inline);
+  padding-inline-end: var(--kl-padding-inline);
+  padding-block-start: var(--kl-padding-block-start);
+  padding-block-end: var(--kl-padding-block-end);
+  margin-inline-start: var(--kl-margin-inline);
+  margin-inline-end: var(--kl-margin-inline);
+  margin-block-start: var(--kl-margin-block-start);
+  margin-block-end: var(--kl-margin-block-end);
+  gap: var(--kl-gap);
+}

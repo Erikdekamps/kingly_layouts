@@ -1,59 +1,53 @@
 /*
-* @file
-* Provides container type styles for Kingly Layouts.
-*/
-
-.kl {
-  display: grid;
-}
-
-/* --- Container Types --- */
+ * @file
+ * Provides container type styles for Kingly Layouts using logical properties.
+ */
 
 /*
-* Apply horizontal padding to "Boxed" and "Edge to Edge" containers.
-* The variable is 0rem by default, so no padding is added unless a
-* padding utility class is also present on the element.
-*/
-.kl--boxed,
-.kl--edge-to-edge {
-  padding-left: var(--kl-padding-x-additional);
-  padding-right: var(--kl-padding-x-additional);
-}
-
-/* Common full-bleed styles for both container types */
+ * Note: The base .kl class now applies padding from variables. These classes
+ * add the special full-bleed margin logic.
+ */
 .kl--full,
 .kl--edge-to-edge {
-  /* 1. Pull the container out to the viewport edges. */
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  box-sizing: border-box; /* Crucial for padding calculations */
+  /* Use logical properties for automatic RTL support. */
+  margin-inline-start: calc(50% - 50vw);
+  margin-inline-end: calc(50% - 50vw);
+  box-sizing: border-box;
 }
 
 /*
-* For "Full Width (Background Only)", we override the default padding
-* with a special calculation that aligns content to the site's container
-* while also including any user-selected additional padding.
-*/
+ * For "Full Width (Background Only)", we add padding to push the inner content
+ * back into alignment with the site's main container.
+ * The padding applied here is *in addition to* any user-selected padding from
+ * the spacing utilities.
+ */
 .kl--full {
-  /* 2. Push inner content back. `max()` prevents negative padding. */
-  padding-left: calc(max(0px, 50vw - 50%) + var(--kl-padding-x-additional));
-  padding-right: calc(max(0px, 50vw - 50%) + var(--kl-padding-x-additional));
+  padding-inline-start: calc(max(0px, 50vw - 50%) + var(--kl-padding-inline));
+  padding-inline-end: calc(max(0px, 50vw - 50%) + var(--kl-padding-inline));
 }
 
+/*
+ * For "Edge to Edge", we do not add any extra padding, allowing the content to
+ * truly go to the edge of the viewport. The user can still add their own
+- * padding via the spacing utilities if desired.
++ * padding via the spacing utilities if desired. The base .kl class handles this.
+ */
+
 .kl--hero {
-  /* Basic full-screen styles.  You'll likely want to customize this further. */
-  min-height: 100vh; /* This will now be the default from CSS */
-  width: 100vw; /* This will now be the default from CSS */
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  min-height: 100vh;
+  width: 100vw;
+  margin-inline-start: calc(50% - 50vw);
+  margin-inline-end: calc(50% - 50vw);
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--kl-spacing-md);
+  /* Apply default padding, which can be overridden by spacing utilities. */
+  --kl-padding-inline: var(--kl-spacing-md);
+  --kl-padding-block-start: var(--kl-spacing-md);
+  --kl-padding-block-end: var(--kl-spacing-md);
 }
 
-/* If you want to ensure content within the hero doesn't get too wide */
 .kl--hero > .layout__region {
   max-width: 1200px; /* Example max width, adjust as needed */
   width: 100%;
