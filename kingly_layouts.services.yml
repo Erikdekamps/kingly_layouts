@@ -26,7 +26,7 @@ services:
 
   kingly_layouts.background_service:
     class: Drupal\kingly_layouts\Service\DisplayOption\BackgroundService
-    arguments: [ '@current_user', '@string_translation', '@kingly_layouts.color_service' ]
+    arguments: [ '@current_user', '@string_translation' ]
     tags:
       - { name: kingly_layouts.display_option, priority: 90 }
 

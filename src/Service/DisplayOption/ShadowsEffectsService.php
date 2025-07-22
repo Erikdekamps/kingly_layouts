@@ -273,11 +273,11 @@ class ShadowsEffectsService implements KinglyLayoutsDisplayOptionInterface {
         'brightness-up' => $this->t('Brightness Up'),
       ],
       'hover_font_size' => $none + [
-        'size-90' => $this->t('Smaller (90%)'),
-        'size-95' => $this->t('Slightly Smaller (95%)'),
-        'size-105' => $this->t('Slightly Larger (105%)'),
-        'size-110' => $this->t('Larger (110%)'),
-        'size-125' => $this->t('Much Larger (125%)'),
+        '90' => $this->t('Smaller (90%)'),
+        '95' => $this->t('Slightly Smaller (95%)'),
+        '105' => $this->t('Slightly Larger (105%)'),
+        '110' => $this->t('Larger (110%)'),
+        '125' => $this->t('Much Larger (125%)'),
       ],
     ];
 

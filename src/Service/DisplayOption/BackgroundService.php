@@ -29,27 +29,16 @@ class BackgroundService implements KinglyLayoutsDisplayOptionInterface {
   protected AccountInterface $currentUser;
 
   /**
-   * The color service.
-   *
-   * While not directly used for picking colors anymore, it provides hex to RGB
-   * conversion if needed and is conceptually related.
-   */
-  protected ColorService $colorService;
-
-  /**
    * Constructs a new BackgroundService object.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\kingly_layouts\Service\DisplayOption\ColorService $color_service
-   *   The color service.
    */
-  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation, ColorService $color_service) {
+  public function __construct(AccountInterface $current_user, TranslationInterface $string_translation) {
     $this->currentUser = $current_user;
     $this->stringTranslation = $string_translation;
-    $this->colorService = $color_service;
   }
 
   /**

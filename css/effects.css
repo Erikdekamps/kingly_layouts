@@ -106,18 +106,18 @@
   filter: brightness(1.25);
 }
 
-.kl--hover-font-size-size-90:hover {
+.kl--hover-font-size-90:hover {
   font-size: var(--kl-font-size-90);
 }
-.kl--hover-font-size-size-95:hover {
+.kl--hover-font-size-95:hover {
   font-size: var(--kl-font-size-95);
 }
-.kl--hover-font-size-size-105:hover {
+.kl--hover-font-size-105:hover {
   font-size: var(--kl-font-size-105);
 }
-.kl--hover-font-size-size-110:hover {
+.kl--hover-font-size-110:hover {
   font-size: var(--kl-font-size-110);
 }
-.kl--hover-font-size-size-125:hover {
+.kl--hover-font-size-125:hover {
   font-size: var(--kl-font-size-125);
 }

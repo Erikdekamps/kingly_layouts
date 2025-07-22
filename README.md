@@ -80,6 +80,13 @@ section.
   viewport width.
 * **Full Screen Hero**: The section fills the entire viewport height and width.
 
++**Important Note on Container Types:** For the **'Full Width (Background Only)'
+** and **'Edge to Edge'** options to function as expected, the layout section
+should be placed within a standard, width-constrained content region in your
+theme (e.g., the main 'Content' region in Olivero). Placing them in a theme
+region that is already full-width may not produce the intended visual effect, as
+the CSS calculations rely on a parent container.
+
 ### Spacing
 
 Control the space inside and around the layout using a consistent scale.

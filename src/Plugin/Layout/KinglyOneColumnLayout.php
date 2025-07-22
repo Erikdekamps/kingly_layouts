@@ -12,8 +12,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   id: "kingly_onecol",
   label: new TranslatableMarkup("One column"),
   category: new TranslatableMarkup("Kingly"),
-  template: "kl-one-column",
-  library: "kingly_layouts/kingly_onecol",
+  template: "layout--kingly-onecol",
+  library: "kingly_layouts/kingly_layout_one_column",
   regions: [
     "content" => [
       "label" => new TranslatableMarkup("Content"),
