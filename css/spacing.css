@@ -1,7 +1,10 @@
 /*
  * @file
  * Provides responsive spacing utility styles for Kingly Layouts.
- * These classes work by setting CSS variables consumed by base.css.
+ *
+ * These classes work by setting CSS variables (e.g., --kl-padding-inline)
+ * which are then consumed by the rules in base.css. This file defines the
+ * utility classes for all breakpoints.
  */
 
 /* --- Base Spacing Utilities (Mobile First) --- */
@@ -100,7 +103,6 @@
   --kl-margin-block-start: var(--kl-spacing-xl);
   --kl-margin-block-end: var(--kl-spacing-xl);
 }
-
 
 /* --- Medium (md) Breakpoint Overrides --- */
 @media (min-width: 768px) {

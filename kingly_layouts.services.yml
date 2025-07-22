@@ -66,12 +66,6 @@ services:
     tags:
       - { name: kingly_layouts.display_option, priority: 30 }
 
-  kingly_layouts.sizing_service:
-    class: Drupal\kingly_layouts\Service\DisplayOption\SizingService
-    arguments: [ '@current_user', '@string_translation' ]
-    tags:
-      - { name: kingly_layouts.display_option, priority: 20 }
-
   kingly_layouts.spacing_service:
     class: Drupal\kingly_layouts\Service\DisplayOption\SpacingService
     arguments: [ '@current_user', '@string_translation', '@kingly_layouts.responsive_field_service' ]
