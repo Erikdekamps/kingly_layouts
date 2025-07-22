@@ -34,13 +34,13 @@
   --kl-transition-duration-default: 0.4s;
   --kl-transition-timing-function-default: ease-out;
   /* Default Layout Property Variables */
-  --kl-padding-inline: 0;
-  --kl-padding-block-start: 0;
-  --kl-padding-block-end: 0;
-  --kl-margin-inline: 0;
-  --kl-margin-block-start: 0;
-  --kl-margin-block-end: 0;
-  --kl-gap: 0;
+  --kl-padding-inline: 0px;
+  --kl-padding-block-start: 0px;
+  --kl-padding-block-end: 0px;
+  --kl-margin-inline: 0px;
+  --kl-margin-block-start: 0px;
+  --kl-margin-block-end: 0px;
+  --kl-gap: 0px;
   /* Dedicated variable for full-width container alignment padding. */
   --kl-full-width-alignment-padding: 0;
 }
