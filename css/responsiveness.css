@@ -15,6 +15,9 @@
 /* This covers screen widths from 0 up to the medium breakpoint. */
 @media (max-width: 767px) {
   .kl-hide-on-mobile {
+    /* !important is used intentionally to ensure this utility class
+    overrides any other display properties (e.g., display: grid)
+    applied to the element. */
     display: none !important;
   }
 }
