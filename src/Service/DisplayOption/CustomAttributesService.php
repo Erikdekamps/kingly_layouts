@@ -7,6 +7,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
+use Drupal\kingly_layouts\KinglyLayoutsValidationTrait;
 
 /**
  * Service to manage custom attribute options for Kingly Layouts.
@@ -14,6 +15,7 @@ use Drupal\kingly_layouts\KinglyLayoutsDisplayOptionInterface;
 class CustomAttributesService implements KinglyLayoutsDisplayOptionInterface {
 
   use StringTranslationTrait;
+  use KinglyLayoutsValidationTrait;
 
   /**
    * The current user.
@@ -56,12 +58,18 @@ class CustomAttributesService implements KinglyLayoutsDisplayOptionInterface {
       '#title' => $this->t('Custom ID'),
       '#default_value' => $configuration['custom_css_id'],
       '#description' => $this->t('Enter a unique ID for this layout section (e.g., `my-unique-section`). Must be unique on the page and contain only letters, numbers, hyphens, and underscores.'),
+      '#element_validate' => [
+        [$this, 'validateCssId'],
+      ],
     ];
     $form[$form_key]['custom_css_class'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Custom CSS Classes'),
       '#default_value' => $configuration['custom_css_class'],
       '#description' => $this->t('Add one or more custom CSS classes to this layout section, separated by spaces (e.g., `my-custom-class another-class`).'),
+      '#element_validate' => [
+        [$this, 'validateCssClasses'],
+      ],
     ];
 
     return $form;
@@ -73,8 +81,9 @@ class CustomAttributesService implements KinglyLayoutsDisplayOptionInterface {
   public function submitConfigurationForm(array $form, FormStateInterface $form_state, array &$configuration): void {
     $form_key = $this->getFormKey();
     $values = $form_state->getValue($form_key, []);
+    // Using preg_split ensures multiple spaces are collapsed to a single space.
     $configuration['custom_css_id'] = trim($values['custom_css_id'] ?? '');
-    $configuration['custom_css_class'] = trim($values['custom_css_class'] ?? '');
+    $configuration['custom_css_class'] = implode(' ', preg_split('/\s+/', trim($values['custom_css_class'] ?? '')));
   }
 
   /**
