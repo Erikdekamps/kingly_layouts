@@ -1,16 +1,14 @@
 /*
  * @file
  * Provides container type styles for Kingly Layouts using logical properties.
- *
- * These classes handle the "full bleed" effect and communicate the necessary
- * alignment padding to base.css via a CSS variable.
  */
 
-/* Common full-bleed margin calculation for container types that break out */
-/* of the main site wrapper. */
+/*
+ * Note: The base .kl class now applies padding from variables. These classes
+ * add the special full-bleed margin logic.
+ */
 .kl--full,
-.kl--edge-to-edge,
-.kl--hero {
+.kl--edge-to-edge {
   /* Use logical properties for automatic RTL support. */
   margin-inline-start: calc(50% - 50vw);
   margin-inline-end: calc(50% - 50vw);
@@ -18,26 +16,29 @@
 }
 
 /*
- * For "Full Width (Background Only)", we set the special alignment variable.
- * The base.css file consumes this variable to calculate the final padding,
- * ensuring the content aligns correctly while respecting user-added spacing.
+ * For "Full Width (Background Only)", we add padding to push the inner content
+ * back into alignment with the site's main container.
+ * The padding applied here is *in addition to* any user-selected padding from
+ * the spacing utilities.
  */
 .kl--full {
-  --kl-full-width-alignment-padding: max(0px, 50vw - 50%);
+  padding-inline-start: calc(max(0px, 50vw - 50%) + var(--kl-padding-inline));
+  padding-inline-end: calc(max(0px, 50vw - 50%) + var(--kl-padding-inline));
 }
 
 /*
- * For "Edge to Edge", we do not need to set the alignment variable, as it
- * defaults to 0. Content will go to the edge of the viewport unless the
- * user adds padding via the spacing utilities.
+ * For "Edge to Edge", we do not add any extra padding, allowing the content to
+ * truly go to the edge of the viewport. The user can still add their own
+- * padding via the spacing utilities if desired.
++ * padding via the spacing utilities if desired. The base .kl class handles this.
  */
 
-/*
- * The "Hero" container type is a special case that fills the viewport.
- */
 .kl--hero {
   min-height: 100vh;
   width: 100vw;
+  margin-inline-start: calc(50% - 50vw);
+  margin-inline-end: calc(50% - 50vw);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,11 +48,7 @@
   --kl-padding-block-end: var(--kl-spacing-md);
 }
 
-/*
- * A helper to constrain the direct content within a hero section, preventing
- * text lines from becoming too long on very wide screens.
- */
 .kl--hero > .layout__region {
-  max-width: 1200px; /* This value can be adjusted as needed. */
+  max-width: 1200px; /* Example max width, adjust as needed */
   width: 100%;
 }
