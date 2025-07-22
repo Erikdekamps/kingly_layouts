@@ -1,30 +1,36 @@
 /*
-* @file
-* Provides responsiveness utility styles for Kingly Layouts.
-*/
+ * @file
+ * Provides responsiveness utility styles for Kingly Layouts.
+ */
 
-/* --- Responsiveness Utilities --- */
+/* --- Hide on Breakpoint Utilities --- */
+/*
+ * These classes are applied to hide the element only on the specified
+ * breakpoint ranges. The CSS variables are placeholders for consistency but
+ * could be replaced with static values if preferred, as breakpoints are
+ * unlikely to change frequently.
+ */
 
-/* Hide on Breakpoint */
-/* Uses the new breakpoint variables for consistency. */
-
-/* Mobile (Up to tablet breakpoint) */
-@media (max-width: calc(var(--kl-breakpoint-tablet) - 1px)) {
+/* Mobile (Up to 767px) */
+/* This covers screen widths from 0 up to the medium breakpoint. */
+@media (max-width: 767px) {
   .kl-hide-on-mobile {
     display: none !important;
   }
 }
 
-/* Tablet (Between tablet and desktop breakpoints) */
-@media (min-width: var(--kl-breakpoint-tablet)) and (max-width: calc(var(--kl-breakpoint-desktop) - 1px)) {
-  .kl-hide-on-tablet {
+/* Medium / Tablet (768px - 1023px) */
+/* This covers screen widths between the medium and large breakpoints. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .kl-hide-on-md {
     display: none !important;
   }
 }
 
-/* Desktop (From desktop breakpoint and up) */
-@media (min-width: var(--kl-breakpoint-desktop)) {
-  .kl-hide-on-desktop {
+/* Large / Desktop (1024px and up) */
+/* This covers screen widths from the large breakpoint upwards. */
+@media (min-width: 1024px) {
+  .kl-hide-on-lg {
     display: none !important;
   }
 }
