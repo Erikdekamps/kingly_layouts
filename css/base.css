@@ -1,16 +1,34 @@
 /*
  * @file
  * Provides the base consumer styles for Kingly Layouts.
- * This file applies the variables set by utility classes.
+ *
+ * This file contains the primary .kl class, which applies the CSS variables
+ * set by various utility classes (e.g., from spacing.css, containers.css).
+ * This centralized approach, using CSS logical properties, ensures consistency
+ * and automatic RTL support.
  */
 
 .kl {
   display: grid;
-  /* Consume spacing variables using logical properties */
-  padding-inline-start: var(--kl-padding-inline);
-  padding-inline-end: var(--kl-padding-inline);
+  /*
+   * Consume spacing variables using logical properties.
+   *
+   * The final inline (horizontal) padding is a calculation of two independent
+   * variables:
+   * 1. --kl-full-width-alignment-padding: A special value set ONLY by the
+   *    '.kl--full' container type to align content within a full-bleed section.
+   *    It is 0 for all other container types.
+   * 2. --kl-padding-inline: The user-selected padding from the spacing utilities.
+   *
+   * This ensures both the container's structural needs and the user's design
+   * choices are respected without conflict.
+   */
+  padding-inline-start: calc(var(--kl-full-width-alignment-padding) + var(--kl-padding-inline));
+  padding-inline-end: calc(var(--kl-full-width-alignment-padding) + var(--kl-padding-inline));
+  /* Block (vertical) padding is more direct. */
   padding-block-start: var(--kl-padding-block-start);
   padding-block-end: var(--kl-padding-block-end);
+  /* Margins and gap are also direct variable consumptions. */
   margin-inline-start: var(--kl-margin-inline);
   margin-inline-end: var(--kl-margin-inline);
   margin-block-start: var(--kl-margin-block-start);
