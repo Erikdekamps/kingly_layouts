@@ -4,6 +4,14 @@ services:
     arguments:
       - !tagged_iterator kingly_layouts.display_option
 
+  kingly_layouts.breakpoint_service:
+    class: Drupal\kingly_layouts\Service\BreakpointService
+    arguments: ['@string_translation']
+
+  kingly_layouts.responsive_field_service:
+    class: Drupal\kingly_layouts\Service\ResponsiveFieldService
+    arguments: ['@kingly_layouts.breakpoint_service']
+
   kingly_layouts.alignment_service:
     class: Drupal\kingly_layouts\Service\DisplayOption\AlignmentService
     arguments: [ '@current_user', '@string_translation' ]
@@ -66,7 +74,7 @@ services:
 
   kingly_layouts.spacing_service:
     class: Drupal\kingly_layouts\Service\DisplayOption\SpacingService
-    arguments: [ '@current_user', '@string_translation' ]
+    arguments: [ '@current_user', '@string_translation', '@kingly_layouts.responsive_field_service' ]
     tags:
       - { name: kingly_layouts.display_option, priority: 10 }
 
