@@ -1,0 +1,59 @@
+/*
+* @file
+* Provides the layout styles for kl_four_column.
+  */
+.layout--kl_four_column {
+  display: grid;
+  /*
+  On small screens (below 40em), grid items will naturally stack in a single column
+  because no 'grid-template-columns' is defined for this breakpoint.
+  The 'gap' property applied via utility classes (e.g., .kl-gap-md)
+  will correctly add vertical spacing between these stacked items.
+  */
+}
+
+/* Sizing variations for larger screens */
+@media screen and (min-width: 40em) {
+  /*
+  Using 'fr' units for grid-template-columns automatically accounts for the 'gap'
+  between columns, ensuring the total width remains within the container.
+  The 'fr' unit represents a fraction of the available space in the grid container.
+  */
+  /* 25-25-25-25 layout: Four equal columns */
+  .layout--kl_four_column--25-25-25-25 {
+    /* Each column takes an equal share (1/4) of the available space. */
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+
+  /* 40-20-20-20 layout */
+  .layout--kl_four_column--40-20-20-20 {
+    /* The first column is twice as wide as the others. Total fractions = 2+1+1+1 = 5. */
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+
+  /* 20-40-20-20 layout */
+  .layout--kl_four_column--20-40-20-20 {
+    /* The second column is twice as wide as the others. */
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+  }
+
+  /* 20-20-40-20 layout */
+  .layout--kl_four_column--20-20-40-20 {
+    /* The third column is twice as wide as the others. */
+    grid-template-columns: 1fr 1fr 2fr 1fr;
+  }
+
+  /* 20-20-20-40 layout */
+  .layout--kl_four_column--20-20-20-40 {
+    /* The fourth column is twice as wide as the others. */
+    grid-template-columns: 1fr 1fr 1fr 2fr;
+  }
+}
+
+/*
+Note on .layout__region styles:
+With CSS Grid, these are no longer necessary.
+1. Stacking is the default behavior for grid items when no columns are defined.
+2. Column widths are defined on the parent container, so child-specific sizing
+   rules are not needed. Grid items automatically flow into the defined columns.
+   */

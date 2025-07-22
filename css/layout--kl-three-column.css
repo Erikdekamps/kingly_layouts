@@ -1,0 +1,65 @@
+/*
+* @file
+* Provides the layout styles for kl_three_column.
+  */
+.layout--kl_three_column {
+  display: grid;
+  /*
+  On small screens (below 40em), grid items will naturally stack in a single column
+  because no 'grid-template-columns' is defined for this breakpoint.
+  Each direct child (.layout__region) will implicitly take up 100% width of its row.
+  The 'gap' property applied via utility classes (e.g., .kl-gap-md)
+  will correctly add vertical spacing between these stacked items.
+  */
+}
+
+/* Sizing variations for larger screens */
+@media screen and (min-width: 40em) {
+  /*
+  Using 'fr' units for grid-template-columns automatically accounts for the 'gap'
+  between columns, ensuring the total width remains within the container.
+  The 'fr' unit represents a fraction of the available space in the grid container.
+  */
+  /* 33-34-33 layout: Three columns, roughly equal */
+  .layout--kl_three_column--33-34-33 {
+    /*
+    1fr 1fr 1fr means each column takes an equal share of the available space.
+    This is the most common and robust way to create equally sized columns
+    that correctly account for gaps.
+    */
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  /* 25-50-25 layout: Side-center-side with a wider middle column */
+  .layout--kl_three_column--25-50-25 {
+    /*
+    1fr 2fr 1fr means the middle column is twice as wide as the side columns.
+    The total "fractions" are 1+2+1 = 4. So, the columns will be 1/4, 2/4 (1/2), 1/4
+    of the available space, respectively.
+    */
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+
+  /* 25-25-50 layout: Two narrow columns, one wide column at the end */
+  .layout--kl_three_column--25-25-50 {
+    /* 1/4, 1/4, 2/4 of available space */
+    grid-template-columns: 1fr 1fr 2fr;
+  }
+
+  /* 50-25-25 layout: One wide column at the start, two narrow columns */
+  .layout--kl_three_column--50-25-25 {
+    /* 2/4, 1/4, 1/4 of available space */
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
+/*
+Note on .layout__region styles:
+With `display: grid;` on the parent, and no `grid-template-columns` defined for
+small screens, each direct child (`.layout__region`) will naturally occupy its
+own row, effectively stacking them vertically.
+
+For larger screens, the `grid-template-columns` on the parent container
+explicitly defines the column widths, making individual sizing properties on the
+regions unnecessary.
+*/

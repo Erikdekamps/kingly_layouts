@@ -9,25 +9,25 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Three column layout with sizing options.
  */
 #[Layout(
-  id: "kingly_threecol",
-  label: new TranslatableMarkup("Three column"),
-  category: new TranslatableMarkup("Kingly"),
-  template: "layout--kingly-threecol",
-  library: "kingly_layouts/kingly_threecol",
+  id: 'kl_three_column',
+  label: new TranslatableMarkup('Three column'),
+  category: new TranslatableMarkup('Kingly'),
+  template: 'layout--kl-three-column',
+  library: 'kingly_layouts/kl_layout_three_column',
   regions: [
-    "first" => [
-      "label" => new TranslatableMarkup("First"),
+    'first' => [
+      'label' => new TranslatableMarkup('First'),
     ],
-    "second" => [
-      "label" => new TranslatableMarkup("Second"),
+    'second' => [
+      'label' => new TranslatableMarkup('Second'),
     ],
-    "third" => [
-      "label" => new TranslatableMarkup("Third"),
+    'third' => [
+      'label' => new TranslatableMarkup('Third'),
     ],
   ],
-  default_region: "second"
+  default_region: 'second'
 )]
-class KinglyThreeColumnLayout extends KinglyLayoutBase {
+class KlThreeColumnLayout extends KinglyLayoutBase {
 
   /**
    * {@inheritdoc}

@@ -78,22 +78,22 @@ typography:
   dependencies:
     - kingly_layouts/variables
 
-kingly_layout_one_column:
+kl_layout_one_column:
   css:
     theme:
-      css/layout--one-column.css: {}
+      css/layout--kl-one-column.css: {}
 
-kingly_layout_two_column:
+kl_layout_two_column:
   css:
     theme:
-      css/layout--two-column.css: {}
+      css/layout--kl-two-column.css: {}
 
-kingly_layout_three_column:
+kl_layout_three_column:
   css:
     theme:
-      css/layout--three-column.css: {}
+      css/layout--kl-three-column.css: {}
 
-kingly_layout_four_column:
+kl_layout_four_column:
   css:
     theme:
-      css/layout--four-column.css: {}
+      css/layout--kl-four-column.css: {}

@@ -9,28 +9,28 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Four column layout with sizing options.
  */
 #[Layout(
-  id: "kingly_fourcol",
-  label: new TranslatableMarkup("Four column"),
-  category: new TranslatableMarkup("Kingly"),
-  template: "layout--kingly-fourcol",
-  library: "kingly_layouts/kingly_fourcol",
+  id: 'kl_four_column',
+  label: new TranslatableMarkup('Four column'),
+  category: new TranslatableMarkup('Kingly'),
+  template: 'layout--kl-four-column',
+  library: 'kingly_layouts/kl_layout_four_column',
   regions: [
-    "first" => [
-      "label" => new TranslatableMarkup("First"),
+    'first' => [
+      'label' => new TranslatableMarkup('First'),
     ],
-    "second" => [
-      "label" => new TranslatableMarkup("Second"),
+    'second' => [
+      'label' => new TranslatableMarkup('Second'),
     ],
-    "third" => [
-      "label" => new TranslatableMarkup("Third"),
+    'third' => [
+      'label' => new TranslatableMarkup('Third'),
     ],
-    "fourth" => [
-      "label" => new TranslatableMarkup("Fourth"),
+    'fourth' => [
+      'label' => new TranslatableMarkup('Fourth'),
     ],
   ],
-  default_region: "first"
+  default_region: 'first'
 )]
-class KinglyFourColumnLayout extends KinglyLayoutBase {
+class KlFourColumnLayout extends KinglyLayoutBase {
 
   /**
    * {@inheritdoc}

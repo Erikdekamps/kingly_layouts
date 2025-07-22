@@ -9,19 +9,19 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * A layout with one column that supports Kingly configuration.
  */
 #[Layout(
-  id: "kingly_onecol",
-  label: new TranslatableMarkup("One column"),
-  category: new TranslatableMarkup("Kingly"),
-  template: "layout--kingly-onecol",
-  library: "kingly_layouts/kingly_layout_one_column",
+  id: 'kl_one_column',
+  label: new TranslatableMarkup('One column'),
+  category: new TranslatableMarkup('Kingly'),
+  template: 'layout--kl-one-column',
+  library: 'kingly_layouts/kl_layout_one_column',
   regions: [
-    "content" => [
-      "label" => new TranslatableMarkup("Content"),
+    'content' => [
+      'label' => new TranslatableMarkup('Content'),
     ],
   ],
-  default_region: "content"
+  default_region: 'content'
 )]
-class KinglyOneColumnLayout extends KinglyLayoutBase {
+class KlOneColumnLayout extends KinglyLayoutBase {
 
   /**
    * {@inheritdoc}

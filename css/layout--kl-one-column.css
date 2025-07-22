@@ -1,0 +1,26 @@
+/*
+* @file
+* Provides the layout styles for kl_one_column.
+  */
+.layout--kl_one_column--100 {
+  /*
+  * By setting display to grid, we ensure this layout behaves consistently
+  * with other multi-column layouts in the system.
+  * The alignment and gap utilities from kingly-utilities.css will apply
+  * correctly to this grid container.
+    */
+  display: grid;
+  /*
+* We explicitly define a single column track that takes up all available
+* space (1 fraction). This ensures the single region within this layout
+* spans the full width of the container.
+  */
+  grid-template-columns: 1fr;
+}
+
+/*
+Note on .layout__region styles:
+No specific styling is needed for the region itself for layout purposes.
+The parent grid container (.kl-one-column) controls the width
+and positioning of its direct children (the regions).
+*/
