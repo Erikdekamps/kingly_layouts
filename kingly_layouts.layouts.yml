@@ -1,10 +1,10 @@
-kingly_onecol:
+kl_one_column:
   label: 'One column'
   category: 'Kingly'
   path: templates
-  template: layout--kingly-onecol
-  library: kingly_layouts/kingly_layout_one_column
-  class: '\Drupal\kingly_layouts\Plugin\Layout\KinglyOneColumnLayout'
+  template: layout--kl-one-column
+  library: kingly_layouts/kl_layout_one_column
+  class: '\Drupal\kingly_layouts\Plugin\Layout\KlOneColumnLayout'
   default_region: content
   icon_map:
     - [ content ]
@@ -12,13 +12,13 @@ kingly_onecol:
     content:
       label: Content
 
-kingly_twocol:
+kl_two_column:
   label: 'Two column'
   category: 'Kingly'
   path: templates
-  template: layout--kingly-twocol
-  library: kingly_layouts/kingly_layout_two_column
-  class: '\Drupal\kingly_layouts\Plugin\Layout\KinglyTwoColumnLayout'
+  template: layout--kl-two-column
+  library: kingly_layouts/kl_layout_two_column
+  class: '\Drupal\kingly_layouts\Plugin\Layout\KlTwoColumnLayout'
   default_region: first
   icon_map:
     - [ first, second ]
@@ -28,13 +28,13 @@ kingly_twocol:
     second:
       label: Second
 
-kingly_threecol:
+kl_three_column:
   label: 'Three column'
   category: 'Kingly'
   path: templates
-  template: layout--kingly-threecol
-  library: kingly_layouts/kingly_layout_three_column
-  class: '\Drupal\kingly_layouts\Plugin\Layout\KinglyThreeColumnLayout'
+  template: layout--kl-three-column
+  library: kingly_layouts/kl_layout_three_column
+  class: '\Drupal\kingly_layouts\Plugin\Layout\KlThreeColumnLayout'
   default_region: second
   icon_map:
     - [ first, second, third ]
@@ -46,13 +46,13 @@ kingly_threecol:
     third:
       label: Third
 
-kingly_fourcol:
+kl_four_column:
   label: 'Four column'
   category: 'Kingly'
   path: templates
-  template: layout--kingly-fourcol
-  library: kingly_layouts/kingly_layout_four_column
-  class: '\Drupal\kingly_layouts\Plugin\Layout\KinglyFourColumnLayout'
+  template: layout--kl-four-column
+  library: kingly_layouts/kl_layout_four_column
+  class: '\Drupal\kingly_layouts\Plugin\Layout\KlFourColumnLayout'
   default_region: first
   icon_map:
     - [ first, second, third, fourth ]

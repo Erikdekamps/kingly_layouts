@@ -9,22 +9,22 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Two column layout with sizing options.
  */
 #[Layout(
-  id: "kingly_twocol",
-  label: new TranslatableMarkup("Two column"),
-  category: new TranslatableMarkup("Kingly"),
-  template: "layout--kingly-twocol",
-  library: "kingly_layouts/kingly_twocol",
+  id: 'kl_two_column',
+  label: new TranslatableMarkup('Two column'),
+  category: new TranslatableMarkup('Kingly'),
+  template: 'layout--kl-two-column',
+  library: 'kingly_layouts/kl_layout_two_column',
   regions: [
-    "first" => [
-      "label" => new TranslatableMarkup("First"),
+    'first' => [
+      'label' => new TranslatableMarkup('First'),
     ],
-    "second" => [
-      "label" => new TranslatableMarkup("Second"),
+    'second' => [
+      'label' => new TranslatableMarkup('Second'),
     ],
   ],
-  default_region: "first"
+  default_region: 'first'
 )]
-class KinglyTwoColumnLayout extends KinglyLayoutBase {
+class KlTwoColumnLayout extends KinglyLayoutBase {
 
   /**
    * {@inheritdoc}
