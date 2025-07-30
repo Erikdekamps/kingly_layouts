@@ -5,19 +5,19 @@
 */
 
 /* Vertical Alignment (align-content) */
-.kl-align-content-flex-start {
+.kl-align-content-flex-start .layout__region {
   align-content: flex-start;
 }
-.kl-align-content-center {
+.kl-align-content-center .layout__region {
   align-content: center;
 }
-.kl-align-content-flex-end {
+.kl-align-content-flex-end .layout__region {
   align-content: flex-end;
 }
-.kl-align-content-stretch {
+.kl-align-content-stretch .layout__region {
   align-content: stretch;
 }
-.kl-align-content-baseline {
+.kl-align-content-baseline .layout__region {
   align-content: baseline;
 }
 
